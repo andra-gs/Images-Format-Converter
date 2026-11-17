@@ -5,7 +5,7 @@ The project will be developed in phases. Complete and test a phase before treati
 ## Phase 0: Project foundation
 
 Tasks:
-- [ ] Create GitHub repository.
+- [x] Create GitHub repository.
 - [ ] Initialize Vite with Vanilla JavaScript.
 - [ ] Add initial package scripts.
 - [ ] Create a maintainable source structure.
