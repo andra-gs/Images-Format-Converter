@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Browser Image Decoder Test</title>
+    <link rel="stylesheet" href="./browser-decoder.css" />
+  </head>
+  <body>
+    <main class="test-page">
+      <a class="back-link" href="/">← Back to Images Format Converter</a>
+      <header>
+        <p class="eyebrow">Development test</p>
+        <h1>Browser Image Decoder</h1>
+        <p class="description">
+          Select real PNG, JPEG, WebP, or BMP files. This page tests browser decoding only.
+          Files stay in your browser and are not uploaded.
+        </p>
+      </header>
+
+      <section class="test-panel" aria-labelledby="input-title">
+        <h2 id="input-title">Choose image files</h2>
+        <input
+          id="decoder-file-input"
+          type="file"
+          accept="image/png,image/jpeg,image/webp,image/bmp,.bmp"
+          multiple
+        />
+        <p class="hint">Use valid image files. Try one file from each supported format.</p>
+      </section>
+
+      <section class="results-panel" aria-labelledby="results-title">
+        <div class="results-heading">
+          <h2 id="results-title">Test results</h2>
+          <button id="clear-results" type="button">Clear results</button>
+        </div>
+        <p id="empty-state" class="empty-state">No files tested yet.</p>
+        <ul id="decoder-results" class="results-list" aria-live="polite"></ul>
+      </section>
+    </main>
+    <script type="module" src="./browser-decoder.js"></script>
+  </body>
+</html>
