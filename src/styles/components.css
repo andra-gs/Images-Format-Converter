@@ -339,6 +339,11 @@
   font-size: 0.84rem;
 }
 
+.field-group select option {
+  padding: 10px 14px;
+  line-height: 1.5;
+}
+
 .field-group select:focus-visible,
 .field-group input:focus-visible {
   outline: 2px solid var(--color-accent);
