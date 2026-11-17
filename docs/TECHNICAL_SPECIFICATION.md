@@ -65,7 +65,8 @@ Images-Format-Converter/
 │           ├── format-detector.js
 │           └── capability-registry.js
 ├── tests/
-│   └── capability-registry.test.js
+│   ├── capability-registry.test.js
+│   └── image-decoder.test.js
 ├── docs/
 ├── .github/
 ├── index.html
@@ -126,7 +127,11 @@ Each queue item should fail independently where possible.
 
 Consider file size, extension and MIME hints, actual decoder support, dimensions and pixel count, corrupt input, and format-specific constraints. Do not trust extension or MIME type alone. A small compressed file can decode into a large image.
 
-## 8. Conversion settings
+## 8. Browser image decoder
+
+The initial browser decoder module handles PNG, JPEG, WebP, and BMP through `createImageBitmap()` when available, with an `HTMLImageElement` and Object URL fallback. It returns a common result containing the decoded source, width, height, detected format, and a `close()` method. Callers must close the result after processing to release the ImageBitmap or Object URL. SVG, GIF, TIFF, HEIC, and HEIF remain outside this decoder's scope. Do not mark decoding as supported in the capability registry until real image fixtures pass in target browsers.
+
+## 9. Conversion settings
 
 - Output format.
 - Quality for supported lossy encoders.
@@ -137,7 +142,7 @@ Consider file size, extension and MIME hints, actual decoder support, dimensions
 
 Quality controls must be format-aware. PNG must not be presented as if its quality slider behaves like JPEG quality.
 
-## 9. Conversion result
+## 10. Conversion result
 
 Show original and output filename/format, file sizes, dimensions, status, preview, and download action.
 
@@ -147,18 +152,18 @@ savingsPercent = ((originalSize - outputSize) / originalSize) * 100
 
 A negative value means the output is larger. Display that honestly.
 
-## 10. Browser compatibility
+## 11. Browser compatibility
 
 Target Chrome, Edge, Firefox, and Safari. Feature-detect Canvas encoding, OffscreenCanvas, worker support, and decoding capabilities.
 
-## 11. Resource management
+## 12. Resource management
 
 Revoke Object URLs, close ImageBitmap instances, release workers and large references, limit concurrency, handle cancellation, and avoid retaining duplicate image data longer than necessary.
 
-## 12. Testing requirements
+## 13. Testing requirements
 
 Test PNG/JPEG/WebP paths, transparency to JPEG with a selected background, corrupt and unsupported inputs, multiple files with independent failures, large dimensions, output MIME type, reopening generated files, ZIP integrity, themes, responsive layout, SVG safety, and format-specific HEIC/TIFF/GIF fixtures when those phases begin.
 
-## 13. Definition of Done
+## 14. Definition of Done
 
 A feature is complete when it matches the agreed behavior, handles errors, passes relevant tests, preserves local processing, releases temporary resources, and has appropriate documentation.
