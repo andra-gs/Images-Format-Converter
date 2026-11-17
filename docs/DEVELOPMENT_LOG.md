@@ -33,6 +33,38 @@ This file records actual repository progress. Update it after meaningful impleme
 
 Add newest entries first.
 
+### 2026-11-17 - Phase 1 initial workspace UI
+- Status: Implemented, local validation pending
+- Changes:
+  - Replaced the foundation placeholder with the initial converter workspace.
+  - Added application branding, privacy messaging, hero section, and upload workspace.
+  - Added file picker and drag-and-drop selection for multiple image files.
+  - Added image preview thumbnails, file size/type details, duplicate filtering, per-file removal, and clear-all behavior.
+  - Added light/dark theme switching with preference persistence in localStorage.
+  - Added responsive layout and keyboard activation for the dropzone.
+  - Kept conversion controls out of this iteration because the conversion engine belongs to Phase 2.
+- Files changed:
+  - `index.html`
+  - `src/js/main.js`
+  - `src/styles/variables.css`
+  - `src/styles/layout.css`
+  - `src/styles/components.css`
+  - `src/styles/themes.css`
+- Tests performed:
+  - Reviewed the updated source and confirmed all changes were committed to `main`.
+  - No local browser interaction or production build was run by the assistant.
+- Test results:
+  - Implementation is present in the repository.
+  - Local validation is still required for file selection, drag-and-drop, theme persistence, responsive layout, and production build.
+- Known issues:
+  - Conversion settings, conversion execution, and result downloads are not implemented yet.
+  - Unsupported or malformed image files may still fail at preview time; deeper validation belongs to Phase 2.
+- Next steps:
+  - Pull the latest `main`.
+  - Run `npm run build`.
+  - Test file selection, drag-and-drop, removal, clear-all, and theme persistence in the browser.
+  - Fix any issues found before proceeding to conversion settings and engine work.
+
 ### 2026-11-17 - Phase 0 foundation implementation
 - Status: In progress
 - Decisions confirmed:
