@@ -5,7 +5,7 @@ This file records actual repository progress. Update it after meaningful impleme
 ## Project status
 
 - Current stage: Phase 1 - UI development
-- Current phase status: In progress
+- Current phase status: Implemented, pending browser verification of the latest settings/results UI
 - Latest release: None
 - Last updated: 2026-11-17
 
@@ -21,8 +21,8 @@ This file records actual repository progress. Update it after meaningful impleme
 
 | Phase | Status | Notes |
 |---|---|---|
-| Phase 0: Project foundation | In progress | Local application runs after a fresh clone; production build verification still needs explicit confirmation |
-| Phase 1: UI development | In progress | Initial workspace and file-selection interactions implemented and manually verified by the user; settings and results remain |
+| Phase 0: Project foundation | Tested, with one documentation check open | User confirmed localhost works and `npm run build` succeeds; package-lock commit status remains unconfirmed |
+| Phase 1: UI development | Implemented, pending latest UI verification | Upload workspace was manually verified; settings and results interface has now been added |
 | Phase 2: Core conversion engine | Not started | Initial raster conversion |
 | Phase 3: Batch processing | Not started | Workers, queue, ZIP |
 | Phase 4: Advanced formats | Not started | HEIC, TIFF, SVG, GIF |
@@ -32,6 +32,35 @@ This file records actual repository progress. Update it after meaningful impleme
 ## Change log
 
 Add newest entries first.
+
+### 2026-11-17 - Conversion settings and results interface
+- Status: Implemented
+- Changes:
+  - Added a conversion settings panel that appears after at least one image is selected.
+  - Added output format choices for PNG, JPEG, WebP, and BMP as planned core output targets.
+  - Added a quality slider for JPEG and WebP selections, with a live percentage value.
+  - Added a disabled Convert images button and clear notice that conversion is not active yet.
+  - Added a conversion results panel with an honest empty state. No fake result cards or download actions are shown.
+  - Kept settings and results hidden when the file queue is empty.
+  - Added responsive styling for the new panels and controls.
+- Files changed:
+  - `index.html`
+  - `src/js/main.js`
+  - `src/styles/components.css`
+  - `docs/DEVELOPMENT_ROADMAP.md`
+  - `docs/DEVELOPMENT_LOG.md`
+- Tests performed:
+  - Reviewed the source changes and confirmed the settings UI is only a preview; no conversion operation is triggered.
+  - Browser interaction and production build for this latest update have not yet been tested by the user.
+- Test results:
+  - Implementation is committed to `main`.
+  - Manual verification remains pending.
+- Known issues:
+  - Format options represent planned output targets and do not imply that conversion is already supported.
+  - The Convert images button remains disabled until the Phase 2 conversion engine exists.
+- Next steps:
+  - Pull the latest `main` and verify the new controls, visibility, and responsive layout.
+  - Then begin Phase 2 with file validation, format capability detection, and browser image decoding.
 
 ### 2026-11-17 - Phase 1 workspace UI verification
 - Status: Tested for the user-reported interactions
@@ -44,13 +73,15 @@ Add newest entries first.
   - Switched between light and dark themes.
   - Refreshed the page and confirmed the selected theme persisted.
   - Checked the mobile layout and reported no visible issues.
+  - Navigated the interface with keyboard controls.
+  - Confirmed Enter/Space opens the file picker from the upload area.
+  - Ran `npm run build`; Vite transformed 2,102 modules and completed the production build in 18.18 seconds.
 - Test results:
-  - All eight user-reported checks passed.
-  - Production build status was not explicitly reported and remains unconfirmed.
+  - All user-reported checks passed for the version tested before the latest settings/results UI update.
+  - The latest settings/results UI still requires a separate browser check.
 - Next steps:
-  - Verify keyboard accessibility for the upload area.
-  - Confirm `npm run build` succeeds.
-  - Continue with the conversion settings and results UI after these checks.
+  - Verify the latest settings and results UI.
+  - Begin Phase 2 core conversion after the UI check.
 
 ### 2026-11-17 - Phase 1 initial workspace UI
 - Status: Implemented
@@ -73,14 +104,13 @@ Add newest entries first.
   - Reviewed the updated source and confirmed all changes were committed to `main`.
   - No local browser interaction or production build was run by the assistant.
 - Test results:
-  - The user later manually verified file selection, drag-and-drop, previews, removal, clear-all, theme switching, theme persistence, and mobile layout. All eight checks passed.
-  - Production build verification remains unconfirmed.
+  - The user later manually verified file selection, drag-and-drop, previews, removal, clear-all, theme switching, theme persistence, mobile layout, keyboard navigation, and production build. All reported checks passed for the version tested.
 - Known issues:
-  - Conversion settings, conversion execution, and result downloads are not implemented yet.
+  - Conversion execution and result downloads are not implemented yet.
   - Unsupported or malformed image files may still fail at preview time; deeper validation belongs to Phase 2.
 - Next steps:
-  - Verify keyboard accessibility and the production build.
-  - Continue with conversion settings and results UI.
+  - Finish the settings and results interface.
+  - Begin core conversion after UI verification.
 
 ### 2026-11-17 - Phase 0 foundation implementation
 - Status: In progress
