@@ -5,7 +5,7 @@ This file records actual repository progress. Update it after meaningful impleme
 ## Project status
 
 - Current stage: Phase 1 - UI development
-- Current phase status: Implemented, user-verified; select option spacing adjustment pending user visual confirmation
+- Current phase status: UI implemented and user-verified; custom format dropdown and startup skeleton implemented, pending user verification
 - Latest release: None
 - Last updated: 2026-11-17
 
@@ -32,6 +32,33 @@ This file records actual repository progress. Update it after meaningful impleme
 ## Change log
 
 Add newest entries first.
+
+### 2026-11-17 - Custom output dropdown and startup skeleton
+- Status: Implemented, pending user verification
+- Changes:
+  - Replaced the native output-format select with a custom listbox dropdown so option padding, spacing, hover, focus, and selected states are controlled by the application CSS.
+  - Added keyboard interaction for the custom dropdown: Arrow Up/Down, Home, End, Enter, Space, and Escape.
+  - Added outside-click handling to close the dropdown.
+  - Added an initial skeleton screen with inline critical styling in the document head.
+  - Kept the application root hidden until the Vite CSS module has loaded and the initial JavaScript setup has completed, preventing the unstyled page flash.
+  - Added reduced-motion handling to the skeleton shimmer.
+- Files changed:
+  - `index.html`
+  - `src/js/main.js`
+  - `src/styles/components.css`
+  - `docs/DEVELOPMENT_LOG.md`
+- Tests performed:
+  - Reviewed markup, event handling, focus behavior, startup visibility sequence, and CSS changes.
+- Test results:
+  - Changes committed to `main`.
+  - Browser interaction and production build have not yet been verified by the user.
+- Known issues:
+  - Startup skeleton is removed when the application module initializes. A JavaScript loading failure will leave the skeleton visible rather than exposing an unstyled application.
+- Next steps:
+  - Verify custom dropdown spacing, mouse selection, keyboard controls, and outside-click close.
+  - Reload the page with cache disabled and confirm the skeleton appears without an unstyled flash.
+  - Run `npm run build`.
+
 
 ### 2026-11-17 - Output format option spacing adjustment
 - Status: Implemented, pending visual confirmation
