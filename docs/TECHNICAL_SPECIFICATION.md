@@ -67,7 +67,10 @@ Images-Format-Converter/
 │           └── image-decoder.js
 ├── tests/
 │   ├── capability-registry.test.js
-│   └── image-decoder.test.js
+│   ├── image-decoder.test.js
+│   ├── browser-decoder.html
+│   ├── browser-decoder.css
+│   └── browser-decoder.js
 ├── docs/
 ├── .github/
 ├── index.html
