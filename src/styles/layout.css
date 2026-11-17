@@ -1,24 +1,34 @@
+#app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
 .app-header,
 .app-footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: min(var(--content-width), calc(100% - 48px));
+  width: min(var(--content-width), calc(100% - 64px));
   margin-inline: auto;
 }
 
 .app-header {
-  min-height: 84px;
+  min-height: 78px;
   border-bottom: 1px solid var(--color-border);
 }
 
 .brand {
   display: inline-flex;
   align-items: center;
-  gap: 12px;
-  font-size: 0.98rem;
-  font-weight: 700;
-  letter-spacing: -0.025em;
+  gap: 11px;
+  font-size: 0.96rem;
+  font-weight: 650;
+  letter-spacing: -0.035em;
+}
+
+.brand strong {
+  font-weight: 800;
 }
 
 .brand-icon {
@@ -26,8 +36,8 @@
   width: 38px;
   height: 38px;
   place-items: center;
-  color: var(--color-accent);
-  background: var(--color-accent-soft);
+  color: white;
+  background: var(--color-accent);
   border-radius: 12px;
 }
 
@@ -36,44 +46,80 @@
   height: 21px;
 }
 
-.header-note,
-.app-footer {
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.privacy-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   color: var(--color-muted);
-  font-size: 0.82rem;
+  font-size: 0.8rem;
+  font-weight: 550;
+}
+
+.privacy-label svg {
+  width: 16px;
+  height: 16px;
+  color: #16a34a;
 }
 
 .main-content {
-  display: grid;
-  min-height: calc(100vh - 145px);
-  padding: 72px 24px;
-  place-items: center;
+  width: min(var(--content-width), calc(100% - 64px));
+  flex: 1;
+  margin-inline: auto;
+  padding: 62px 0 56px;
 }
 
-.welcome-panel {
-  width: min(720px, 100%);
-  padding: clamp(28px, 6vw, 64px);
+.hero {
+  max-width: 680px;
+  margin: 0 auto 42px;
+  text-align: center;
+}
+
+.workspace {
+  width: min(760px, 100%);
+  margin-inline: auto;
 }
 
 .app-footer {
-  min-height: 60px;
+  min-height: 64px;
   border-top: 1px solid var(--color-border);
+  color: var(--color-muted);
+  font-size: 0.78rem;
 }
 
-@media (max-width: 560px) {
+@media (max-width: 640px) {
   .app-header,
-  .app-footer {
-    width: calc(100% - 32px);
+  .app-footer,
+  .main-content {
+    width: calc(100% - 36px);
   }
 
-  .header-note {
+  .app-header {
+    min-height: 70px;
+  }
+
+  .brand-name {
+    font-size: 0.84rem;
+  }
+
+  .privacy-label {
     display: none;
   }
 
   .main-content {
-    padding: 40px 16px;
+    padding: 48px 0 40px;
+  }
+
+  .hero {
+    margin-bottom: 32px;
   }
 
   .app-footer {
-    font-size: 0.72rem;
+    font-size: 0.7rem;
   }
 }
