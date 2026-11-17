@@ -12,7 +12,7 @@ Tasks:
 - [x] Add base CSS variables and reset.
 - [x] Decide styling approach: plain CSS.
 - [x] Add Lucide through NPM.
-- [ ] Install dependencies and confirm package-lock.json is committed.
+- [x] Install dependencies and confirm package-lock.json is committed (verified in the GitHub repository).
 - [x] Confirm the application runs on localhost (user-confirmed).
 - [x] Verify the production build with `npm run build` (user-confirmed on 2026-11-17).
 
@@ -35,12 +35,12 @@ Tasks:
 - [x] Light theme.
 - [x] Dark theme.
 - [x] Theme persistence preference, if implemented.
-- [x] Responsive desktop and mobile layouts (initial workspace tested; latest panels pending).
+- [x] Responsive desktop and mobile layouts (user-confirmed).
 - [x] Basic accessibility and keyboard interaction (user-confirmed).
 - [x] Verify settings/results visibility and custom format selection on desktop and mobile (user-confirmed).
 - [x] Verify quality slider visibility and value updates (user-confirmed).
 - [x] Verify custom dropdown mouse and keyboard interactions (user-confirmed).
-- [x] Verify startup skeleton appears and no unstyled flash occurs (user-confirmed; theme matching fix is a separate follow-up).
+- [x] Verify startup skeleton appears, follows light/dark theme, and no unstyled flash occurs (user-confirmed).
 - [x] Verify both panels disappear after clearing the file queue (user-confirmed).
 - [x] Run a fresh production build after the latest UI changes (user-confirmed).
 
@@ -49,8 +49,9 @@ Deliverable: complete interface with file-selection and conversion-settings cont
 ## Phase 2: Core conversion engine (MVP)
 
 Tasks:
-- [ ] File validation.
-- [ ] Format detection and capability registry.
+- [ ] File validation (implemented; manual verification pending).
+- [ ] Image format signature detection (implemented; manual verification pending).
+- [ ] Capability registry separating input decoding from output encoding.
 - [ ] Browser image decoding.
 - [ ] PNG output.
 - [ ] JPEG output.
