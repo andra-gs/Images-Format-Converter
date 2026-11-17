@@ -6,14 +6,15 @@ The project will be developed in phases. Complete and test a phase before treati
 
 Tasks:
 - [x] Create GitHub repository.
-- [ ] Initialize Vite with Vanilla JavaScript.
-- [ ] Add initial package scripts.
-- [ ] Create a maintainable source structure.
-- [ ] Add base CSS variables and reset.
-- [ ] Decide whether Tailwind CSS is needed; plain CSS remains acceptable.
-- [ ] Add Lucide icons.
-- [x] Add README and project documentation.
+- [x] Initialize Vite with Vanilla JavaScript.
+- [x] Add initial package scripts.
+- [x] Create a maintainable initial source structure.
+- [x] Add base CSS variables and reset.
+- [x] Decide styling approach: plain CSS.
+- [x] Add Lucide through NPM.
+- [ ] Install dependencies and generate package-lock.json.
 - [ ] Confirm the application runs on localhost.
+- [ ] Verify the production build.
 
 Deliverable: a working project skeleton.
 
@@ -35,7 +36,7 @@ Tasks:
 - [ ] Responsive desktop and mobile layouts.
 - [ ] Basic accessibility and keyboard interaction.
 
-Deliverable: complete interface with basic file-selection interactions. Conversion may still be mocked only in clearly identified development UI; do not present mock conversion as working functionality.
+Deliverable: complete interface with basic file-selection interactions. Conversion may be mocked only in clearly identified development UI.
 
 ## Phase 2: Core conversion engine (MVP)
 
@@ -52,7 +53,7 @@ Tasks:
 - [ ] Individual download.
 - [ ] Error messages and status updates.
 
-Deliverable: reliable local conversion for the formats implemented and tested in this phase.
+Deliverable: reliable local conversion for implemented and tested formats.
 
 ## Phase 3: Batch processing
 
@@ -84,7 +85,7 @@ Tasks:
 - [ ] Implement animated GIF frame/timing handling if feasible.
 - [ ] Add format-specific error messages and compatibility notes.
 
-Deliverable: tested advanced-format pipelines. Do not claim full support for variants that have not been tested.
+Deliverable: tested advanced-format pipelines. Do not claim untested variants are supported.
 
 ## Phase 5: Image manipulation
 
@@ -147,4 +148,4 @@ Deliverable: documented and tested GitHub release.
 
 ## Completion policy
 
-Do not mark a phase complete based on UI appearance alone. A feature must work with real files and pass relevant tests. Update `DEVELOPMENT_LOG.md` as work progresses.
+Do not mark a phase complete based on appearance alone. A feature must work with real files and pass relevant tests. Update `DEVELOPMENT_LOG.md` as work progresses.
