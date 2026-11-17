@@ -3,10 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <style>
-      html, body { margin: 0; min-height: 100%; background: #f7f8fa; }
+      :root { color-scheme: light; --boot-bg: #f7f8fa; --boot-base: #e8ebf1; --boot-highlight: #f4f5f8; }
+      :root[data-theme="dark"] { color-scheme: dark; --boot-bg: #0d111b; --boot-base: #202a3a; --boot-highlight: #2b374b; }
+      html, body { margin: 0; min-height: 100%; background: var(--boot-bg); }
       #app { visibility: hidden; }
-      #boot-splash { min-height: 100vh; box-sizing: border-box; padding: 28px 6vw; display: grid; align-content: start; gap: 24px; font-family: Inter, system-ui, sans-serif; }
-      .boot-bar, .boot-block { background: linear-gradient(90deg, #e8ebf1 25%, #f4f5f8 38%, #e8ebf1 63%); background-size: 400% 100%; animation: boot-shimmer 1.4s ease infinite; border-radius: 12px; }
+      #boot-splash { min-height: 100vh; box-sizing: border-box; padding: 28px 6vw; display: grid; align-content: start; gap: 24px; background: var(--boot-bg); font-family: Inter, system-ui, sans-serif; }
+      .boot-bar, .boot-block { background: linear-gradient(90deg, var(--boot-base) 25%, var(--boot-highlight) 38%, var(--boot-base) 63%); background-size: 400% 100%; animation: boot-shimmer 1.4s ease infinite; border-radius: 12px; }
       .boot-bar { height: 42px; max-width: 240px; }
       .boot-hero { height: 150px; max-width: 620px; width: 100%; margin: 20px auto 0; }
       .boot-panel { height: 260px; max-width: 760px; width: 100%; margin: 0 auto; }
@@ -16,6 +18,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Convert image formats locally in your browser. Your files stay on your device." />
     <meta name="theme-color" content="#f7f8fa" />
+    <script>
+      (() => {
+        let theme = "light";
+        try {
+          const savedTheme = localStorage.getItem("ifc-theme");
+          theme = savedTheme || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+        } catch {
+          theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        }
+        document.documentElement.dataset.theme = theme;
+        document.querySelector('meta[name="theme-color"]')?.setAttribute("content", theme === "dark" ? "#0d111b" : "#f7f8fa");
+      })();
+    </script>
     <title>Images Format Converter</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   </head>
