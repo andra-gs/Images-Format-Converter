@@ -2,8 +2,8 @@
 
 A local-first image format conversion web application. Users clone this repository, install its dependencies, and run the application on localhost. Image files are processed in the user's browser and are not uploaded to a remote server.
 
-> Project status: Planning / pre-development  
-> Initial development approach: Vanilla JavaScript + Vite  
+> Project status: Planning / Phase 0 - Project Foundation
+> Initial development approach: Vanilla JavaScript + Vite
 > Architecture: Client-side, modular, hybrid processing
 
 ## Project goals
@@ -35,7 +35,7 @@ Special cases:
 | Area | Planned technology |
 |---|---|
 | Markup | HTML5 |
-| Styling | CSS3, with Tailwind CSS only if adopted during setup |
+| Styling | CSS3; Tailwind CSS only if adopted during setup |
 | Language | Vanilla JavaScript (ES modules, modern JavaScript) |
 | Development/build | Vite |
 | Standard image processing | Canvas API, ImageBitmap |
@@ -50,11 +50,11 @@ No backend, database, cloud storage, or remote image-processing API is planned f
 
 ## Run locally
 
-The commands below apply after the Vite project and `package.json` scripts have been created:
+The following commands will apply once the Vite application skeleton and its `package.json` scripts have been created:
 
 ```bash
-git clone https://github.com/USERNAME/images-format-converter.git
-cd images-format-converter
+git clone https://github.com/andra-gs/Images-Format-Converter.git
+cd Images-Format-Converter
 npm install
 npm run dev
 ```
@@ -65,8 +65,6 @@ Production build:
 npm run build
 npm run preview
 ```
-
-Replace `USERNAME` with the actual GitHub account or organization and adjust the repository URL if its name changes.
 
 ## Documentation
 
@@ -90,4 +88,4 @@ Replace `USERNAME` with the actual GitHub account or organization and adjust the
 
 ## Project status
 
-The project is currently at the planning stage. No feature should be marked as implemented until it exists in the repository and has been tested.
+The repository currently contains project documentation only. Phase 0 is in progress. The application skeleton has not yet been created, and no conversion feature is implemented.
