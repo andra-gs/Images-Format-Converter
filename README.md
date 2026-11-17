@@ -2,10 +2,23 @@
 
 A local-first image format conversion web application. Image files are processed in the user's browser and are not uploaded to a remote server.
 
-> Project status: Phase 0 - Project Foundation (implementation started)
+> Project status: Phase 2 - Core conversion engine (in progress)
 > Stack: Vanilla JavaScript + Vite + plain CSS
 > Icons: Lucide via NPM
 > Architecture: Client-side, modular, hybrid processing
+
+## Current implementation
+
+The current interface includes:
+
+- File selection through the file picker and drag-and-drop.
+- A selected-file queue with image previews, file details, individual removal, and clear-all behavior.
+- Light and dark themes with saved preference.
+- Conversion settings UI for PNG, JPEG, WebP, and BMP. These are interface options only until the matching encoder is implemented and tested.
+- Startup skeleton that follows the selected theme and prevents an unstyled-content flash.
+- Initial file validation and image-format signature detection. These checks identify recognized image file contents; they do not prove that every format can be decoded or converted in the current browser.
+
+The conversion engine, output generation, and downloads are not available yet. The Convert button remains disabled.
 
 ## Project goals
 
@@ -65,10 +78,6 @@ Production build and preview:
 npm run build
 npm run preview
 ```
-
-## Current foundation
-
-The repository now contains the root Vite entry point, Vite configuration, NPM scripts, JavaScript entry point, base CSS files, and favicon. The current page is a foundation screen only. Image upload and conversion are not implemented.
 
 ## Documentation
 
