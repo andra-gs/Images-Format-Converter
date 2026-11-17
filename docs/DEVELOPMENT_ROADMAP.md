@@ -51,7 +51,7 @@ Deliverable: complete interface with file-selection and conversion-settings cont
 Tasks:
 - [ ] File validation (implemented; manual verification pending).
 - [ ] Image format signature detection (implemented; manual verification pending).
-- [ ] Capability registry separating input decoding from output encoding.
+- [x] Capability registry separating input decoding from output encoding (implemented; automated tests added, execution pending).
 - [ ] Browser image decoding.
 - [ ] PNG output.
 - [ ] JPEG output.
