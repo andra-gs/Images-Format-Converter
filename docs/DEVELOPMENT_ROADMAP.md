@@ -12,7 +12,7 @@ Tasks:
 - [ ] Add base CSS variables and reset.
 - [ ] Decide whether Tailwind CSS is needed; plain CSS remains acceptable.
 - [ ] Add Lucide icons.
-- [ ] Add README and project documentation.
+- [x] Add README and project documentation.
 - [ ] Confirm the application runs on localhost.
 
 Deliverable: a working project skeleton.
