@@ -5,9 +5,9 @@ This file records actual repository progress. Update it after meaningful impleme
 ## Project status
 
 - Current stage: Phase 2 - Core conversion engine
-- Current phase status: Phase 2 in progress; file validation, signature detection, and capability registry implemented; manual and automated test execution pending
+- Current phase status: Phase 2 in progress; file validation, signature detection, and capability registry implemented; registry tests and build confirmed by user; browser decoder module added, real-browser verification pending
 - Latest release: None
-- Last updated: 2026-11-17
+- Last updated: 2026-11-18
 
 ## Status legend
 
@@ -23,7 +23,7 @@ This file records actual repository progress. Update it after meaningful impleme
 |---|---|---|
 | Phase 0: Project foundation | Tested | User confirmed localhost works and `npm run build` succeeds; `package-lock.json` is present in the GitHub repository |
 | Phase 1: UI development | Tested | User confirmed the skeleton follows light/dark themes, theme persists after refresh, no unstyled flash appears, and `npm run build` succeeds |
-| Phase 2: Core conversion engine | In progress | File validation and signature-based format detection implemented; manual verification pending |
+| Phase 2: Core conversion engine | In progress | Capability registry tests and build confirmed by user; browser decoder module added; real-file verification pending |
 | Phase 3: Batch processing | Not started | Workers, queue, ZIP |
 | Phase 4: Advanced formats | Not started | HEIC, TIFF, SVG, GIF |
 | Phase 5: Image manipulation | Not started | Resize, compression, metadata |
@@ -33,9 +33,43 @@ This file records actual repository progress. Update it after meaningful impleme
 
 Add newest entries first.
 
+### 2026-11-18 - Initial browser image decoder
+
+- Status: Implemented; real-browser verification pending
+- Changes:
+  - Added `image-decoder.js` for the initial raster formats: PNG, JPEG, WebP, and BMP.
+  - Uses `createImageBitmap()` when available and falls back to `HTMLImageElement` with an Object URL.
+  - Returns a consistent result containing the decoded source, width, height, format, and a `close()` cleanup method.
+  - Validates decoded dimensions and releases an invalid ImageBitmap if decoding returns unusable dimensions.
+  - Rejects formats outside this module's scope. SVG, GIF, TIFF, HEIC, and HEIF remain separate work.
+  - Kept decoding capability status as planned until real image fixtures are verified in target browsers.
+  - Added unit tests for the ImageBitmap path, HTML image fallback, unsupported formats, invalid/empty inputs, invalid dimensions, and resource cleanup.
+- Files changed:
+  - `src/js/core/image-decoder.js`
+  - `tests/image-decoder.test.js`
+  - `src/js/core/capability-registry.js`
+  - `docs/TECHNICAL_SPECIFICATION.md`
+  - `docs/DEVELOPMENT_ROADMAP.md`
+  - `docs/DEVELOPMENT_LOG.md`
+- Tests performed:
+  - Ran the five image-decoder unit tests in an isolated Node.js environment using mocked browser APIs.
+- Test results:
+  - All five decoder unit tests passed in the isolated test environment.
+  - The user had already confirmed that the existing `npm test` suite and `npm run build` passed before this decoder addition.
+  - The complete test suite and production build must be rerun after pulling this latest commit.
+  - Real PNG, JPEG, WebP, and BMP files still need browser verification.
+- Known issues:
+  - The decoder is not yet connected to the conversion UI.
+  - Browser support can vary. The capability registry must remain unchanged until real-file tests pass.
+- Next steps:
+  - Run `npm test` and `npm run build` after pulling.
+  - Test decoding with real PNG, JPEG, WebP, and BMP files in the browser.
+  - Confirm reported dimensions and check that failed decodes show a useful error.
+  - Only then mark verified formats as decodable and connect the decoder to the conversion pipeline.
+
 ### 2026-11-17 - Image format capability registry
 
-- Status: Implemented; automated test execution pending
+- Status: Tested; automated tests and production build confirmed by user on 2026-11-18
 - Changes:
   - Added `capability-registry.js` as the single source of truth for recognized formats and their separate detection, decoding, and encoding states.
   - Recorded PNG, JPEG, WebP, BMP, GIF, TIFF, HEIC, HEIF, and SVG as detectable formats.
@@ -57,10 +91,10 @@ Add newest entries first.
 - Tests performed:
   - Added automated tests for detected format definitions, unknown formats, separate decode/encode status, planned output formats, and protection against mutation of internal registry data.
   - Reviewed the committed source and test definitions.
-  - Tests and production build have not been executed in a local project environment by the assistant.
+  - The user ran `npm test` and `npm run build` after pulling the implementation and confirmed that all tests passed and the build succeeded.
 - Test results:
   - Changes committed to `main`.
-  - User should run `npm test` and `npm run build` locally.
+  - All five capability-registry tests passed in the user's environment.
 - Known limitations:
   - The registry describes implementation state. It does not perform actual browser feature detection or image decoding.
   - No input decoder or output encoder is currently marked as implemented.
