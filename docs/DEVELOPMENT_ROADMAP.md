@@ -21,19 +21,19 @@ Deliverable: a working project skeleton.
 ## Phase 1: UI development
 
 Tasks:
-- [ ] Navbar and application branding.
-- [ ] Hero section and local-processing explanation.
+- [x] Navbar and application branding.
+- [x] Hero section and local-processing explanation.
 - [ ] Upload workspace.
-- [ ] File picker interaction.
-- [ ] Drag-and-drop interaction.
-- [ ] File queue layout.
-- [ ] Preview component.
+- [x] File picker interaction.
+- [x] Drag-and-drop interaction.
+- [x] File queue layout.
+- [x] Preview component.
 - [ ] Conversion settings panel.
 - [ ] Results component.
-- [ ] Light theme.
-- [ ] Dark theme.
-- [ ] Theme persistence preference, if implemented.
-- [ ] Responsive desktop and mobile layouts.
+- [x] Light theme.
+- [x] Dark theme.
+- [x] Theme persistence preference, if implemented.
+- [x] Responsive desktop and mobile layouts.
 - [ ] Basic accessibility and keyboard interaction.
 
 Deliverable: complete interface with basic file-selection interactions. Conversion may be mocked only in clearly identified development UI.
