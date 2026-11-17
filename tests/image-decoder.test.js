@@ -129,3 +129,18 @@ test("rejects decoded sources with invalid dimensions and releases them", async 
   );
   assert.equal(closeCalls, 1);
 });
+
+test("detects the input format when the caller does not provide one", async (t) => {
+  const bitmap = { width: 320, height: 240, close() {} };
+  mockGlobal(t, "createImageBitmap", async () => bitmap);
+
+  const pngHeader = new Uint8Array([
+    0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a
+  ]);
+  const result = await decodeImage(new Blob([pngHeader]));
+
+  assert.equal(result.format, "png");
+  assert.equal(result.width, 320);
+  assert.equal(result.height, 240);
+  result.close();
+});
