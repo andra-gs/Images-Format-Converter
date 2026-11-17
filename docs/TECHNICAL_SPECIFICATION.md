@@ -2,156 +2,82 @@
 
 ## 1. Architecture
 
-The application uses a client-side, modular architecture with four conceptual layers.
+The application uses a client-side, modular architecture.
 
 ```text
-Presentation Layer
-  HTML / CSS / UI modules
-          |
-          v
-Application Layer
-  File manager / Queue manager / Conversion controller
-          |
-          v
-Execution Layer
-  Main thread <----> Web Workers
-          |
-          v
-Image Processing Layer
-  Browser APIs / format-specific decoders and encoders
-          |
-          v
-Output Layer
-  Blob / Object URL / download / ZIP
+Presentation: HTML / CSS / UI modules
+        |
+Application: file manager / queue / conversion controller
+        |
+Execution: main thread <----> Web Workers
+        |
+Image processing: browser APIs / format decoders and encoders
+        |
+Output: Blob / Object URL / download / ZIP
 ```
 
 There is no planned backend, database, or remote image-processing service.
 
 ## 2. Main modules
 
-### Presentation
-Responsible for rendering and interaction:
-- Uploader
-- File queue
-- Preview
-- Conversion settings
-- Results
-- Theme controls
-- Notifications and error messages
+- Presentation: uploader, queue, preview, settings, results, themes, notifications.
+- Application core: file manager, queue manager, conversion controller, capability registry, job state, cancellation, event communication.
+- Format adapters: separate decoding and encoding capabilities, report unsupported features, and release resources.
+- Execution: main thread for UI and orchestration; Web Workers for suitable heavy tasks; OffscreenCanvas when supported, with a practical fallback.
 
-### Application core
-Responsible for coordinating work:
-- File manager
-- Queue manager
-- Conversion controller
-- Capability registry
-- Job state and cancellation
-- Event communication
-
-### Format adapters
-Each format adapter should expose a consistent interface where practical:
-- Detect or declare supported input formats.
-- Decode a source file into an agreed internal representation.
-- Encode an internal representation to a target format.
-- Report unsupported features and useful errors.
-- Release resources.
-
-Avoid assuming every adapter can support every conversion direction.
-
-### Execution
-- Main thread: UI updates, small jobs, capability checks, orchestration.
-- Web Workers: suitable CPU-heavy decoding, encoding, and batch tasks.
-- OffscreenCanvas: use when supported and useful.
-- Fallback: provide a main-thread or alternative worker path where practical.
-
-## 3. Suggested technology stack
+## 3. Agreed technology stack
 
 | Technology | Purpose |
 |---|---|
 | HTML5 | Document structure |
-| CSS3 | Styling, responsive layout, themes |
+| Plain CSS3 | Styling, responsive layout, themes |
 | Vanilla JavaScript ES modules | Application logic |
-| Vite | Local development server and production build |
-| Canvas API | Raster drawing and encoding |
-| ImageBitmap | Efficient decoded image representation |
-| Web Workers | Background processing |
-| OffscreenCanvas | Canvas operations in workers where supported |
-| JSZip | Package multiple output files |
-| heic-to (candidate) | HEIC/HEIF decoding |
-| UTIF.js (candidate) | TIFF decoding |
-| Lucide | Interface icons |
+| Vite | Development server and production build |
+| Lucide via NPM | Interface icons |
+| Canvas API / ImageBitmap | Standard raster processing |
+| Web Workers / OffscreenCanvas | Background processing where supported |
+| JSZip | ZIP downloads, planned for batch phase |
+| heic-to | Candidate HEIC/HEIF decoder |
+| UTIF.js | Candidate TIFF decoder |
 
-Library selection is provisional until compatibility, maintenance, bundle size, license, and browser support have been checked.
+Advanced format libraries remain provisional until compatibility, maintenance, bundle size, license, and browser support have been checked.
 
-## 4. Suggested directory structure
+## 4. Current project structure
+
+This reflects files already created. Add feature-specific modules when their phase begins.
 
 ```text
-images-format-converter/
+Images-Format-Converter/
 ├── public/
-│   ├── favicon.svg
-│   └── icons/
+│   └── favicon.svg
 ├── src/
-│   ├── index.html
-│   ├── assets/
 │   ├── styles/
 │   │   ├── main.css
 │   │   ├── variables.css
+│   │   ├── reset.css
 │   │   ├── layout.css
 │   │   ├── components.css
 │   │   └── themes.css
-│   ├── js/
-│   │   ├── main.js
-│   │   ├── core/
-│   │   │   ├── file-manager.js
-│   │   │   ├── queue-manager.js
-│   │   │   ├── conversion-controller.js
-│   │   │   └── event-bus.js
-│   │   ├── converters/
-│   │   │   ├── canvas-converter.js
-│   │   │   ├── bmp-converter.js
-│   │   │   ├── tiff-converter.js
-│   │   │   ├── heic-converter.js
-│   │   │   ├── svg-converter.js
-│   │   │   └── gif-converter.js
-│   │   ├── workers/
-│   │   │   └── conversion.worker.js
-│   │   ├── ui/
-│   │   │   ├── uploader.js
-│   │   │   ├── preview.js
-│   │   │   ├── settings.js
-│   │   │   ├── results.js
-│   │   │   └── theme.js
-│   │   └── utils/
-│   │       ├── file-validation.js
-│   │       ├── format-detection.js
-│   │       ├── image-utils.js
-│   │       └── size-calculator.js
-│   └── tests/
-│       ├── validation.test.js
-│       ├── converter.test.js
-│       └── utils.test.js
+│   └── js/
+│       └── main.js
 ├── docs/
-│   ├── PROJECT_CONTEXT.md
-│   ├── TECHNICAL_SPECIFICATION.md
-│   ├── DEVELOPMENT_ROADMAP.md
-│   └── DEVELOPMENT_LOG.md
 ├── .github/
-│   └── PULL_REQUEST_TEMPLATE.md
-├── .gitignore
+├── index.html
 ├── package.json
-├── package-lock.json
 ├── vite.config.js
+├── .gitignore
 └── README.md
 ```
 
-This is a target structure. Create folders and modules when the relevant phase begins; do not create empty files solely to make the tree look complete.
+The Vite entry point is the root-level `index.html`. Plain CSS is the selected styling approach. Lucide is installed as an NPM dependency. Running `npm install` generates `package-lock.json`.
+
+Future directories such as `converters/`, `workers/`, `core/`, `ui/`, and `tests/` will be added when needed. Do not create empty placeholders.
 
 ## 5. Suggested conversion data model
 
 ```javascript
 {
   id: "unique-file-id",
-
   original: {
     file: File,
     name: "photo.png",
@@ -160,14 +86,12 @@ This is a target structure. Create folders and modules when the relevant phase b
     width: 1920,
     height: 1080
   },
-
   settings: {
     outputFormat: "WEBP",
     quality: 0.85,
     resize: null,
     backgroundColor: null
   },
-
   result: {
     blob: null,
     name: null,
@@ -175,18 +99,17 @@ This is a target structure. Create folders and modules when the relevant phase b
     size: null,
     url: null
   },
-
   status: "pending",
   error: null
 }
 ```
 
-This is a conceptual model. Refine it when implementation reveals concrete requirements. Avoid storing duplicate large binary data unnecessarily.
+This is conceptual and may be refined during implementation. Avoid duplicate large binary data.
 
 ## 6. Job statuses
 
 - `pending`: waiting in queue.
-- `processing`: currently being processed.
+- `processing`: currently processing.
 - `completed`: conversion and output validation succeeded.
 - `failed`: conversion failed.
 - `cancelled`: user or application cancelled the job.
@@ -195,95 +118,41 @@ Each queue item should fail independently where possible.
 
 ## 7. File validation
 
-Validation should consider:
-- File size.
-- File extension as a hint.
-- MIME type as a hint.
-- Actual decoder support.
-- Image dimensions and pixel count.
-- Corrupt or malformed input.
-- Format-specific constraints.
-
-Do not rely on extension or MIME type alone. Do not assume a small compressed file will decode into a small amount of memory.
+Consider file size, extension and MIME hints, actual decoder support, dimensions and pixel count, corrupt input, and format-specific constraints. Do not trust extension or MIME type alone. A small compressed file can decode into a large image.
 
 ## 8. Conversion settings
 
 - Output format.
 - Quality for supported lossy encoders.
-- Width and height.
-- Aspect-ratio lock.
+- Width, height, and aspect-ratio lock.
 - Background color when transparency cannot be represented.
 - Output filename.
 - Individual download or ZIP download.
 
-Quality controls must be format-aware. PNG is lossless in the ordinary Canvas encoding path and should not be presented as if its quality slider behaves like JPEG quality.
+Quality controls must be format-aware. PNG must not be presented as if its quality slider behaves like JPEG quality.
 
 ## 9. Conversion result
 
-For each completed item, show:
-- Original filename and format.
-- Output filename and format.
-- Original file size.
-- Output file size.
-- Output dimensions.
-- Conversion status.
-- Preview.
-- Download action.
-
-Size savings formula:
+Show original and output filename/format, file sizes, dimensions, status, preview, and download action.
 
 ```text
-savingsPercent =
-  ((originalSize - outputSize) / originalSize) * 100
+savingsPercent = ((originalSize - outputSize) / originalSize) * 100
 ```
 
 A negative value means the output is larger. Display that honestly.
 
 ## 10. Browser compatibility
 
-Target testing:
-- Google Chrome
-- Microsoft Edge
-- Mozilla Firefox
-- Safari
-
-Feature-detect browser capabilities at runtime. Do not assume Canvas encoding, OffscreenCanvas, worker support, or format decoding is identical across browsers.
+Target Chrome, Edge, Firefox, and Safari. Feature-detect Canvas encoding, OffscreenCanvas, worker support, and decoding capabilities.
 
 ## 11. Resource management
 
-- Revoke object URLs when no longer needed.
-- Close ImageBitmap instances.
-- Clear canvas dimensions or references when appropriate.
-- Release worker resources and terminate workers when appropriate.
-- Limit concurrency to avoid memory exhaustion.
-- Handle cancellation and application teardown.
-- Avoid retaining original and converted copies longer than necessary.
+Revoke Object URLs, close ImageBitmap instances, release workers and large references, limit concurrency, handle cancellation, and avoid retaining duplicate image data longer than necessary.
 
 ## 12. Testing requirements
 
-At minimum:
-- PNG to JPEG, WebP, and supported raster outputs.
-- JPEG to PNG and WebP.
-- WebP to PNG and JPEG.
-- Transparent source to JPEG with selected background.
-- Unsupported or corrupt input.
-- Multiple files and independent failures.
-- Large dimensions and memory pressure.
-- Correct output MIME type.
-- Reopen/decode generated output.
-- ZIP integrity.
-- Light/dark theme.
-- Responsive layout.
-- SVG safety tests.
-- HEIC/TIFF/GIF format-specific test fixtures when those phases are implemented.
+Test PNG/JPEG/WebP paths, transparency to JPEG with a selected background, corrupt and unsupported inputs, multiple files with independent failures, large dimensions, output MIME type, reopening generated files, ZIP integrity, themes, responsive layout, SVG safety, and format-specific HEIC/TIFF/GIF fixtures when those phases begin.
 
 ## 13. Definition of Done
 
-A feature is complete when:
-1. It matches the agreed behavior.
-2. It handles expected errors.
-3. It does not break unrelated queue items.
-4. It passes relevant tests.
-5. It respects local-processing and privacy requirements.
-6. It releases temporary resources.
-7. Documentation and development log are updated.
+A feature is complete when it matches the agreed behavior, handles errors, passes relevant tests, preserves local processing, releases temporary resources, and has appropriate documentation.
