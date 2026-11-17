@@ -58,14 +58,14 @@ async function decodeWithImageElement(file, format) {
   const objectUrl = globalThis.URL.createObjectURL(file);
 
   try {
-    image.src = objectUrl;
-
     if (typeof image.decode === "function") {
+      image.src = objectUrl;
       await image.decode();
     } else {
       await new Promise((resolve, reject) => {
         image.onload = resolve;
         image.onerror = () => reject(new Error("The browser could not load this image."));
+        image.src = objectUrl;
       });
     }
 
