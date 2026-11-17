@@ -12,9 +12,9 @@ Tasks:
 - [x] Add base CSS variables and reset.
 - [x] Decide styling approach: plain CSS.
 - [x] Add Lucide through NPM.
-- [ ] Install dependencies and generate package-lock.json.
-- [ ] Confirm the application runs on localhost.
-- [ ] Verify the production build.
+- [ ] Install dependencies and confirm package-lock.json is committed.
+- [x] Confirm the application runs on localhost (user-confirmed).
+- [x] Verify the production build with `npm run build` (user-confirmed on 2026-11-17).
 
 Deliverable: a working project skeleton.
 
@@ -28,15 +28,16 @@ Tasks:
 - [x] Drag-and-drop interaction.
 - [x] File queue layout.
 - [x] Preview component.
-- [ ] Conversion settings panel.
-- [ ] Results component.
+- [x] Conversion settings panel (interface only).
+- [x] Results component (empty state only).
 - [x] Light theme.
 - [x] Dark theme.
 - [x] Theme persistence preference, if implemented.
 - [x] Responsive desktop and mobile layouts.
-- [ ] Basic accessibility and keyboard interaction.
+- [x] Basic accessibility and keyboard interaction (user-confirmed).
+- [ ] Manually verify the new settings and results UI in the browser.
 
-Deliverable: complete interface with basic file-selection interactions. Conversion may be mocked only in clearly identified development UI.
+Deliverable: complete interface with file-selection and conversion-settings controls. Conversion execution remains in Phase 2.
 
 ## Phase 2: Core conversion engine (MVP)
 
