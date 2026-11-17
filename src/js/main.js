@@ -8,7 +8,11 @@ import {
   LockKeyhole,
   FileImage,
   X,
-  Trash2
+  Trash2,
+  Settings2,
+  FileOutput,
+  Info,
+  Image
 } from "lucide";
 import "../styles/main.css";
 
@@ -21,7 +25,11 @@ const iconSet = {
   LockKeyhole,
   FileImage,
   X,
-  Trash2
+  Trash2,
+  Settings2,
+  FileOutput,
+  Info,
+  Image
 };
 
 const renderIcons = () => createIcons({ icons: iconSet });
@@ -40,6 +48,12 @@ const queueSection = document.querySelector("#queue-section");
 const fileCount = document.querySelector("#file-count");
 const clearButton = document.querySelector("#clear-button");
 const themeToggle = document.querySelector("#theme-toggle");
+const settingsPanel = document.querySelector("#settings-panel");
+const resultsPanel = document.querySelector("#results-panel");
+const outputFormat = document.querySelector("#output-format");
+const qualityField = document.querySelector("#quality-field");
+const outputQuality = document.querySelector("#output-quality");
+const qualityValue = document.querySelector("#quality-value");
 
 const selectedFiles = new Map();
 let nextFileId = 0;
@@ -54,6 +68,13 @@ const updateQueueSummary = () => {
   const count = selectedFiles.size;
   fileCount.textContent = `${count} ${count === 1 ? "file" : "files"}`;
   queueSection.hidden = count === 0;
+  settingsPanel.hidden = count === 0;
+  resultsPanel.hidden = count === 0;
+};
+
+const updateQualityVisibility = () => {
+  const usesQuality = ["image/jpeg", "image/webp"].includes(outputFormat.value);
+  qualityField.hidden = !usesQuality;
 };
 
 const renderFile = (entry) => {
@@ -185,6 +206,13 @@ dropzone.addEventListener("drop", (event) => {
 
 clearButton.addEventListener("click", clearFiles);
 
+outputFormat.addEventListener("change", updateQualityVisibility);
+
+outputQuality.addEventListener("input", () => {
+  qualityValue.value = `${outputQuality.value}%`;
+  qualityValue.textContent = `${outputQuality.value}%`;
+});
+
 const savedTheme = localStorage.getItem("ifc-theme");
 const preferredTheme = window.matchMedia("(prefers-color-scheme: dark)").matches
   ? "dark"
@@ -203,6 +231,7 @@ const applyTheme = (theme) => {
 };
 
 applyTheme(savedTheme || preferredTheme);
+updateQualityVisibility();
 
 themeToggle.addEventListener("click", () => {
   const nextTheme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
