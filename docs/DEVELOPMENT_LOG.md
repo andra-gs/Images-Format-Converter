@@ -5,7 +5,7 @@ This file records actual repository progress. Update it after meaningful impleme
 ## Project status
 
 - Current stage: Phase 1 - UI development
-- Current phase status: Implemented, partially verified by the user
+- Current phase status: Implemented, user-verified; select option spacing adjustment pending user visual confirmation
 - Latest release: None
 - Last updated: 2026-11-17
 
@@ -22,7 +22,7 @@ This file records actual repository progress. Update it after meaningful impleme
 | Phase | Status | Notes |
 |---|---|---|
 | Phase 0: Project foundation | Tested, with one documentation check open | User confirmed localhost works and `npm run build` succeeds; package-lock commit status remains unconfirmed |
-| Phase 1: UI development | Implemented, partially tested | User confirmed settings/results visibility, format selection, JPEG/WebP quality slider visibility, and live percentage updates; remaining checks are pending |
+| Phase 1: UI development | Tested, minor visual adjustment pending | User confirmed all seven settings/results checks passed; select option padding has been adjusted and needs visual confirmation |
 | Phase 2: Core conversion engine | Not started | Initial raster conversion |
 | Phase 3: Batch processing | Not started | Workers, queue, ZIP |
 | Phase 4: Advanced formats | Not started | HEIC, TIFF, SVG, GIF |
@@ -33,23 +33,44 @@ This file records actual repository progress. Update it after meaningful impleme
 
 Add newest entries first.
 
+### 2026-11-17 - Output format option spacing adjustment
+- Status: Implemented, pending visual confirmation
+- Changes:
+  - Added vertical and horizontal padding to native output-format option elements.
+  - Added option line-height to improve readability and spacing in the opened dropdown where the browser supports option styling.
+- Files changed:
+  - `src/styles/components.css`
+  - `docs/DEVELOPMENT_LOG.md`
+- Tests performed:
+  - Reviewed the existing select styling and the user-provided screenshot.
+- Test results:
+  - CSS adjustment committed to `main`.
+  - Actual dropdown appearance still requires user confirmation because native select popup styling can vary by browser and operating system.
+- Known issues:
+  - Some browsers/operating systems limit styling of native select option menus. If padding remains unchanged in the user's browser, replace the native select with a fully custom accessible dropdown in a separate implementation.
+- Next steps:
+  - Pull the update and check the Output format dropdown.
+  - If native option padding is still ignored, implement a custom accessible select.
+
 ### 2026-11-17 - User verification of conversion settings UI
-- Status: Partially tested
+- Status: Tested
 - Tests performed by the user:
   - Selected an image and confirmed Conversion Settings and Conversion Results appear.
   - Confirmed output format choices are available.
   - Confirmed the quality slider appears only for JPEG and WebP.
   - Changed the slider and confirmed the percentage value updates.
+  - Cleared all selected images and confirmed both panels disappear.
+  - Confirmed desktop and mobile layouts look normal.
+  - Ran `npm run build`; Vite transformed 2,102 modules and completed the production build in 21.79 seconds.
 - Test results:
-  - All four reported interactions passed.
-  - The user also supplied a screenshot showing the settings panel and native format dropdown.
-  - Clear-all visibility behavior, responsive layout for the new panels, and a fresh production build after this UI update have not yet been reported.
+  - All seven user-reported checks passed.
+  - The output-format dropdown has a spacing issue visible in the supplied screenshot; a CSS adjustment is recorded in the newer entry above.
 - Known issues:
   - The Convert images button remains disabled until the Phase 2 conversion engine exists.
   - Format choices are interface options only; they do not indicate completed conversion support.
 - Next steps:
-  - Finish manual checks for clearing the queue, desktop/mobile layout, and production build.
-  - After verification, begin Phase 2 with file validation, format capability detection, and browser image decoding.
+  - Confirm the dropdown option spacing after the CSS update.
+  - Then begin Phase 2 with file validation, format capability detection, and browser image decoding.
 
 ### 2026-11-17 - Conversion settings and results interface
 - Status: Implemented
@@ -72,12 +93,12 @@ Add newest entries first.
   - Browser interaction and production build for this latest update had not been tested at implementation time.
 - Test results:
   - Implementation is committed to `main`.
-  - User subsequently verified four settings interactions; see the newer entry above.
+  - User subsequently verified the settings interface; see the newer verification entry above.
 - Known issues:
   - Format options represent planned output targets and do not imply that conversion is already supported.
   - The Convert images button remains disabled until the Phase 2 conversion engine exists.
 - Next steps:
-  - Complete remaining manual checks for the latest UI.
+  - Complete visual confirmation of the select option spacing.
   - Then begin Phase 2 with file validation, format capability detection, and browser image decoding.
 
 ### 2026-11-17 - Phase 1 workspace UI verification
@@ -96,10 +117,8 @@ Add newest entries first.
   - Ran `npm run build`; Vite transformed 2,102 modules and completed the production build in 18.18 seconds.
 - Test results:
   - All user-reported checks passed for the version tested before the latest settings/results UI update.
-  - The latest settings/results UI has been partially verified; see the newer entry above.
 - Next steps:
-  - Complete verification of the settings and results UI.
-  - Begin Phase 2 core conversion after the UI check.
+  - Continue Phase 2 after the settings/results UI was verified.
 
 ### 2026-11-17 - Phase 1 initial workspace UI
 - Status: Implemented
