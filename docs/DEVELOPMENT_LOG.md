@@ -4,8 +4,8 @@ This file records actual repository progress. Update it after meaningful impleme
 
 ## Project status
 
-- Current stage: Phase 1 - UI development
-- Current phase status: Phase 1 UI verified by user; startup skeleton now follows the saved or system color theme
+- Current stage: Phase 2 - Core conversion engine
+- Current phase status: Phase 2 started; initial file validation and signature-based format detection implemented, manual verification pending
 - Latest release: None
 - Last updated: 2026-11-17
 
@@ -21,9 +21,9 @@ This file records actual repository progress. Update it after meaningful impleme
 
 | Phase | Status | Notes |
 |---|---|---|
-| Phase 0: Project foundation | Tested, with one documentation check open | User confirmed localhost works and `npm run build` succeeds; package-lock commit status remains unconfirmed |
-| Phase 1: UI development | Tested, theme-aware skeleton update implemented | User confirmed custom dropdown, keyboard behavior, outside-click close, no unstyled flash, theme switching, and production build; skeleton theme fix is now committed |
-| Phase 2: Core conversion engine | Not started | Initial raster conversion |
+| Phase 0: Project foundation | Tested | User confirmed localhost works and `npm run build` succeeds; `package-lock.json` is present in the GitHub repository |
+| Phase 1: UI development | Tested | User confirmed the skeleton follows light/dark themes, theme persists after refresh, no unstyled flash appears, and `npm run build` succeeds |
+| Phase 2: Core conversion engine | In progress | File validation and signature-based format detection implemented; manual verification pending |
 | Phase 3: Batch processing | Not started | Workers, queue, ZIP |
 | Phase 4: Advanced formats | Not started | HEIC, TIFF, SVG, GIF |
 | Phase 5: Image manipulation | Not started | Resize, compression, metadata |
@@ -32,6 +32,53 @@ This file records actual repository progress. Update it after meaningful impleme
 ## Change log
 
 Add newest entries first.
+
+### 2026-11-17 - Phase 1 verification and Phase 2 foundation
+
+- Status: Phase 1 tested; Phase 2 in progress
+- User-confirmed tests:
+  - Startup skeleton follows both light and dark themes.
+  - Theme preference remains correct after page refresh.
+  - No unstyled page appears during startup.
+  - `npm run build` succeeds for the version tested by the user before this Phase 2 code update.
+- Repository audit:
+  - Confirmed `package-lock.json` exists on `main`.
+  - Confirmed the current application entry point and UI structure.
+  - Updated README to describe the actual Phase 1 interface and clarify that conversion is not available yet.
+  - Reconciled Phase 0 and Phase 1 checklist wording in the roadmap.
+  - Clarified that plain CSS is the agreed styling choice.
+- Phase 2 implementation:
+  - Added signature-based detection for PNG, JPEG, GIF, WebP, BMP, TIFF, HEIC, HEIF, and SVG.
+  - Added basic file validation for invalid objects, empty files, unreadable content, and unrecognized image content.
+  - Uses detected file content rather than trusting the extension or declared MIME type.
+  - Reports MIME mismatches as warnings and continues using the detected format.
+  - Integrated validation into file selection and drag-and-drop.
+  - Added accessible feedback for rejected files and MIME warnings.
+  - Added a format-label fallback when the browser cannot display a preview for a recognized format.
+- Files changed:
+  - `src/js/core/format-detector.js`
+  - `src/js/core/file-validator.js`
+  - `src/js/main.js`
+  - `index.html`
+  - `src/styles/components.css`
+  - `README.md`
+  - `docs/DEVELOPMENT_ROADMAP.md`
+  - `docs/PROJECT_CONTEXT.md`
+  - `docs/DEVELOPMENT_LOG.md`
+- Tests performed:
+  - Reviewed the implementation and repository changes.
+  - No local browser test or production build was run by the assistant for this new Phase 2 code.
+- Test results:
+  - Changes committed to `main`.
+  - User must pull the latest changes and verify valid images, unsupported files, empty files where testable, and MIME mismatch behavior.
+- Known limitations:
+  - Format recognition does not prove browser decoding or conversion support.
+  - HEIC/HEIF, TIFF, and some GIF/SVG previews may not render in the browser. A fallback label is shown.
+  - The capability registry, image decoder, and encoders have not been implemented.
+- Next steps:
+  - Verify file validation and format detection with real files.
+  - Implement the explicit input/output capability registry.
+  - Then implement browser image decoding.
 
 ### 2026-11-17 - Theme-aware startup skeleton
 - Status: Implemented, pending user visual confirmation
