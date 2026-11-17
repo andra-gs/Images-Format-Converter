@@ -225,6 +225,7 @@ const addFiles = async (files) => {
       id: nextFileId++,
       file,
       format: validation.format,
+      capabilities: validation.capabilities,
       url: URL.createObjectURL(file)
     };
 
