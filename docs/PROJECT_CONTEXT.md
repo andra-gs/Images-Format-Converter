@@ -31,7 +31,7 @@ The core application must not upload image files to a backend, cloud storage, or
 |---|---|
 | Frontend | Vanilla JavaScript |
 | Markup | HTML5 |
-| Styling | CSS3; Tailwind CSS was included in the proposed stack but should only be added if useful during setup |
+| Styling | Plain CSS3; do not add Tailwind CSS unless the owner changes this decision |
 | Build tool | Vite |
 | Processing | Hybrid: lightweight work on the main thread, suitable heavy work in Web Workers |
 | Worker canvas | OffscreenCanvas where supported, with fallback |
