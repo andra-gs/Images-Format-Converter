@@ -28,15 +28,19 @@ Tasks:
 - [x] Drag-and-drop interaction.
 - [x] File queue layout.
 - [x] Preview component.
-- [x] Conversion settings panel (interface only).
+- [x] Conversion settings panel (interface only)
+- [x] Custom accessible output-format dropdown with controlled option spacing
+- [x] Startup skeleton to prevent unstyled content flash.
 - [x] Results component (empty state only).
 - [x] Light theme.
 - [x] Dark theme.
 - [x] Theme persistence preference, if implemented.
 - [x] Responsive desktop and mobile layouts (initial workspace tested; latest panels pending).
 - [x] Basic accessibility and keyboard interaction (user-confirmed).
-- [ ] Verify settings/results visibility and format selection on desktop and mobile.
-- [ ] Verify quality slider visibility and value updates (partially verified: JPEG/WebP visibility and live percentage confirmed).
+- [ ] Verify settings/results visibility and custom format selection on desktop and mobile.
+- [ ] Verify quality slider visibility and value updates (user-confirmed before custom dropdown replacement: JPEG/WebP visibility and live percentage confirmed).
+- [ ] Verify custom dropdown mouse and keyboard interactions.
+- [ ] Verify startup skeleton and absence of unstyled flash on reload.
 - [ ] Verify both panels disappear after clearing the file queue.
 - [ ] Run a fresh production build after the latest UI changes.
 
