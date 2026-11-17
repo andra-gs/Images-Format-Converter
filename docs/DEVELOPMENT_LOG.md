@@ -5,7 +5,7 @@ This file records actual repository progress. Update it after meaningful impleme
 ## Project status
 
 - Current stage: Phase 1 - UI development
-- Current phase status: UI implemented and user-verified; custom format dropdown and startup skeleton implemented, pending user verification
+- Current phase status: Phase 1 UI verified by user; startup skeleton now follows the saved or system color theme
 - Latest release: None
 - Last updated: 2026-11-17
 
@@ -22,7 +22,7 @@ This file records actual repository progress. Update it after meaningful impleme
 | Phase | Status | Notes |
 |---|---|---|
 | Phase 0: Project foundation | Tested, with one documentation check open | User confirmed localhost works and `npm run build` succeeds; package-lock commit status remains unconfirmed |
-| Phase 1: UI development | Tested, minor visual adjustment pending | User confirmed all seven settings/results checks passed; select option padding has been adjusted and needs visual confirmation |
+| Phase 1: UI development | Tested, theme-aware skeleton update implemented | User confirmed custom dropdown, keyboard behavior, outside-click close, no unstyled flash, theme switching, and production build; skeleton theme fix is now committed |
 | Phase 2: Core conversion engine | Not started | Initial raster conversion |
 | Phase 3: Batch processing | Not started | Workers, queue, ZIP |
 | Phase 4: Advanced formats | Not started | HEIC, TIFF, SVG, GIF |
@@ -32,6 +32,44 @@ This file records actual repository progress. Update it after meaningful impleme
 ## Change log
 
 Add newest entries first.
+
+### 2026-11-17 - Theme-aware startup skeleton
+- Status: Implemented, pending user visual confirmation
+- Changes:
+  - Added an early theme initialization script in the document head. It reads the saved theme before the body renders and falls back to the operating-system color preference.
+  - Added light and dark skeleton color tokens to the critical inline CSS.
+  - Applied the selected theme to the page background and skeleton before the application module loads, avoiding a light skeleton flash for dark-theme users.
+  - Updated the browser theme-color metadata to match the initial theme.
+- Files changed:
+  - `index.html`
+  - `docs/DEVELOPMENT_LOG.md`
+- Tests performed:
+  - Reviewed the initialization order and confirmed the theme preference is read before the skeleton markup is painted.
+- Test results:
+  - Changes committed to `main`.
+  - User needs to verify the skeleton in both light and dark themes after a hard refresh.
+- Known issues:
+  - If browser storage is unavailable, the skeleton falls back to the operating-system theme preference.
+- Next steps:
+  - Test first load and reload in both themes.
+  - Run `npm run build`.
+
+### 2026-11-17 - User verification of custom dropdown and startup skeleton
+- Status: Tested
+- Tests performed by the user:
+  - Confirmed dropdown option padding is correct.
+  - Confirmed all output format options can be selected.
+  - Confirmed keyboard navigation works.
+  - Confirmed clicking outside closes the dropdown.
+  - Confirmed the skeleton appears, but reported it always uses the light theme.
+  - Confirmed there is no unstyled-content flash.
+  - Confirmed light and dark application themes still work.
+  - Ran `npm run build` successfully.
+- Test results:
+  - All reported checks passed except skeleton theme matching. The newer entry above addresses that issue.
+- Next steps:
+  - Verify the skeleton theme fix in both themes, then proceed to Phase 2.
+
 
 ### 2026-11-17 - Custom output dropdown and startup skeleton
 - Status: Implemented, pending user verification
