@@ -23,7 +23,7 @@ Deliverable: a working project skeleton.
 Tasks:
 - [x] Navbar and application branding.
 - [x] Hero section and local-processing explanation.
-- [ ] Upload workspace.
+- [x] Upload workspace.
 - [x] File picker interaction.
 - [x] Drag-and-drop interaction.
 - [x] File queue layout.
