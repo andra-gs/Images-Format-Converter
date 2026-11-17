@@ -1,4 +1,5 @@
 import { detectImageFormat } from "./format-detector.js";
+import { getFormatCapabilities } from "./capability-registry.js";
 
 export async function validateImageFile(file) {
   if (!(file instanceof Blob)) {
@@ -42,6 +43,7 @@ export async function validateImageFile(file) {
   return {
     valid: true,
     format: detected,
+    capabilities: getFormatCapabilities(detected.format),
     warnings: mimeMismatch
       ? ["The file MIME type does not match its detected content. The detected format will be used."]
       : []
