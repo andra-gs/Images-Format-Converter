@@ -4,7 +4,7 @@ This file records actual repository progress. Update it after meaningful impleme
 
 ## Project status
 
-- Current stage: Phase 0 - Project foundation
+- Current stage: Phase 1 - UI development
 - Current phase status: In progress
 - Latest release: None
 - Last updated: 2026-11-17
@@ -21,8 +21,8 @@ This file records actual repository progress. Update it after meaningful impleme
 
 | Phase | Status | Notes |
 |---|---|---|
-| Phase 0: Project foundation | In progress | Vite skeleton and base styles created; dependency installation and runtime/build verification remain |
-| Phase 1: UI development | Not started | Full interface, themes, responsive layout, and file selection |
+| Phase 0: Project foundation | In progress | Local application runs after a fresh clone; production build verification still needs explicit confirmation |
+| Phase 1: UI development | In progress | Initial workspace and file-selection interactions implemented and manually verified by the user; settings and results remain |
 | Phase 2: Core conversion engine | Not started | Initial raster conversion |
 | Phase 3: Batch processing | Not started | Workers, queue, ZIP |
 | Phase 4: Advanced formats | Not started | HEIC, TIFF, SVG, GIF |
@@ -33,8 +33,27 @@ This file records actual repository progress. Update it after meaningful impleme
 
 Add newest entries first.
 
+### 2026-11-17 - Phase 1 workspace UI verification
+- Status: Tested for the user-reported interactions
+- Tests performed by the user:
+  - Selected multiple image files at once.
+  - Added images through drag-and-drop.
+  - Confirmed thumbnails and file sizes appear.
+  - Removed individual images.
+  - Cleared the entire selection with Clear all.
+  - Switched between light and dark themes.
+  - Refreshed the page and confirmed the selected theme persisted.
+  - Checked the mobile layout and reported no visible issues.
+- Test results:
+  - All eight user-reported checks passed.
+  - Production build status was not explicitly reported and remains unconfirmed.
+- Next steps:
+  - Verify keyboard accessibility for the upload area.
+  - Confirm `npm run build` succeeds.
+  - Continue with the conversion settings and results UI after these checks.
+
 ### 2026-11-17 - Phase 1 initial workspace UI
-- Status: Implemented, local validation pending
+- Status: Implemented
 - Changes:
   - Replaced the foundation placeholder with the initial converter workspace.
   - Added application branding, privacy messaging, hero section, and upload workspace.
@@ -54,16 +73,14 @@ Add newest entries first.
   - Reviewed the updated source and confirmed all changes were committed to `main`.
   - No local browser interaction or production build was run by the assistant.
 - Test results:
-  - Implementation is present in the repository.
-  - Local validation is still required for file selection, drag-and-drop, theme persistence, responsive layout, and production build.
+  - The user later manually verified file selection, drag-and-drop, previews, removal, clear-all, theme switching, theme persistence, and mobile layout. All eight checks passed.
+  - Production build verification remains unconfirmed.
 - Known issues:
   - Conversion settings, conversion execution, and result downloads are not implemented yet.
   - Unsupported or malformed image files may still fail at preview time; deeper validation belongs to Phase 2.
 - Next steps:
-  - Pull the latest `main`.
-  - Run `npm run build`.
-  - Test file selection, drag-and-drop, removal, clear-all, and theme persistence in the browser.
-  - Fix any issues found before proceeding to conversion settings and engine work.
+  - Verify keyboard accessibility and the production build.
+  - Continue with conversion settings and results UI.
 
 ### 2026-11-17 - Phase 0 foundation implementation
 - Status: In progress
