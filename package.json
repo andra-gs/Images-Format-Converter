@@ -12,6 +12,22 @@
     "lucide": "^1.74.0"
   },
   "devDependencies": {
-    "vite": "^7.0.0"
-  }
+    "vite": "^7.3.8"
+  },
+  "description": "A local-first image format conversion web application. Image files are processed in the user's browser and are not uploaded to a remote server.",
+  "main": "vite.config.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/andra-gs/Images-Format-Converter.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/andra-gs/Images-Format-Converter/issues"
+  },
+  "homepage": "https://github.com/andra-gs/Images-Format-Converter#readme"
 }
