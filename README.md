@@ -18,9 +18,10 @@ The current interface includes:
 - Startup skeleton that follows the selected theme and prevents an unstyled-content flash.
 - Initial file validation and image-format signature detection.
 - An explicit capability registry that keeps detection, decoding, and encoding status separate.
-- Automated Node.js tests for the capability registry using the built-in test runner.
+- An initial browser image decoder module for PNG, JPEG, WebP, and BMP, with an ImageBitmap path and HTML image fallback. Real-file browser verification is still pending.
+- Automated Node.js tests for the capability registry and image decoder using the built-in test runner.
 
-The image decoder, encoders, conversion execution, output generation, and downloads are not available yet. The Convert button remains disabled. The capability registry currently reports no implemented decoder or encoder.
+The decoder is not connected to the conversion workflow yet. Encoders, conversion execution, output generation, and downloads are not available. The Convert button remains disabled. The capability registry continues to report no implemented decoder or encoder until real image fixtures pass browser verification.
 
 ## Project goals
 
