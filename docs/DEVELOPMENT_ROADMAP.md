@@ -33,9 +33,12 @@ Tasks:
 - [x] Light theme.
 - [x] Dark theme.
 - [x] Theme persistence preference, if implemented.
-- [x] Responsive desktop and mobile layouts.
+- [x] Responsive desktop and mobile layouts (initial workspace tested; latest panels pending).
 - [x] Basic accessibility and keyboard interaction (user-confirmed).
-- [ ] Manually verify the new settings and results UI in the browser.
+- [ ] Verify settings/results visibility and format selection on desktop and mobile.
+- [ ] Verify quality slider visibility and value updates (partially verified: JPEG/WebP visibility and live percentage confirmed).
+- [ ] Verify both panels disappear after clearing the file queue.
+- [ ] Run a fresh production build after the latest UI changes.
 
 Deliverable: complete interface with file-selection and conversion-settings controls. Conversion execution remains in Phase 2.
 
