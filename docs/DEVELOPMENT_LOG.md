@@ -5,7 +5,7 @@ This file records actual repository progress. Update it after meaningful impleme
 ## Project status
 
 - Current stage: Phase 2 - Core conversion engine
-- Current phase status: Phase 2 started; initial file validation and signature-based format detection implemented, manual verification pending
+- Current phase status: Phase 2 in progress; file validation, signature detection, and capability registry implemented; manual and automated test execution pending
 - Latest release: None
 - Last updated: 2026-11-17
 
@@ -32,6 +32,42 @@ This file records actual repository progress. Update it after meaningful impleme
 ## Change log
 
 Add newest entries first.
+
+### 2026-11-17 - Image format capability registry
+
+- Status: Implemented; automated test execution pending
+- Changes:
+  - Added `capability-registry.js` as the single source of truth for recognized formats and their separate detection, decoding, and encoding states.
+  - Recorded PNG, JPEG, WebP, BMP, GIF, TIFF, HEIC, HEIF, and SVG as detectable formats.
+  - Kept decoder status separate from detection. No decoder is marked implemented yet.
+  - Marked PNG, JPEG, WebP, and BMP as planned output encoders, not currently available output formats.
+  - Documented special handling requirements for JPEG transparency, WebP MIME verification, dedicated BMP encoding, GIF animation, TIFF/HEIC/HEIF decoders, and safe SVG rasterization.
+  - Connected the capability metadata to file validation and queued file records.
+  - Added Node's built-in test runner and capability-registry unit tests without adding a third-party testing dependency.
+- Files changed:
+  - `src/js/core/capability-registry.js`
+  - `src/js/core/file-validator.js`
+  - `src/js/main.js`
+  - `tests/capability-registry.test.js`
+  - `package.json`
+  - `README.md`
+  - `docs/TECHNICAL_SPECIFICATION.md`
+  - `docs/DEVELOPMENT_ROADMAP.md`
+  - `docs/DEVELOPMENT_LOG.md`
+- Tests performed:
+  - Added automated tests for detected format definitions, unknown formats, separate decode/encode status, planned output formats, and protection against mutation of internal registry data.
+  - Reviewed the committed source and test definitions.
+  - Tests and production build have not been executed in a local project environment by the assistant.
+- Test results:
+  - Changes committed to `main`.
+  - User should run `npm test` and `npm run build` locally.
+- Known limitations:
+  - The registry describes implementation state. It does not perform actual browser feature detection or image decoding.
+  - No input decoder or output encoder is currently marked as implemented.
+- Next steps:
+  - Verify the registry tests and build.
+  - Implement the browser image decoder for the initial raster formats.
+  - Add runtime decoding checks and update capability status only after real-file tests pass.
 
 ### 2026-11-17 - Phase 1 verification and Phase 2 foundation
 
