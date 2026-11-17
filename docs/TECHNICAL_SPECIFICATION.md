@@ -59,7 +59,13 @@ Images-Format-Converter/
 │   │   ├── components.css
 │   │   └── themes.css
 │   └── js/
-│       └── main.js
+│       ├── main.js
+│       └── core/
+│           ├── file-validator.js
+│           ├── format-detector.js
+│           └── capability-registry.js
+├── tests/
+│   └── capability-registry.test.js
 ├── docs/
 ├── .github/
 ├── index.html
