@@ -5,7 +5,7 @@ This file records actual repository progress. Update it after meaningful impleme
 ## Project status
 
 - Current stage: Phase 1 - UI development
-- Current phase status: Implemented, pending browser verification of the latest settings/results UI
+- Current phase status: Implemented, partially verified by the user
 - Latest release: None
 - Last updated: 2026-11-17
 
@@ -22,7 +22,7 @@ This file records actual repository progress. Update it after meaningful impleme
 | Phase | Status | Notes |
 |---|---|---|
 | Phase 0: Project foundation | Tested, with one documentation check open | User confirmed localhost works and `npm run build` succeeds; package-lock commit status remains unconfirmed |
-| Phase 1: UI development | Implemented, pending latest UI verification | Upload workspace was manually verified; settings and results interface has now been added |
+| Phase 1: UI development | Implemented, partially tested | User confirmed settings/results visibility, format selection, JPEG/WebP quality slider visibility, and live percentage updates; remaining checks are pending |
 | Phase 2: Core conversion engine | Not started | Initial raster conversion |
 | Phase 3: Batch processing | Not started | Workers, queue, ZIP |
 | Phase 4: Advanced formats | Not started | HEIC, TIFF, SVG, GIF |
@@ -32,6 +32,24 @@ This file records actual repository progress. Update it after meaningful impleme
 ## Change log
 
 Add newest entries first.
+
+### 2026-11-17 - User verification of conversion settings UI
+- Status: Partially tested
+- Tests performed by the user:
+  - Selected an image and confirmed Conversion Settings and Conversion Results appear.
+  - Confirmed output format choices are available.
+  - Confirmed the quality slider appears only for JPEG and WebP.
+  - Changed the slider and confirmed the percentage value updates.
+- Test results:
+  - All four reported interactions passed.
+  - The user also supplied a screenshot showing the settings panel and native format dropdown.
+  - Clear-all visibility behavior, responsive layout for the new panels, and a fresh production build after this UI update have not yet been reported.
+- Known issues:
+  - The Convert images button remains disabled until the Phase 2 conversion engine exists.
+  - Format choices are interface options only; they do not indicate completed conversion support.
+- Next steps:
+  - Finish manual checks for clearing the queue, desktop/mobile layout, and production build.
+  - After verification, begin Phase 2 with file validation, format capability detection, and browser image decoding.
 
 ### 2026-11-17 - Conversion settings and results interface
 - Status: Implemented
@@ -51,15 +69,15 @@ Add newest entries first.
   - `docs/DEVELOPMENT_LOG.md`
 - Tests performed:
   - Reviewed the source changes and confirmed the settings UI is only a preview; no conversion operation is triggered.
-  - Browser interaction and production build for this latest update have not yet been tested by the user.
+  - Browser interaction and production build for this latest update had not been tested at implementation time.
 - Test results:
   - Implementation is committed to `main`.
-  - Manual verification remains pending.
+  - User subsequently verified four settings interactions; see the newer entry above.
 - Known issues:
   - Format options represent planned output targets and do not imply that conversion is already supported.
   - The Convert images button remains disabled until the Phase 2 conversion engine exists.
 - Next steps:
-  - Pull the latest `main` and verify the new controls, visibility, and responsive layout.
+  - Complete remaining manual checks for the latest UI.
   - Then begin Phase 2 with file validation, format capability detection, and browser image decoding.
 
 ### 2026-11-17 - Phase 1 workspace UI verification
@@ -78,9 +96,9 @@ Add newest entries first.
   - Ran `npm run build`; Vite transformed 2,102 modules and completed the production build in 18.18 seconds.
 - Test results:
   - All user-reported checks passed for the version tested before the latest settings/results UI update.
-  - The latest settings/results UI still requires a separate browser check.
+  - The latest settings/results UI has been partially verified; see the newer entry above.
 - Next steps:
-  - Verify the latest settings and results UI.
+  - Complete verification of the settings and results UI.
   - Begin Phase 2 core conversion after the UI check.
 
 ### 2026-11-17 - Phase 1 initial workspace UI
@@ -110,7 +128,7 @@ Add newest entries first.
   - Unsupported or malformed image files may still fail at preview time; deeper validation belongs to Phase 2.
 - Next steps:
   - Finish the settings and results interface.
-  - Begin core conversion after UI verification.
+  - Begin core conversion after verification.
 
 ### 2026-11-17 - Phase 0 foundation implementation
 - Status: In progress
