@@ -3,11 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta
-      name="description"
-      content="Convert image formats locally in your browser with Images Format Converter."
-    />
-    <meta name="theme-color" content="#f8fafc" />
+    <meta name="description" content="Convert image formats locally in your browser. Your files stay on your device." />
+    <meta name="theme-color" content="#f7f8fa" />
     <title>Images Format Converter</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   </head>
@@ -16,24 +13,55 @@
       <header class="app-header">
         <a class="brand" href="/" aria-label="Images Format Converter home">
           <span class="brand-icon" aria-hidden="true"><i data-lucide="images"></i></span>
-          <span>Images Format Converter</span>
+          <span class="brand-name">Images Format <strong>Converter</strong></span>
         </a>
-        <span class="header-note">Local-first image tools</span>
+        <div class="header-actions">
+          <span class="privacy-label"><i data-lucide="shield-check"></i> Files stay on your device</span>
+          <button class="icon-button" id="theme-toggle" type="button" aria-label="Switch color theme" title="Switch color theme">
+            <i data-lucide="moon"></i>
+          </button>
+        </div>
       </header>
 
       <main class="main-content">
-        <section class="welcome-panel" aria-labelledby="welcome-title">
-          <span class="eyebrow">PRIVATE BY DESIGN</span>
-          <h1 id="welcome-title">Image conversion, right in your browser.</h1>
-          <p>
-            Your images stay on your device. The conversion workspace is being
-            prepared, and supported formats will appear here as they are implemented.
-          </p>
-          <div class="status-row">
-            <span class="status-dot" aria-hidden="true"></span>
-            <span>Project foundation initialized</span>
+        <section class="hero" aria-labelledby="hero-title">
+          <span class="eyebrow">PRIVATE. SIMPLE. IN YOUR BROWSER.</span>
+          <h1 id="hero-title">Your images.<br /><span>Any format.</span></h1>
+          <p>Convert images directly on your device. No account, no upload, and no third-party conversion server.</p>
+        </section>
+
+        <section class="workspace" aria-labelledby="workspace-title">
+          <div class="workspace-heading">
+            <div>
+              <h2 id="workspace-title">Image workspace</h2>
+              <p>Select one or more images to get started.</p>
+            </div>
+            <span class="file-count" id="file-count">0 files</span>
+          </div>
+
+          <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Choose images or drag and drop files here">
+            <div class="upload-icon"><i data-lucide="cloud-upload"></i></div>
+            <h3>Drop your images here</h3>
+            <p>or <button class="text-button" id="browse-button" type="button">browse files</button> from your device</p>
+            <span class="file-hint">Image files · Multiple selection supported</span>
+            <input id="file-input" type="file" accept="image/*" multiple hidden />
+          </div>
+
+          <div class="queue-section" id="queue-section" hidden>
+            <div class="queue-heading">
+              <h3>Selected files</h3>
+              <button class="text-button danger-text" id="clear-button" type="button">Clear all</button>
+            </div>
+            <ul class="file-list" id="file-list" aria-live="polite"></ul>
+          </div>
+
+          <div class="workspace-note">
+            <i data-lucide="lock-keyhole"></i>
+            <span>Your images are handled locally in this browser. Nothing is sent to a server.</span>
           </div>
         </section>
+
+        <p class="phase-note">Workspace preview · Conversion engine is the next development phase.</p>
       </main>
 
       <footer class="app-footer">
