@@ -37,12 +37,12 @@ Tasks:
 - [x] Theme persistence preference, if implemented.
 - [x] Responsive desktop and mobile layouts (initial workspace tested; latest panels pending).
 - [x] Basic accessibility and keyboard interaction (user-confirmed).
-- [ ] Verify settings/results visibility and custom format selection on desktop and mobile.
-- [ ] Verify quality slider visibility and value updates (user-confirmed before custom dropdown replacement: JPEG/WebP visibility and live percentage confirmed).
-- [ ] Verify custom dropdown mouse and keyboard interactions.
-- [ ] Verify startup skeleton and absence of unstyled flash on reload.
-- [ ] Verify both panels disappear after clearing the file queue.
-- [ ] Run a fresh production build after the latest UI changes.
+- [x] Verify settings/results visibility and custom format selection on desktop and mobile (user-confirmed).
+- [x] Verify quality slider visibility and value updates (user-confirmed).
+- [x] Verify custom dropdown mouse and keyboard interactions (user-confirmed).
+- [x] Verify startup skeleton appears and no unstyled flash occurs (user-confirmed; theme matching fix is a separate follow-up).
+- [x] Verify both panels disappear after clearing the file queue (user-confirmed).
+- [x] Run a fresh production build after the latest UI changes (user-confirmed).
 
 Deliverable: complete interface with file-selection and conversion-settings controls. Conversion execution remains in Phase 2.
 
