@@ -52,9 +52,9 @@ Add newest entries first.
   - `docs/DEVELOPMENT_ROADMAP.md`
   - `docs/DEVELOPMENT_LOG.md`
 - Tests performed:
-  - Ran the five image-decoder unit tests in an isolated Node.js environment using mocked browser APIs.
+  - Ran the six image-decoder unit tests in an isolated Node.js environment using mocked browser APIs.
 - Test results:
-  - All five decoder unit tests passed in the isolated test environment.
+  - All six decoder unit tests passed in the isolated test environment.
   - The user had already confirmed that the existing `npm test` suite and `npm run build` passed before this decoder addition.
   - The complete test suite and production build must be rerun after pulling this latest commit.
   - Real PNG, JPEG, WebP, and BMP files still need browser verification.
