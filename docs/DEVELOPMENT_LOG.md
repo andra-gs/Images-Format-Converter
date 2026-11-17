@@ -43,10 +43,14 @@ Add newest entries first.
   - Validates decoded dimensions and releases an invalid ImageBitmap if decoding returns unusable dimensions.
   - Rejects formats outside this module's scope. SVG, GIF, TIFF, HEIC, and HEIF remain separate work.
   - Kept decoding capability status as planned until real image fixtures are verified in target browsers.
-  - Added unit tests for the ImageBitmap path, HTML image fallback, unsupported formats, invalid/empty inputs, invalid dimensions, and resource cleanup.
+  - Added unit tests for the ImageBitmap path, HTML image fallback, automatic format detection, unsupported formats, invalid/empty inputs, invalid dimensions, and resource cleanup.
+  - Added a standalone Vite development test page at `tests/browser-decoder.html` so real PNG, JPEG, WebP, and BMP fixtures can be decoded in the browser without connecting the decoder to the main UI.
 - Files changed:
   - `src/js/core/image-decoder.js`
   - `tests/image-decoder.test.js`
+  - `tests/browser-decoder.html`
+  - `tests/browser-decoder.css`
+  - `tests/browser-decoder.js`
   - `src/js/core/capability-registry.js`
   - `docs/TECHNICAL_SPECIFICATION.md`
   - `docs/DEVELOPMENT_ROADMAP.md`
@@ -57,13 +61,13 @@ Add newest entries first.
   - All six decoder unit tests passed in the isolated test environment.
   - The user had already confirmed that the existing `npm test` suite and `npm run build` passed before this decoder addition.
   - The complete test suite and production build must be rerun after pulling this latest commit.
-  - Real PNG, JPEG, WebP, and BMP files still need browser verification.
+  - Real PNG, JPEG, WebP, and BMP files still need browser verification through the new test page.
 - Known issues:
   - The decoder is not yet connected to the conversion UI.
   - Browser support can vary. The capability registry must remain unchanged until real-file tests pass.
 - Next steps:
   - Run `npm test` and `npm run build` after pulling.
-  - Test decoding with real PNG, JPEG, WebP, and BMP files in the browser.
+  - Open `/tests/browser-decoder.html` through the Vite development server and test real PNG, JPEG, WebP, and BMP files.
   - Confirm reported dimensions and check that failed decodes show a useful error.
   - Only then mark verified formats as decodable and connect the decoder to the conversion pipeline.
 
