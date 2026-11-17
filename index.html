@@ -2,6 +2,17 @@
 <html lang="id">
   <head>
     <meta charset="UTF-8" />
+    <style>
+      html, body { margin: 0; min-height: 100%; background: #f7f8fa; }
+      #app { visibility: hidden; }
+      #boot-splash { min-height: 100vh; box-sizing: border-box; padding: 28px 6vw; display: grid; align-content: start; gap: 24px; font-family: Inter, system-ui, sans-serif; }
+      .boot-bar, .boot-block { background: linear-gradient(90deg, #e8ebf1 25%, #f4f5f8 38%, #e8ebf1 63%); background-size: 400% 100%; animation: boot-shimmer 1.4s ease infinite; border-radius: 12px; }
+      .boot-bar { height: 42px; max-width: 240px; }
+      .boot-hero { height: 150px; max-width: 620px; width: 100%; margin: 20px auto 0; }
+      .boot-panel { height: 260px; max-width: 760px; width: 100%; margin: 0 auto; }
+      @keyframes boot-shimmer { 0% { background-position: 100% 50%; } 100% { background-position: 0 50%; } }
+      @media (prefers-reduced-motion: reduce) { .boot-bar, .boot-block { animation: none; } }
+    </style>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Convert image formats locally in your browser. Your files stay on your device." />
     <meta name="theme-color" content="#f7f8fa" />
@@ -9,6 +20,11 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   </head>
   <body>
+    <div id="boot-splash" role="status" aria-label="Loading Images Format Converter">
+      <div class="boot-bar"></div>
+      <div class="boot-block boot-hero"></div>
+      <div class="boot-block boot-panel"></div>
+    </div>
     <div id="app">
       <header class="app-header">
         <a class="brand" href="/" aria-label="Images Format Converter home">
@@ -72,13 +88,19 @@
 
           <div class="settings-grid">
             <div class="field-group">
-              <label for="output-format">Output format</label>
-              <select id="output-format">
-                <option value="image/png">PNG</option>
-                <option value="image/jpeg">JPEG</option>
-                <option value="image/webp">WebP</option>
-                <option value="image/bmp">BMP</option>
-              </select>
+              <label id="output-format-label">Output format</label>
+              <div class="custom-select" id="format-select">
+                <button class="custom-select-trigger" id="output-format-trigger" type="button" aria-labelledby="output-format-label output-format-value" aria-haspopup="listbox" aria-expanded="false">
+                  <span id="output-format-value">PNG</span>
+                  <span class="custom-select-chevron" aria-hidden="true"></span>
+                </button>
+                <ul class="custom-select-menu" id="output-format-menu" role="listbox" aria-labelledby="output-format-label" hidden>
+                  <li class="custom-select-option" role="option" tabindex="-1" data-value="image/png" aria-selected="true">PNG</li>
+                  <li class="custom-select-option" role="option" tabindex="-1" data-value="image/jpeg" aria-selected="false">JPEG</li>
+                  <li class="custom-select-option" role="option" tabindex="-1" data-value="image/webp" aria-selected="false">WebP</li>
+                  <li class="custom-select-option" role="option" tabindex="-1" data-value="image/bmp" aria-selected="false">BMP</li>
+                </ul>
+              </div>
               <span class="field-hint">Initial format options planned for the core converter.</span>
             </div>
 
