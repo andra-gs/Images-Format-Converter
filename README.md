@@ -1,9 +1,10 @@
 # Images Format Converter
 
-A local-first image format conversion web application. Users clone this repository, install its dependencies, and run the application on localhost. Image files are processed in the user's browser and are not uploaded to a remote server.
+A local-first image format conversion web application. Image files are processed in the user's browser and are not uploaded to a remote server.
 
-> Project status: Planning / Phase 0 - Project Foundation
-> Initial development approach: Vanilla JavaScript + Vite
+> Project status: Phase 0 - Project Foundation (implementation started)
+> Stack: Vanilla JavaScript + Vite + plain CSS
+> Icons: Lucide via NPM
 > Architecture: Client-side, modular, hybrid processing
 
 ## Project goals
@@ -13,44 +14,41 @@ A local-first image format conversion web application. Users clone this reposito
 - Support multiple images and batch conversion.
 - Provide quality, resizing, preview, and download controls.
 - Offer light and dark themes.
-- Keep the codebase modular so additional decoders and encoders can be added without rewriting the application.
+- Keep the codebase modular for additional decoders and encoders.
 
 ## Planned formats
 
 PNG, JPG/JPEG, WebP, BMP, HEIC/HEIF, TIFF, SVG, and GIF.
 
-Format support is capability-dependent. Reading a format (decoding) and producing a format (encoding) are separate capabilities. The application must not advertise a conversion path until it has been implemented and tested.
+Decoding and encoding are separate capabilities. The application must not advertise a conversion path until it has been implemented and tested.
 
 Special cases:
-
-- Canvas commonly supports PNG output and browser-dependent JPEG/WebP output. Always inspect the resulting Blob MIME type.
-- BMP requires a dedicated encoder if the browser does not provide one.
-- HEIC/HEIF requires a suitable decoder, such as `heic-to` or another evaluated library.
-- TIFF requires a decoder such as UTIF.js. TIFF encoding and advanced TIFF features must be verified separately.
-- SVG to raster formats requires safe SVG loading and rasterization. Raster images wrapped inside SVG are not true vector conversions.
+- Canvas commonly supports PNG output and browser-dependent JPEG/WebP output. Verify the returned Blob MIME type.
+- BMP may require a dedicated encoder.
+- HEIC/HEIF requires a suitable decoder, such as an evaluated `heic-to` implementation.
+- TIFF decoding and encoding must be evaluated separately.
+- SVG-to-raster requires safe rasterization. Raster wrapped in SVG is not true vector conversion.
 - Animated GIF requires frame-aware decoding and encoding. A simple Canvas pipeline may only process one frame.
 
-## Technology direction
+## Technology
 
-| Area | Planned technology |
+| Area | Technology |
 |---|---|
 | Markup | HTML5 |
-| Styling | CSS3; Tailwind CSS only if adopted during setup |
-| Language | Vanilla JavaScript (ES modules, modern JavaScript) |
+| Styling | Plain CSS3 |
+| Language | Vanilla JavaScript ES modules |
 | Development/build | Vite |
+| Icons | Lucide NPM package |
 | Standard image processing | Canvas API, ImageBitmap |
 | Background processing | Web Workers, OffscreenCanvas where supported |
-| HEIC/HEIF | Evaluate `heic-to` and alternatives |
-| TIFF | UTIF.js for decoding; validate encoder options |
-| ZIP downloads | JSZip |
-| Icons | Lucide |
+| ZIP downloads | JSZip, planned |
 | Version control | Git and GitHub |
 
-No backend, database, cloud storage, or remote image-processing API is planned for the core application.
+No backend, database, cloud storage, or remote image-processing API is planned.
 
 ## Run locally
 
-The following commands will apply once the Vite application skeleton and its `package.json` scripts have been created:
+Requirements: Node.js compatible with the Vite version in package.json and npm.
 
 ```bash
 git clone https://github.com/andra-gs/Images-Format-Converter.git
@@ -59,12 +57,18 @@ npm install
 npm run dev
 ```
 
-Production build:
+Open the localhost URL printed by Vite.
+
+Production build and preview:
 
 ```bash
 npm run build
 npm run preview
 ```
+
+## Current foundation
+
+The repository now contains the root Vite entry point, Vite configuration, NPM scripts, JavaScript entry point, base CSS files, and favicon. The current page is a foundation screen only. Image upload and conversion are not implemented.
 
 ## Documentation
 
@@ -77,15 +81,11 @@ npm run preview
 
 ## Development principles
 
-1. Keep all image processing local to the browser.
-2. Separate UI code, application orchestration, format adapters, and utilities.
+1. Keep image processing local to the browser.
+2. Separate UI, orchestration, format adapters, workers, and utilities.
 3. Treat decoding and encoding as separate capabilities.
-4. Validate actual file content and decoder results. Do not trust file extensions alone.
-5. Revoke Object URLs and release large image resources when they are no longer needed.
-6. Use Web Workers for suitable heavy work, with a fallback for browsers without required capabilities.
+4. Validate file content and decoder results. Do not trust extensions alone.
+5. Revoke Object URLs and release large image resources.
+6. Use Web Workers for suitable heavy work, with a fallback where practical.
 7. Report unsupported conversions honestly.
-8. Test output files by decoding them again, not merely by checking that a Blob was returned.
-
-## Project status
-
-The repository currently contains project documentation only. Phase 0 is in progress. The application skeleton has not yet been created, and no conversion feature is implemented.
+8. Reopen generated outputs to validate them.
