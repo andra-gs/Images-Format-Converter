@@ -16,9 +16,11 @@ The current interface includes:
 - Light and dark themes with saved preference.
 - Conversion settings UI for PNG, JPEG, WebP, and BMP. These are interface options only until the matching encoder is implemented and tested.
 - Startup skeleton that follows the selected theme and prevents an unstyled-content flash.
-- Initial file validation and image-format signature detection. These checks identify recognized image file contents; they do not prove that every format can be decoded or converted in the current browser.
+- Initial file validation and image-format signature detection.
+- An explicit capability registry that keeps detection, decoding, and encoding status separate.
+- Automated Node.js tests for the capability registry using the built-in test runner.
 
-The conversion engine, output generation, and downloads are not available yet. The Convert button remains disabled.
+The image decoder, encoders, conversion execution, output generation, and downloads are not available yet. The Convert button remains disabled. The capability registry currently reports no implemented decoder or encoder.
 
 ## Project goals
 
@@ -75,6 +77,7 @@ Open the localhost URL printed by Vite.
 Production build and preview:
 
 ```bash
+npm test
 npm run build
 npm run preview
 ```
