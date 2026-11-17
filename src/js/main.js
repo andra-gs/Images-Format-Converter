@@ -50,7 +50,12 @@ const clearButton = document.querySelector("#clear-button");
 const themeToggle = document.querySelector("#theme-toggle");
 const settingsPanel = document.querySelector("#settings-panel");
 const resultsPanel = document.querySelector("#results-panel");
-const outputFormat = document.querySelector("#output-format");
+const formatSelect = document.querySelector("#format-select");
+const formatTrigger = document.querySelector("#output-format-trigger");
+const formatValue = document.querySelector("#output-format-value");
+const formatMenu = document.querySelector("#output-format-menu");
+const formatOptions = [...formatMenu.querySelectorAll('[role="option"]')];
+let selectedFormat = "image/png";
 const qualityField = document.querySelector("#quality-field");
 const outputQuality = document.querySelector("#output-quality");
 const qualityValue = document.querySelector("#quality-value");
@@ -73,9 +78,76 @@ const updateQueueSummary = () => {
 };
 
 const updateQualityVisibility = () => {
-  const usesQuality = ["image/jpeg", "image/webp"].includes(outputFormat.value);
+  const usesQuality = ["image/jpeg", "image/webp"].includes(selectedFormat);
   qualityField.hidden = !usesQuality;
 };
+
+const closeFormatMenu = (returnFocus = false) => {
+  formatMenu.hidden = true;
+  formatTrigger.setAttribute("aria-expanded", "false");
+  if (returnFocus) formatTrigger.focus();
+};
+
+const openFormatMenu = (focusSelected = false) => {
+  formatMenu.hidden = false;
+  formatTrigger.setAttribute("aria-expanded", "true");
+  const selectedOption = formatOptions.find((option) => option.dataset.value === selectedFormat);
+  (focusSelected ? selectedOption : formatOptions[0])?.focus();
+};
+
+const selectFormat = (option) => {
+  selectedFormat = option.dataset.value;
+  formatValue.textContent = option.textContent.trim();
+  formatOptions.forEach((item) => {
+    const isSelected = item === option;
+    item.setAttribute("aria-selected", String(isSelected));
+    item.classList.toggle("is-selected", isSelected);
+  });
+  closeFormatMenu();
+  updateQualityVisibility();
+  formatTrigger.focus();
+};
+
+formatTrigger.addEventListener("click", () => {
+  if (formatMenu.hidden) openFormatMenu(true);
+  else closeFormatMenu();
+});
+
+formatOptions.forEach((option, index) => {
+  option.addEventListener("click", () => selectFormat(option));
+  option.addEventListener("keydown", (event) => {
+    let nextIndex = index;
+    if (event.key === "ArrowDown") nextIndex = (index + 1) % formatOptions.length;
+    else if (event.key === "ArrowUp") nextIndex = (index - 1 + formatOptions.length) % formatOptions.length;
+    else if (event.key === "Home") nextIndex = 0;
+    else if (event.key === "End") nextIndex = formatOptions.length - 1;
+    else if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      selectFormat(option);
+      return;
+    } else if (event.key === "Escape") {
+      event.preventDefault();
+      closeFormatMenu(true);
+      return;
+    } else {
+      return;
+    }
+    event.preventDefault();
+    formatOptions[nextIndex].focus();
+  });
+});
+
+document.addEventListener("click", (event) => {
+  if (!formatSelect.contains(event.target)) closeFormatMenu();
+});
+
+formatTrigger.addEventListener("keydown", (event) => {
+  if (["ArrowDown", "ArrowUp", "Enter", " "].includes(event.key)) {
+    event.preventDefault();
+    openFormatMenu(true);
+  }
+  if (event.key === "Escape") closeFormatMenu();
+});
 
 const renderFile = (entry) => {
   const item = document.createElement("li");
@@ -206,8 +278,6 @@ dropzone.addEventListener("drop", (event) => {
 
 clearButton.addEventListener("click", clearFiles);
 
-outputFormat.addEventListener("change", updateQualityVisibility);
-
 outputQuality.addEventListener("input", () => {
   qualityValue.value = `${outputQuality.value}%`;
   qualityValue.textContent = `${outputQuality.value}%`;
@@ -240,6 +310,9 @@ themeToggle.addEventListener("click", () => {
 });
 
 renderIcons();
+
+document.querySelector("#boot-splash")?.remove();
+app.style.visibility = "visible";
 
 window.addEventListener("beforeunload", () => {
   for (const entry of selectedFiles.values()) {
