@@ -7,7 +7,7 @@ const FORMAT_CAPABILITIES = Object.freeze({
     decoding: {
       status: "planned",
       strategy: "browser-native",
-      note: "Standard browser image decoding will be implemented and verified in the decoder module."
+      note: "A browser-native decoder module is available; real-file verification is required before enabling this format."
     },
     encoding: {
       status: "planned",
@@ -23,7 +23,7 @@ const FORMAT_CAPABILITIES = Object.freeze({
     decoding: {
       status: "planned",
       strategy: "browser-native",
-      note: "Standard browser image decoding will be implemented and verified in the decoder module."
+      note: "A browser-native decoder module is available; real-file verification is required before enabling this format."
     },
     encoding: {
       status: "planned",
@@ -39,7 +39,7 @@ const FORMAT_CAPABILITIES = Object.freeze({
     decoding: {
       status: "planned",
       strategy: "browser-native",
-      note: "Actual browser decoding support will be checked during decoding."
+      note: "A browser-native decoder module is available; real-file verification is required before enabling this format."
     },
     encoding: {
       status: "planned",
