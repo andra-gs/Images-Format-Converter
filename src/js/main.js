@@ -15,6 +15,7 @@ import {
   Image
 } from "lucide";
 import "../styles/main.css";
+import { validateImageFile } from "./core/file-validator.js";
 
 const iconSet = {
   Images,
@@ -46,6 +47,7 @@ const dropzone = document.querySelector("#dropzone");
 const fileList = document.querySelector("#file-list");
 const queueSection = document.querySelector("#queue-section");
 const fileCount = document.querySelector("#file-count");
+const fileFeedback = document.querySelector("#file-feedback");
 const clearButton = document.querySelector("#clear-button");
 const themeToggle = document.querySelector("#theme-toggle");
 const settingsPanel = document.querySelector("#settings-panel");
@@ -161,6 +163,12 @@ const renderFile = (entry) => {
   image.src = entry.url;
   image.alt = "";
   image.loading = "lazy";
+  image.addEventListener("error", () => {
+    const fallback = document.createElement("span");
+    fallback.className = "file-preview-fallback";
+    fallback.textContent = entry.format.label;
+    preview.replaceChildren(fallback);
+  }, { once: true });
   preview.append(image);
 
   const details = document.createElement("div");
@@ -172,7 +180,7 @@ const renderFile = (entry) => {
 
   const meta = document.createElement("span");
   meta.className = "file-meta";
-  meta.textContent = `${formatBytes(entry.file.size)} · ${entry.file.type || "Image"}`;
+  meta.textContent = `${formatBytes(entry.file.size)} · ${entry.format.label}`;
 
   details.append(name, meta);
 
@@ -187,11 +195,24 @@ const renderFile = (entry) => {
   fileList.append(item);
 };
 
-const addFiles = (files) => {
-  const imageFiles = [...files].filter((file) => file.type.startsWith("image/"));
-  const ignoredCount = files.length - imageFiles.length;
+const showFileFeedback = (messages, state = "info") => {
+  fileFeedback.hidden = messages.length === 0;
+  fileFeedback.dataset.state = state;
+  fileFeedback.textContent = messages.join(" ");
+};
 
-  for (const file of imageFiles) {
+const addFiles = async (files) => {
+  const rejected = [];
+  const warnings = [];
+
+  for (const file of [...files]) {
+    const validation = await validateImageFile(file);
+
+    if (!validation.valid) {
+      rejected.push(`${file.name}: ${validation.reason}`);
+      continue;
+    }
+
     const duplicate = [...selectedFiles.values()].some(
       (entry) => entry.file.name === file.name &&
         entry.file.size === file.size &&
@@ -203,19 +224,23 @@ const addFiles = (files) => {
     const entry = {
       id: nextFileId++,
       file,
+      format: validation.format,
       url: URL.createObjectURL(file)
     };
 
     selectedFiles.set(entry.id, entry);
     renderFile(entry);
+
+    for (const warning of validation.warnings) {
+      warnings.push(`${file.name}: ${warning}`);
+    }
   }
 
   updateQueueSummary();
   renderIcons();
 
-  if (ignoredCount > 0) {
-    console.info(`${ignoredCount} non-image file(s) were ignored.`);
-  }
+  const messages = [...rejected, ...warnings];
+  showFileFeedback(messages, rejected.length > 0 ? "error" : "warning");
 };
 
 const removeFile = (id) => {
