@@ -63,7 +63,8 @@ Images-Format-Converter/
 │       └── core/
 │           ├── file-validator.js
 │           ├── format-detector.js
-│           └── capability-registry.js
+│           ├── capability-registry.js
+│           └── image-decoder.js
 ├── tests/
 │   ├── capability-registry.test.js
 │   └── image-decoder.test.js
