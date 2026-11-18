@@ -302,7 +302,7 @@ const renderConversionError = (entry, error) => {
 };
 
 const runConversion = async () => {
-  if (!["image/png", "image/jpeg"].includes(selectedFormat) || isConverting) return;
+  if (!["image/png", "image/jpeg", "image/webp"].includes(selectedFormat) || isConverting) return;
 
   isConverting = true;
   updateConvertButton();
