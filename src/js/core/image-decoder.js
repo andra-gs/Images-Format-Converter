@@ -103,7 +103,7 @@ async function decodeWithImageElement(file, format) {
  * Decode a validated raster image into a browser-processable source.
  *
  * The caller owns the returned resource and must call close() when finished.
- * SVG, GIF, TIFF, HEIC, and HEIF are intentionally excluded from this module.
+ * SVG, GIF, and TIFF are intentionally excluded from this module.
  */
 export async function decodeImage(file, { format } = {}) {
   if (!(file instanceof Blob)) {
