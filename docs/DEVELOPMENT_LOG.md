@@ -33,6 +33,27 @@ This file records actual repository progress. Update it after meaningful impleme
 
 Add newest entries first.
 
+### 2026-11-18 - Initial WebP encoder and conversion integration
+
+- Status: Implemented; real-browser verification pending
+- Changes:
+  - Extended the shared Canvas encoder to request WebP output and pass the quality setting to OffscreenCanvas and HTML Canvas.
+  - Required the final Blob MIME type to be exactly `image/webp`; the conversion fails if the browser returns another format.
+  - Added `convertImageToWebp()` with the shared signature, output-decoding, dimension, and resource-cleanup validation.
+  - Enabled WebP in the capability registry and output-format dropdown.
+  - Connected WebP conversion to the main interface and added the `.webp` filename extension.
+  - Kept BMP output disabled.
+  - Added automated tests for OffscreenCanvas WebP encoding, HTML Canvas fallback, MIME mismatch rejection, and quality validation.
+  - Updated README, Technical Specification, and Roadmap.
+- Tests performed:
+  - Automated tests have been added but have not yet been run by the user after this implementation.
+  - Real-file browser verification is pending.
+- Next steps:
+  - Run `npm test` and `npm run build`.
+  - Test PNG, JPEG, WebP, and BMP input files to WebP in the main interface.
+  - Verify MIME type, quality changes, dimensions, preview, and `.webp` download.
+  - Confirm unsupported browser WebP encoding produces a clear per-file error.
+
 ### 2026-11-18 - JPEG conversion verified and enabled in the main interface
 
 - Status: Tested; user-confirmed real-file browser verification
