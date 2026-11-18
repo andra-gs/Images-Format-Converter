@@ -74,10 +74,10 @@ Tasks:
 - [x] Concurrency limit of one conversion job at a time to control memory usage.
 - [x] Cancel remaining queued files after the active file finishes.
 - [x] Quality adjustment for JPEG and WebP.
-- [x] ZIP download using JSZip (implementation committed; user verification and dependency-lock synchronization pending).
+- [ ] Verify ZIP download using JSZip (implementation committed; dependency-lock synchronization and user verification pending).
 - [x] Resource cleanup for decoded images, output object URLs, and worker shutdown.
 
-Deliverable: batch conversion without freezing the UI under normal test loads. ZIP export is implemented and awaiting user verification.
+Deliverable: batch conversion without freezing the UI under normal test loads. Batch and worker behavior are user-verified; ZIP export awaits dependency installation and browser verification.
 
 ## Phase 4: Advanced format support
 
