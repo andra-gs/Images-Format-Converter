@@ -707,6 +707,39 @@ Add newest entries first.
 - Recorded light and dark themes, hybrid processing, and phased MVP development.
 - No application features had been implemented or tested at this point.
 
+
+### 2026-11-18 - ZIP export implementation
+- Status: Implemented, pending user verification
+- Changes:
+  - Added JSZip as an application dependency.
+  - Added a Download all as ZIP action to the conversion results panel.
+  - Included only successfully converted outputs in the archive.
+  - Added duplicate filename handling with numeric suffixes.
+  - Used ZIP STORE mode to avoid spending additional CPU time compressing already encoded image files.
+  - Added accessible archive-generation status text and disabled the action while the archive is being created.
+  - Kept individual image download links available.
+- Files changed:
+  - `package.json`
+  - `index.html`
+  - `src/js/main.js`
+  - `src/styles/components.css`
+  - `docs/DEVELOPMENT_ROADMAP.md`
+  - `docs/TECHNICAL_SPECIFICATION.md`
+  - `README.md`
+- Tests performed:
+  - Reviewed the ZIP flow, successful-result filtering, duplicate filename handling, and cleanup of the temporary archive Object URL.
+  - Dependency installation, automated tests, production build, and browser ZIP extraction have not yet been verified.
+- Test results:
+  - Implementation committed to `main`.
+  - `package-lock.json` must be refreshed by running `npm install` after pulling the update.
+- Known issues:
+  - ZIP generation runs on the main thread. STORE mode avoids compression work, but archive assembly still uses browser memory.
+  - ZIP download and archive integrity need user verification.
+- Next steps:
+  - Pull `main`, run `npm install`, `npm test`, and `npm run build`.
+  - Test ZIP downloads with multiple successful files, duplicate output names, mixed successful and failed conversions, and a single successful result.
+  - Extract the downloaded archive and confirm each image opens.
+
 ## Entry template
 
 ```markdown
