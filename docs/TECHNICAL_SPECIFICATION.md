@@ -142,7 +142,7 @@ The initial browser decoder module handles PNG, JPEG, WebP, and BMP through `cre
 
 The first conversion path decodes a supported source image, draws it to a 2D Canvas, and encodes the canvas as PNG. The encoder prefers `OffscreenCanvas` and falls back to an HTML canvas. The conversion service checks the generated PNG signature, decodes the generated output again, and confirms that its dimensions match the source. It closes both decoded image resources after use. PNG output does not use the lossy quality slider.
 
-The user verified the complete PNG conversion flow in the main interface with real PNG, JPEG, WebP, and BMP input files. The generated files opened as PNG, retained the source dimensions, preserved PNG transparency, downloaded with the `.png` extension, and worked independently during multi-file conversion. PNG encoding is marked implemented in the capability registry. JPEG output is also implemented and enabled in the main interface after separate real-file browser verification. WebP encoder code is implemented separately and described in the next section, but remains unavailable in the main interface pending real-browser verification. BMP output remains unavailable until its encoder is implemented and verified.
+The user verified the complete PNG conversion flow in the main interface with real PNG, JPEG, WebP, and BMP input files. The generated files opened as PNG, retained the source dimensions, preserved PNG transparency, downloaded with the `.png` extension, and worked independently during multi-file conversion. PNG encoding is marked implemented in the capability registry. JPEG output is also implemented and enabled in the main interface after separate real-file browser verification. WebP output is now implemented, verified, and enabled in the main interface. BMP output remains unavailable until its encoder is implemented and verified.
 
 ## 10. JPEG conversion pipeline
 
@@ -152,9 +152,9 @@ The user verified real-file JPEG output in the main application interface: PNG, 
 
 ## 11. WebP conversion pipeline
 
-The WebP encoder uses the browser Canvas API with a quality value from 0 to 1. It prefers OffscreenCanvas and falls back to an HTML canvas. Browser support for WebP encoding can vary, so the encoder must verify that the returned Blob MIME type is exactly `image/webp`. If a browser silently returns PNG or another format, the conversion must fail with a clear error rather than presenting the file as WebP. The conversion service validates the WebP signature, decodes the generated output again, and confirms that its dimensions match the source. The conversion service exposes `convertImageToWebp()`, but WebP remains disabled in the main interface while real-browser verification is pending. The capability registry keeps WebP encoding in the planned state until the browser test passes. The quality slider will be shared with JPEG when the format is enabled.
+The WebP encoder uses the browser Canvas API with a quality value from 0 to 1. It prefers OffscreenCanvas and falls back to an HTML canvas. Browser support for WebP encoding can vary, so the encoder verifies that the returned Blob MIME type is exactly `image/webp`. If a browser silently returns PNG or another format, the conversion fails with a clear error rather than presenting the file as WebP. The conversion service validates the WebP signature, decodes the generated output again, and confirms that its dimensions match the source. The main interface now enables WebP output and shares the quality slider with JPEG.
 
-Use the standalone page at `/tests/browser-encoder.html`. The browser test must cover PNG, JPEG, WebP, and BMP sources, quality changes, MIME type, dimensions, preview, and `.webp` download in the target browser.
+The user verified all 11 browser checks: PNG, JPEG, WebP, and BMP sources convert to WebP; PNG transparency is preserved; quality adjustment works; the MIME type is exactly `image/webp`; dimensions match; preview displays; the download uses the `.webp` extension; and browsers without WebP encoding support show a clear error.
 
 ## 12. Conversion settings
 
