@@ -142,7 +142,7 @@ The initial browser decoder module handles PNG, JPEG, WebP, and BMP through `cre
 
 The first conversion path decodes a supported source image, draws it to a 2D Canvas, and encodes the canvas as PNG. The encoder prefers `OffscreenCanvas` and falls back to an HTML canvas. The conversion service checks the generated PNG signature, decodes the generated output again, and confirms that its dimensions match the source. It closes both decoded image resources after use. PNG output does not use the lossy quality slider.
 
-The user verified the complete PNG conversion flow in the main interface with real PNG, JPEG, WebP, and BMP input files. The generated files opened as PNG, retained the source dimensions, preserved PNG transparency, downloaded with the `.png` extension, and worked independently during multi-file conversion. PNG encoding is marked implemented in the capability registry. JPEG output is also implemented and enabled in the main interface after separate real-file browser verification. WebP output is now implemented, verified, and enabled in the main interface. BMP output remains unavailable until its encoder is implemented and verified.
+The user verified the complete PNG conversion flow in the main interface with real PNG, JPEG, WebP, and BMP input files. The generated files opened as PNG, retained the source dimensions, preserved PNG transparency, downloaded with the `.png` extension, and worked independently during multi-file conversion. PNG encoding is marked implemented in the capability registry. JPEG output is also implemented and enabled in the main interface after separate real-file browser verification. WebP output is now implemented, verified, and enabled in the main interface. BMP output now has a dedicated 24-bit encoder. It writes a Windows BMP file header and 40-byte DIB header, stores rows bottom-up as BGR pixels, and pads each row to a 4-byte boundary. Because this implementation uses 24-bit BMP, transparent pixels are composited onto white. The conversion service validates the BMP signature, reopens the output, and checks its dimensions. Real-file browser verification is still pending.
 
 ## 10. JPEG conversion pipeline
 
@@ -192,3 +192,8 @@ Test PNG/JPEG/WebP paths, transparency to JPEG with a selected background, corru
 ## 17. Definition of Done
 
 A feature is complete when it matches the agreed behavior, handles errors, passes relevant tests, preserves local processing, releases temporary resources, and has appropriate documentation.
+
+
+## 12. BMP conversion pipeline
+
+The BMP encoder is a dedicated browser-side implementation. It draws the decoded source to a 2D Canvas, reads RGBA pixel data, and writes a 24-bit Windows BMP file. Pixel rows are stored bottom-up in BGR order and padded to 4-byte boundaries. The 24-bit format has no alpha channel, so transparent pixels are composited onto white. The conversion service checks the BMP signature, decodes the generated output again, and confirms that its dimensions match the source. Automated unit tests cover the file header, pixel order, row padding, alpha compositing, and HTML Canvas fallback. Real-file browser verification is pending.
