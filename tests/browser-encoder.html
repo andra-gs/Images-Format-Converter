@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Browser JPEG Encoder Test</title>
+    <link rel="stylesheet" href="./browser-decoder.css" />
+    <style>
+      .quality-control { display: flex; align-items: center; gap: 14px; margin-top: 18px; }
+      .quality-control input { flex: 1; }
+      .result-preview { display: block; max-width: 100%; max-height: 240px; margin-top: 12px; border-radius: 8px; background: repeating-conic-gradient(#ddd 0% 25%, #fff 0% 50%) 50% / 16px 16px; }
+      .download-link { display: inline-block; margin-top: 10px; color: #087e69; }
+      .test-controls { display: grid; gap: 16px; margin-top: 18px; }
+    </style>
+  </head>
+  <body>
+    <main class="test-page">
+      <a class="back-link" href="/">← Back to Images Format Converter</a>
+      <header>
+        <p class="eyebrow">Development test</p>
+        <h1>Browser JPEG Encoder</h1>
+        <p class="description">
+          Convert real image files to JPEG in this browser test page. It checks the output signature,
+          MIME type, dimensions, and download. Files are not uploaded.
+        </p>
+      </header>
+
+      <section class="test-panel" aria-labelledby="input-title">
+        <h2 id="input-title">Choose source images</h2>
+        <input id="encoder-file-input" type="file" accept="image/png,image/jpeg,image/webp,image/bmp" multiple />
+        <div class="test-controls">
+          <label class="quality-control" for="jpeg-quality">
+            <span>JPEG quality</span>
+            <input id="jpeg-quality" type="range" min="10" max="100" value="85" step="5" />
+            <output id="jpeg-quality-value">85%</output>
+          </label>
+        </div>
+        <p class="hint">Transparent pixels are composited onto white. Include a transparent PNG to verify this behavior.</p>
+      </section>
+
+      <section class="results-panel" aria-labelledby="results-title">
+        <div class="results-heading">
+          <h2 id="results-title">Test results</h2>
+          <button id="clear-results" type="button">Clear results</button>
+        </div>
+        <p id="empty-state" class="empty-state">No files tested yet.</p>
+        <ul id="encoder-results" class="results-list" aria-live="polite"></ul>
+      </section>
+    </main>
+    <script type="module" src="./browser-encoder.js"></script>
+  </body>
+</html>
