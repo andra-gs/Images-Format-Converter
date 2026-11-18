@@ -54,3 +54,13 @@ export function convertImageToPng(file) {
 export function convertImageToJpeg(file, { quality = 0.85, backgroundColor = "#ffffff" } = {}) {
   return convertImage(file, "jpeg", { quality, backgroundColor });
 }
+
+
+/**
+ * Convert a supported source image to WebP.
+ * Quality is a number from 0 to 1. The browser must return image/webp;
+ * unsupported browser encoders are rejected rather than mislabeled.
+ */
+export function convertImageToWebp(file, { quality = 0.85 } = {}) {
+  return convertImage(file, "webp", { quality });
+}
