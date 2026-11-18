@@ -5,7 +5,7 @@ This file records actual repository progress. Update it after meaningful impleme
 ## Project status
 
 - Current stage: Phase 4 - Advanced format support
-- Current phase status: HEIC/HEIF decoder adapter using heic-to is implemented. Real-file decoder and conversion verification are pending.
+- Current phase status: HEIC/HEIF decoder, main conversion, and Worker paths are user-verified. The UTIF2 TIFF decoder adapter is implemented and awaits real-file verification.
 - Latest release: None
 - Last updated: 2026-11-18
 
@@ -25,13 +25,41 @@ This file records actual repository progress. Update it after meaningful impleme
 | Phase 1: UI development | Tested | User confirmed the skeleton follows light/dark themes, theme persists after refresh, no unstyled flash appears, and `npm run build` succeeds |
 | Phase 2: Core conversion engine | Tested | PNG, JPEG, WebP, and BMP conversion paths are user-verified; user reports the requested automated tests and build checks passed |
 | Phase 3: Batch processing | Tested | User verified batch queue, worker execution, progress, cancellation, failure isolation, large-image responsiveness, cleanup, individual downloads, ZIP extraction, and image integrity |
-| Phase 4: Advanced formats | In progress | HEIC/HEIF decoder adapter implemented; real-file tests pending. TIFF, SVG, and GIF remain |
+| Phase 4: Advanced formats | In progress | HEIC/HEIF user-verified. TIFF adapter implemented, real-file tests pending. SVG and GIF remain |
 | Phase 5: Image manipulation | Not started | Resize, compression, metadata |
 | Phase 6: Testing and release | Not started | QA and v1.0.0 |
 
 ## Change log
 
 Add newest entries first.
+
+
+### 2026-11-18 - HEIC/HEIF verification and TIFF decoder adapter
+- HEIC/HEIF status: Tested, based on user-reported browser results.
+- User-confirmed HEIC/HEIF checks:
+  - Browser decoder test produced the expected result.
+  - Main application conversion produced the expected result.
+  - Web Worker conversion produced the expected result.
+- HEIC and HEIF decoding are now marked implemented in the capability registry. Encoding remains not planned.
+- TIFF decoder evaluation:
+  - Selected UTIF2 4.1.0 for the first TIFF decoder integration. Its documented API decodes TIFF IFDs and converts the first decoded page to 8-bit RGBA. Its documentation lists grayscale, RGB, palette, Fax 3/4, JPEG, LZW, PackBits, and additional compression support.
+  - The adapter reads the first IFD only and renders it to Canvas so the existing conversion pipeline can process the result. Multi-page selection and TIFF output encoding are not included.
+- Changes:
+  - Added UTIF2 as a dependency.
+  - Added TIFF decoding through the dedicated adapter, including Canvas rendering and resource cleanup.
+  - Extended the browser decoder test page to accept TIFF files.
+  - Added capability-registry tests for verified HEIC/HEIF and planned TIFF status.
+  - Kept TIFF decoding planned until real-file browser and Worker verification passes.
+- Tests performed:
+  - HEIC/HEIF decoder, main conversion, and Worker tests were user-confirmed.
+  - TIFF implementation has not yet been run through npm tests, production build, or real TIFF fixtures.
+- Next steps:
+  - Run npm install to update package-lock.json, then npm test and npm run build.
+  - Test real single-page TIFF files with common compression variants.
+  - Test multi-page TIFF and confirm the first page is used.
+  - Convert TIFF files to PNG, JPEG, WebP, and BMP through the main interface and Worker.
+  - Verify dimensions, orientation, color, transparency where applicable, MIME types, output files, and downloads.
+
 
 
 ### 2026-11-18 - HEIC/HEIF decoder adapter
