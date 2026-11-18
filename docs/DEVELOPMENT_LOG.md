@@ -5,7 +5,7 @@ This file records actual repository progress. Update it after meaningful impleme
 ## Project status
 
 - Current stage: Phase 2 - Core conversion engine
-- Current phase status: Phase 2 in progress; PNG conversion is user-verified; JPEG encoder and conversion service are implemented with real-browser verification pending; JPEG remains disabled in the main UI
+- Current phase status: Phase 2 in progress; PNG and JPEG conversion are user-verified and enabled in the main UI; WebP and BMP output encoders remain pending
 - Latest release: None
 - Last updated: 2026-11-18
 
@@ -23,7 +23,7 @@ This file records actual repository progress. Update it after meaningful impleme
 |---|---|---|
 | Phase 0: Project foundation | Tested | User confirmed localhost works and `npm run build` succeeds; `package-lock.json` is present in the GitHub repository |
 | Phase 1: UI development | Tested | User confirmed the skeleton follows light/dark themes, theme persists after refresh, no unstyled flash appears, and `npm run build` succeeds |
-| Phase 2: Core conversion engine | In progress | PNG conversion is user-verified; JPEG encoder and conversion service are implemented but pending real-browser verification; WebP and BMP output encoders remain pending |
+| Phase 2: Core conversion engine | In progress | PNG and JPEG output are user-verified; WebP and BMP output encoders remain pending |
 | Phase 3: Batch processing | Not started | Workers, queue, ZIP |
 | Phase 4: Advanced formats | Not started | HEIC, TIFF, SVG, GIF |
 | Phase 5: Image manipulation | Not started | Resize, compression, metadata |
@@ -32,6 +32,32 @@ This file records actual repository progress. Update it after meaningful impleme
 ## Change log
 
 Add newest entries first.
+
+### 2026-11-18 - JPEG conversion verified and enabled in the main interface
+
+- Status: Tested; user-confirmed real-file browser verification
+- User-confirmed checks:
+  - PNG, JPEG, WebP, and BMP inputs convert successfully to JPEG.
+  - Transparent areas in PNG sources become white in the JPEG output.
+  - The quality setting produces valid output.
+  - The output MIME type is `image/jpeg`.
+  - Output dimensions match the source image.
+  - The output preview displays correctly.
+  - The `.jpg` download works.
+- Repository changes:
+  - Marked JPEG encoding as `implemented` in the capability registry.
+  - Enabled JPEG in the custom output-format dropdown.
+  - Connected the main conversion action to `convertImageToJpeg()` and passed the selected quality value.
+  - Made result filenames, format labels, and download labels depend on the actual output format.
+  - Updated README, Technical Specification, and Development Roadmap.
+  - Updated capability-registry tests to expect PNG and JPEG as available output formats.
+- Test status:
+  - Real-browser JPEG checks were confirmed by the user.
+  - `npm test` and `npm run build` must still be rerun after these repository changes. Do not treat the earlier 17/17 test result as validation of the latest commit.
+- Remaining limitations:
+  - JPEG background is currently fixed to white in the main interface.
+  - WebP and BMP output remain unavailable.
+
 
 ### 2026-11-18 - Initial JPEG encoder and conversion service
 
