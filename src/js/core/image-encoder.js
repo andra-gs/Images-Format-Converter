@@ -1,7 +1,7 @@
 const PNG_MIME_TYPE = "image/png";
 
 function createHtmlCanvas(width, height) {
-  if (typeof document?.createElement !== "function") {
+  if (typeof document === "undefined" || typeof document.createElement !== "function") {
     throw new Error("Canvas is not available in this browser.");
   }
 
