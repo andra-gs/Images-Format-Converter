@@ -75,13 +75,14 @@ The application should maintain an explicit capability registry. The UI should o
 - Validate generated files by decoding them with an independent decoder or browser-supported path.
 
 **HEIC / HEIF**
-- Use `heic-to` as the selected browser-compatible decoder candidate. Version 1.6.7 is integrated as a decoder fallback with a worker-specific entry point. Keep HEIC/HEIF support unadvertised until representative real-file tests pass. After adding the dependency, refresh and commit `package-lock.json` with `npm install`. Continue monitoring bundle size, licensing, and browser compatibility.
+- Use `heic-to` as the selected browser-compatible decoder. Version 1.6.7 is integrated as a decoder fallback with a worker-specific entry point. The user has verified real HEIC and HEIF files through the browser decoder, main conversion pipeline, and Web Worker. HEIC/HEIF input support is implemented; HEIC/HEIF output encoding remains out of scope. Continue monitoring bundle size, licensing, and browser compatibility.
 - Treat HEIC and HEIF as related but not automatically identical in every implementation detail.
 - HEIC input conversion does not imply HEIC output support.
 
 **TIFF**
-- UTIF.js is a candidate for decoding.
-- Test multipage TIFF behavior, color depth, compression variants, and memory use.
+- UTIF2 4.1.0 is integrated as the TIFF decoder.
+- The current adapter decodes and renders the first IFD only. Multi-page navigation is not implemented.
+- Test real TIFF files, including color depth, compression variants, orientation, and memory use, before marking TIFF input supported.
 - TIFF encoding must be evaluated separately. Do not claim complete TIFF support based only on decoding support.
 
 **SVG**
