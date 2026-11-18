@@ -154,7 +154,7 @@ The user verified real-file JPEG output in the main application interface: PNG, 
 
 The WebP encoder uses the browser Canvas API with a quality value from 0 to 1. It prefers OffscreenCanvas and falls back to an HTML canvas. Browser support for WebP encoding can vary, so the encoder must verify that the returned Blob MIME type is exactly `image/webp`. If a browser silently returns PNG or another format, the conversion must fail with a clear error rather than presenting the file as WebP. The conversion service validates the WebP signature, decodes the generated output again, and confirms that its dimensions match the source. The conversion service exposes `convertImageToWebp()`, but WebP remains disabled in the main interface while real-browser verification is pending. The capability registry keeps WebP encoding in the planned state until the browser test passes. The quality slider will be shared with JPEG when the format is enabled.
 
-The browser test must cover PNG, JPEG, WebP, and BMP sources, quality changes, MIME type, dimensions, preview, and `.webp` download in the target browser.
+Use the standalone page at `/tests/browser-encoder.html`. The browser test must cover PNG, JPEG, WebP, and BMP sources, quality changes, MIME type, dimensions, preview, and `.webp` download in the target browser.
 
 ## 12. Conversion settings
 
