@@ -56,7 +56,7 @@ Add newest entries first.
   - `docs/DEVELOPMENT_ROADMAP.md`
   - `docs/DEVELOPMENT_LOG.md`
 - Tests performed:
-  - Added automated tests for OffscreenCanvas PNG encoding, unsupported output formats, invalid decoded input, and empty output.
+  - Added automated tests for OffscreenCanvas PNG encoding, HTML canvas fallback, fallback after OffscreenCanvas errors, unsupported output formats, invalid decoded input, and empty output.
   - Source changes have been reviewed, but the complete test suite and production build have not yet been run after this implementation.
 - Test results:
   - Automated test execution is pending in the user's local checkout.
