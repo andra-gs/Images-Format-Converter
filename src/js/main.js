@@ -16,7 +16,7 @@ import {
 } from "lucide";
 import "../styles/main.css";
 import { validateImageFile } from "./core/file-validator.js";
-import { convertImageToJpeg, convertImageToPng } from "./core/conversion-service.js";
+import { convertImageToJpeg, convertImageToPng, convertImageToWebp } from "./core/conversion-service.js";
 
 const iconSet = {
   Images,
@@ -78,7 +78,7 @@ const formatBytes = (bytes) => {
 };
 
 const updateConvertButton = () => {
-  convertButton.disabled = selectedFiles.size === 0 || !["image/png", "image/jpeg"].includes(selectedFormat) || isConverting;
+  convertButton.disabled = selectedFiles.size === 0 || !["image/png", "image/jpeg", "image/webp"].includes(selectedFormat) || isConverting;
 };
 
 const updateQueueSummary = () => {
@@ -251,7 +251,7 @@ const clearConversionResults = () => {
 const renderConversionResult = (entry, result) => {
   removeConversionResult(entry.id);
 
-  const extension = result.format === "jpeg" ? "jpg" : "png";
+  const extension = result.format === "jpeg" ? "jpg" : result.format === "webp" ? "webp" : "png";
   const formatLabel = result.format.toUpperCase();
   const outputName = `${entry.file.name.replace(/\.[^.]+$/, "") || "image"}.${extension}`;
   const url = URL.createObjectURL(result.blob);
@@ -302,7 +302,7 @@ const renderConversionError = (entry, error) => {
 };
 
 const runConversion = async () => {
-  if (!["image/png", "image/jpeg"].includes(selectedFormat) || isConverting) return;
+  if (!["image/png", "image/jpeg", "image/webp"].includes(selectedFormat) || isConverting) return;
 
   isConverting = true;
   updateConvertButton();
@@ -315,9 +315,12 @@ const runConversion = async () => {
     if (!selectedFiles.has(entry.id)) continue;
 
     try {
+      const quality = Number(outputQuality.value) / 100;
       const result = selectedFormat === "image/jpeg"
-        ? await convertImageToJpeg(entry.file, { quality: Number(outputQuality.value) / 100 })
-        : await convertImageToPng(entry.file);
+        ? await convertImageToJpeg(entry.file, { quality })
+        : selectedFormat === "image/webp"
+          ? await convertImageToWebp(entry.file, { quality })
+          : await convertImageToPng(entry.file);
       if (!selectedFiles.has(entry.id)) continue;
       renderConversionResult(entry, result);
     } catch (error) {
