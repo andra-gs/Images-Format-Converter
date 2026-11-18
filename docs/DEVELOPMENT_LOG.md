@@ -33,6 +33,45 @@ This file records actual repository progress. Update it after meaningful impleme
 
 Add newest entries first.
 
+### 2026-11-18 - Dedicated BMP encoder implementation
+
+- Status: Implemented; real-file browser verification pending
+- Changes:
+  - Added a dedicated 24-bit Windows BMP encoder using browser Canvas pixel data.
+  - Writes the BMP file header and 40-byte DIB header.
+  - Stores pixel rows bottom-up in BGR order and applies 4-byte row alignment.
+  - Composites transparent pixels onto white because 24-bit BMP does not contain an alpha channel.
+  - Added BMP conversion service integration and enabled BMP in the main output dropdown.
+  - Added automated tests for BMP headers, dimensions, BGR pixel order, row padding, alpha compositing, and HTML Canvas fallback.
+  - Updated the capability registry, README, technical specification, and roadmap.
+- Files changed:
+  - `src/js/core/image-encoder.js`
+  - `src/js/core/conversion-service.js`
+  - `src/js/core/capability-registry.js`
+  - `src/js/main.js`
+  - `index.html`
+  - `tests/image-encoder.test.js`
+  - `tests/capability-registry.test.js`
+  - `README.md`
+  - `docs/TECHNICAL_SPECIFICATION.md`
+  - `docs/DEVELOPMENT_ROADMAP.md`
+  - `docs/DEVELOPMENT_LOG.md`
+- Tests performed:
+  - Added unit tests for BMP byte layout and the Canvas fallback.
+  - The full automated test suite and production build have not yet been run after this change.
+  - Real-file browser conversion has not yet been verified.
+- Test results:
+  - Implementation and tests are committed to `main`.
+  - BMP must remain pending final verification until the user tests real files in the browser.
+- Known limitations:
+  - BMP output uses 24-bit color and does not preserve transparency. Transparent pixels become white.
+  - Large images may require substantial memory while the BMP pixel buffer is created.
+- Next steps:
+  - Run `npm test` and `npm run build`.
+  - Test PNG, JPEG, WebP, and BMP inputs converted to BMP in the main UI.
+  - Confirm the output opens correctly, dimensions match, MIME type is `image/bmp`, and download uses the `.bmp` extension.
+  - Test a transparent PNG and confirm transparent pixels become white.
+
 ### 2026-11-18 - WebP conversion verified and enabled in the main interface
 
 - Status: Tested; user-confirmed real-file browser verification
