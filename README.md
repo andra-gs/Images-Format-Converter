@@ -20,12 +20,12 @@ The current interface includes:
 - An explicit capability registry that keeps detection, decoding, and encoding status separate.
 - A browser image decoder for PNG, JPEG, WebP, and BMP, with an ImageBitmap path and HTML image fallback. The user verified all four formats with real files in the browser.
 - A PNG encoder and conversion service using OffscreenCanvas with an HTML Canvas fallback. The service checks the PNG signature and reopens the output to verify its dimensions.
-- A JPEG encoder and conversion service have been added using OffscreenCanvas with an HTML Canvas fallback. The encoder accepts a quality setting, composites transparency onto a white background by default, and checks the output MIME type. Real-browser verification is pending through `/tests/browser-encoder.html`.
+- JPEG output is implemented and enabled in the main interface. The user verified PNG, JPEG, WebP, and BMP inputs convert to JPEG, transparent PNG areas become white, quality settings work, output MIME type is `image/jpeg`, dimensions match, previews display, and `.jpg` downloads work.
 - The main interface supports PNG output from PNG, JPEG, WebP, and BMP inputs, with individual PNG downloads and per-file error results.
 - The user verified that all four input formats convert successfully, output files open as PNG, dimensions match the originals, PNG transparency is preserved, filenames use the .png extension, downloads work, and multiple files convert independently.
 - Automated Node.js tests for the capability registry, image decoder, and PNG/JPEG encoders using the built-in test runner.
 
-PNG decoding and encoding are marked implemented. JPEG encoding code is implemented but remains disabled in the main interface pending real-browser verification. WebP and BMP output encoders are not implemented. GIF, TIFF, HEIC, HEIF, and SVG decoding remain planned.
+PNG and JPEG decoding and encoding are marked implemented. WebP and BMP output encoders are not implemented. GIF, TIFF, HEIC, HEIF, and SVG decoding remain planned.
 
 ## Project goals
 
