@@ -1,6 +1,7 @@
 const FORMAT_MIME_TYPES = Object.freeze({
   png: "image/png",
-  jpeg: "image/jpeg"
+  jpeg: "image/jpeg",
+  webp: "image/webp"
 });
 
 function createHtmlCanvas(width, height, mimeType, quality) {
@@ -22,7 +23,7 @@ function createHtmlCanvas(width, height, mimeType, quality) {
           return;
         }
         resolve(blob);
-      }, mimeType, mimeType === "image/jpeg" ? quality : undefined);
+      }, mimeType, ["image/jpeg", "image/webp"].includes(mimeType) ? quality : undefined);
     })
   };
 }
@@ -48,7 +49,7 @@ async function createCanvasBlob(decodedImage, { mimeType, quality, backgroundCol
         prepareCanvas(context, source, width, height, mimeType, backgroundColor);
         const blob = await canvas.convertToBlob({
           type: mimeType,
-          ...(mimeType === "image/jpeg" ? { quality } : {})
+          ...(["image/jpeg", "image/webp"].includes(mimeType) ? { quality } : {})
         });
 
         if (blob instanceof Blob && blob.size > 0 && blob.type.toLowerCase() === mimeType) {
@@ -75,9 +76,9 @@ async function createCanvasBlob(decodedImage, { mimeType, quality, backgroundCol
 }
 
 /**
- * Encode a decoded browser image as PNG or JPEG.
- * JPEG quality is a number from 0 to 1. Transparent pixels are composited
- * onto the supplied background color, which defaults to white.
+ * Encode a decoded browser image as PNG, JPEG, or WebP.
+ * JPEG and WebP quality values are numbers from 0 to 1. Transparent JPEG
+ * pixels are composited onto the supplied background color, which defaults to white.
  */
 export async function encodeImage(
   decodedImage,
@@ -95,15 +96,15 @@ export async function encodeImage(
   const mimeType = FORMAT_MIME_TYPES[normalizedFormat];
 
   if (!mimeType) {
-    throw new Error("Only PNG and JPEG encoding are currently implemented.");
+    throw new Error("Only PNG, JPEG, and WebP encoding are currently implemented.");
   }
 
-  if (normalizedFormat === "jpeg") {
+  if (["jpeg", "webp"].includes(normalizedFormat)) {
     if (!Number.isFinite(quality) || quality < 0 || quality > 1) {
-      throw new RangeError("JPEG quality must be a number between 0 and 1.");
+      throw new RangeError("JPEG and WebP quality must be a number between 0 and 1.");
     }
 
-    if (typeof backgroundColor !== "string" || backgroundColor.trim() === "") {
+    if (normalizedFormat === "jpeg" && (typeof backgroundColor !== "string" || backgroundColor.trim() === "")) {
       throw new TypeError("A valid JPEG background color is required.");
     }
   }
