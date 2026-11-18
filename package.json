@@ -10,6 +10,7 @@
     "test": "node --test"
   },
   "dependencies": {
+    "heic-to": "^1.6.7",
     "jszip": "^3.10.1",
     "lucide": "^1.74.0"
   },
