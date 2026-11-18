@@ -36,9 +36,9 @@ There is no planned backend, database, or remote image-processing service.
 | Lucide via NPM | Interface icons |
 | Canvas API / ImageBitmap | Standard raster processing |
 | Web Workers / OffscreenCanvas | Background processing where supported |
-| JSZip | ZIP downloads |\n| heic-to | HEIC/HEIF decoding through WebAssembly in the browser or conversion worker |
-| heic-to | Selected HEIC/HEIF decoder; real-file verification pending |
-| UTIF.js | Candidate TIFF decoder |
+| JSZip | ZIP downloads |
+| heic-to | HEIC/HEIF decoding through WebAssembly in the browser or conversion worker |
+| UTIF2 | TIFF first-page decoding to RGBA and Canvas |
 
 Advanced format libraries remain subject to compatibility, bundle size, license, and browser testing. heic-to 1.6.7 is selected for HEIC/HEIF decoding. It exposes a browser entry and a worker-specific `heic-to/next` entry. The adapter prefers native ImageBitmap decoding, then falls back to heic-to's bitmap output. The user has verified real HEIC and HEIF files through the browser decoder, main conversion pipeline, and Web Worker. UTIF2 4.1.0 is selected for TIFF input decoding; its adapter decodes the first IFD and renders it to Canvas. TIFF capability remains planned until representative real files pass browser and Worker tests.
 
