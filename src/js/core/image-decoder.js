@@ -1,6 +1,6 @@
 import { detectImageFormat } from "./format-detector.js";
 
-const BROWSER_RASTER_FORMATS = new Set(["png", "jpeg", "webp", "bmp", "heic", "heif"]);
+const BROWSER_RASTER_FORMATS = new Set(["png", "jpeg", "webp", "bmp", "heic", "heif", "tiff"]);
 
 function getImageDimensions(source) {
   const width = source.width || source.naturalWidth;
@@ -65,6 +65,61 @@ async function decodeWithHeicLibrary(file, format) {
   }
 }
 
+async function decodeWithTiffLibrary(file, format) {
+  const decoderModule = await import("utif2");
+  const decoder = decoderModule.default || decoderModule;
+  const buffer = await file.arrayBuffer();
+  const directories = decoder.decode(buffer);
+  const firstPage = directories?.[0];
+
+  if (!firstPage) {
+    throw new Error("The TIFF file does not contain a readable image page.");
+  }
+
+  decoder.decodeImage(buffer, firstPage);
+
+  const { width, height } = firstPage;
+  if (!Number.isInteger(width) || !Number.isInteger(height) || width <= 0 || height <= 0) {
+    throw new Error("The TIFF decoder returned invalid image dimensions.");
+  }
+
+  const rgba = decoder.toRGBA8(firstPage);
+  if (!rgba || rgba.length !== width * height * 4) {
+    throw new Error("The TIFF decoder returned incomplete pixel data.");
+  }
+
+  let canvas;
+  if (typeof globalThis.OffscreenCanvas === "function") {
+    canvas = new globalThis.OffscreenCanvas(width, height);
+  } else if (typeof document !== "undefined" && document.createElement) {
+    canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+  } else {
+    throw new Error("Canvas is not available to render the decoded TIFF image.");
+  }
+
+  const context = canvas.getContext("2d");
+  if (!context) {
+    throw new Error("A 2D canvas context is not available for TIFF decoding.");
+  }
+
+  const imageData = context.createImageData(width, height);
+  imageData.data.set(rgba);
+  context.putImageData(imageData, 0, 0);
+
+  try {
+    return createDecodedResult(canvas, format, () => {
+      canvas.width = 0;
+      canvas.height = 0;
+    });
+  } catch (error) {
+    canvas.width = 0;
+    canvas.height = 0;
+    throw error;
+  }
+}
+
 async function decodeWithImageElement(file, format) {
   if (typeof globalThis.Image !== "function") {
     throw new Error("The browser image element is not available.");
@@ -103,7 +158,7 @@ async function decodeWithImageElement(file, format) {
  * Decode a validated raster image into a browser-processable source.
  *
  * The caller owns the returned resource and must call close() when finished.
- * SVG, GIF, and TIFF are intentionally excluded from this module.
+ * SVG and GIF are intentionally excluded from this module. TIFF uses UTIF2 to render its first page to Canvas.
  */
 export async function decodeImage(file, { format } = {}) {
   if (!(file instanceof Blob)) {
@@ -125,6 +180,16 @@ export async function decodeImage(file, { format } = {}) {
 
   if (!BROWSER_RASTER_FORMATS.has(detectedFormat)) {
     throw new Error(`Decoding is not available for the ${detectedFormat || "unknown"} format.`);
+  }
+
+  if (detectedFormat === "tiff") {
+    try {
+      return await decodeWithTiffLibrary(file, detectedFormat);
+    } catch (error) {
+      const decodeError = new Error("This TIFF file could not be decoded. It may use an unsupported compression or image variant.");
+      decodeError.cause = error;
+      throw decodeError;
+    }
   }
 
   const decodingErrors = [];
