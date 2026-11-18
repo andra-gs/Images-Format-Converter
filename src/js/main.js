@@ -16,7 +16,7 @@ import {
 } from "lucide";
 import "../styles/main.css";
 import { validateImageFile } from "./core/file-validator.js";
-import { convertImageToBmp, convertImageToJpeg, convertImageToPng, convertImageToWebp } from "./core/conversion-service.js";
+import { convertImageToBmp, convertImageToJpeg, convertImageToPng, convertImageToWebp, disposeConversionWorker } from "./core/conversion-service.js";
 
 const iconSet = {
   Images,
@@ -591,4 +591,5 @@ window.addEventListener("beforeunload", () => {
   for (const entry of selectedFiles.values()) {
     URL.revokeObjectURL(entry.url);
   }
+  disposeConversionWorker();
 });
