@@ -14,7 +14,7 @@
         <p class="eyebrow">Development test</p>
         <h1>Browser Image Decoder</h1>
         <p class="description">
-          Select real PNG, JPEG, WebP, BMP, HEIC, or HEIF files. This page tests browser decoding only.
+          Select real PNG, JPEG, WebP, BMP, HEIC, HEIF, or TIFF files. This page tests browser decoding only.
           Files stay in your browser and are not uploaded.
         </p>
       </header>
@@ -24,10 +24,10 @@
         <input
           id="decoder-file-input"
           type="file"
-          accept="image/png,image/jpeg,image/webp,image/bmp,image/heic,image/heif,.bmp,.heic,.heif"
+          accept="image/png,image/jpeg,image/webp,image/bmp,image/heic,image/heif,image/tiff,.bmp,.heic,.heif,.tif,.tiff"
           multiple
         />
-        <p class="hint">Use valid image files. Test HEIC and HEIF files separately, including files from different devices when available.</p>
+        <p class="hint">Use valid image files. Test HEIC and HEIF separately. For TIFF, include single-page and multi-page files and different compression types when available. The current TIFF adapter reads the first page.</p>
       </section>
 
       <section class="results-panel" aria-labelledby="results-title">
