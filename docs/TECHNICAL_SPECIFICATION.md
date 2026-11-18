@@ -197,3 +197,12 @@ A feature is complete when it matches the agreed behavior, handles errors, passe
 ## 12. BMP conversion pipeline
 
 The BMP encoder is a dedicated browser-side implementation. It draws the decoded source to a 2D Canvas, reads RGBA pixel data, and writes a 24-bit Windows BMP file. Pixel rows are stored bottom-up in BGR order and padded to 4-byte boundaries. The 24-bit format has no alpha channel, so transparent pixels are composited onto white. The conversion service checks the BMP signature, decodes the generated output again, and confirms that its dimensions match the source. Automated unit tests cover the file header, pixel order, row padding, alpha compositing, and HTML Canvas fallback. Real-file browser verification is pending.
+
+
+## 13. Batch processing and worker execution
+
+The application keeps the UI and queue orchestration on the main thread. When Worker, OffscreenCanvas, and createImageBitmap are available, image conversion runs in a module Web Worker. The worker uses the same conversion service and returns the verified output Blob and dimensions. If worker support is unavailable or worker execution cannot complete, the application retries through the main-thread conversion path so HTMLImageElement and HTMLCanvas fallbacks remain available.
+
+The queue processes one image at a time to limit simultaneous decoded-image memory usage. Each job moves through pending, processing, completed, failed, or cancelled. The interface shows an indeterminate per-file processing indicator and overall batch completion progress. The cancel action allows the active conversion to finish, then marks remaining queued files as cancelled. It does not interrupt a running Canvas operation.
+
+Decoded ImageBitmap resources are closed by the conversion service. The UI revokes input and output Object URLs when their items are removed, when the queue is cleared, or when the page unloads. The conversion worker is terminated on page unload. ZIP download remains pending and will use JSZip after dependency installation and verification.
