@@ -14,7 +14,7 @@ The current interface includes:
 - File selection through the file picker and drag-and-drop.
 - A selected-file queue with image previews, file details, individual removal, and clear-all behavior.
 - Light and dark themes with saved preference.
-- Conversion settings for PNG, JPEG, and WebP, with quality control for JPEG and WebP. BMP remains disabled until its encoder is implemented and tested.
+- Conversion settings for PNG and JPEG, with quality control for JPEG. WebP encoder code is implemented but remains in browser testing and disabled in the main converter. BMP output is not implemented.
 - Startup skeleton that follows the selected theme and prevents an unstyled-content flash.
 - Initial file validation and image-format signature detection.
 - An explicit capability registry that keeps detection, decoding, and encoding status separate.
@@ -23,9 +23,9 @@ The current interface includes:
 - JPEG output is implemented and enabled in the main interface. The user verified PNG, JPEG, WebP, and BMP inputs convert to JPEG, transparent PNG areas become white, quality settings work, output MIME type is `image/jpeg`, dimensions match, previews display, and `.jpg` downloads work.
 - The main interface supports PNG output from PNG, JPEG, WebP, and BMP inputs, with individual PNG downloads and per-file error results.
 - The user verified that all four input formats convert successfully, output files open as PNG, dimensions match the originals, PNG transparency is preserved, filenames use the .png extension, downloads work, and multiple files convert independently.
-- Automated Node.js tests for the capability registry, image decoder, and PNG/JPEG/WebP encoders using the built-in test runner.
+- Automated Node.js tests for the capability registry, image decoder, and PNG/JPEG/WebP encoder code using the built-in test runner.
 
-PNG, JPEG, and WebP decoding and encoding are marked implemented. BMP output encoding is not implemented. GIF, TIFF, HEIC, HEIF, and SVG decoding remain planned.
+PNG and JPEG decoding and encoding are marked implemented. WebP encoder code is implemented but not yet verified in the browser. BMP output encoding is not implemented. GIF, TIFF, HEIC, HEIF, and SVG decoding remain planned.
 
 ## Project goals
 
