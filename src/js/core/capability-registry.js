@@ -5,9 +5,9 @@ const FORMAT_CAPABILITIES = Object.freeze({
     mime: "image/png",
     detection: { status: "implemented" },
     decoding: {
-      status: "planned",
+      status: "implemented",
       strategy: "browser-native",
-      note: "A browser-native decoder module is available; real-file verification is required before enabling this format."
+      note: "Real-file decoding was verified in the browser."
     },
     encoding: {
       status: "planned",
@@ -21,9 +21,9 @@ const FORMAT_CAPABILITIES = Object.freeze({
     mime: "image/jpeg",
     detection: { status: "implemented" },
     decoding: {
-      status: "planned",
+      status: "implemented",
       strategy: "browser-native",
-      note: "A browser-native decoder module is available; real-file verification is required before enabling this format."
+      note: "Real-file decoding was verified in the browser."
     },
     encoding: {
       status: "planned",
@@ -37,9 +37,9 @@ const FORMAT_CAPABILITIES = Object.freeze({
     mime: "image/webp",
     detection: { status: "implemented" },
     decoding: {
-      status: "planned",
+      status: "implemented",
       strategy: "browser-native",
-      note: "A browser-native decoder module is available; real-file verification is required before enabling this format."
+      note: "Real-file decoding was verified in the browser."
     },
     encoding: {
       status: "planned",
@@ -53,9 +53,9 @@ const FORMAT_CAPABILITIES = Object.freeze({
     mime: "image/bmp",
     detection: { status: "implemented" },
     decoding: {
-      status: "planned",
+      status: "implemented",
       strategy: "browser-native",
-      note: "Browser decoding support will be tested with real BMP files."
+      note: "Real BMP decoding was verified in the browser."
     },
     encoding: {
       status: "planned",
