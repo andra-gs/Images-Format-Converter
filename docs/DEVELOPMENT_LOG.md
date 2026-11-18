@@ -5,7 +5,7 @@ This file records actual repository progress. Update it after meaningful impleme
 ## Project status
 
 - Current stage: Phase 2 - Core conversion engine
-- Current phase status: Phase 2 in progress; file validation, signature detection, and capability registry implemented; registry tests and build confirmed by user; browser decoding for PNG, JPEG, WebP, and BMP verified with real files; initial PNG conversion pipeline implemented, browser verification pending
+- Current phase status: Phase 2 in progress; PNG conversion is implemented and user-verified in the main UI for PNG, JPEG, WebP, and BMP inputs; PNG encoding is marked implemented in the capability registry
 - Latest release: None
 - Last updated: 2026-11-18
 
@@ -23,7 +23,7 @@ This file records actual repository progress. Update it after meaningful impleme
 |---|---|---|
 | Phase 0: Project foundation | Tested | User confirmed localhost works and `npm run build` succeeds; `package-lock.json` is present in the GitHub repository |
 | Phase 1: UI development | Tested | User confirmed the skeleton follows light/dark themes, theme persists after refresh, no unstyled flash appears, and `npm run build` succeeds |
-| Phase 2: Core conversion engine | In progress | Capability registry tests and build confirmed; PNG, JPEG, WebP, and BMP decoding verified with real files; encoder work pending |
+| Phase 2: Core conversion engine | In progress | PNG conversion from PNG, JPEG, WebP, and BMP inputs is user-verified; JPEG, WebP, and BMP output encoders remain pending |
 | Phase 3: Batch processing | Not started | Workers, queue, ZIP |
 | Phase 4: Advanced formats | Not started | HEIC, TIFF, SVG, GIF |
 | Phase 5: Image manipulation | Not started | Resize, compression, metadata |
@@ -32,6 +32,33 @@ This file records actual repository progress. Update it after meaningful impleme
 ## Change log
 
 Add newest entries first.
+
+### 2026-11-18 - PNG conversion verified in the main interface
+
+- Status: Tested; user-confirmed real-file browser verification
+- User-confirmed tests:
+  - Convert images button becomes active after selecting images.
+  - PNG, JPEG, WebP, and BMP input files all convert successfully to PNG.
+  - Generated output opens as a PNG image.
+  - Output dimensions match the original image dimensions.
+  - PNG transparency remains intact.
+  - Output filenames use the `.png` extension.
+  - Individual Download PNG actions work.
+  - Multiple images convert independently without interfering with one another's results.
+- Changes:
+  - Marked PNG encoding as `implemented` in the capability registry.
+  - Updated the roadmap to mark the verified PNG output path, Blob generation, output reopening/dimension validation, individual download, and per-file conversion error results as complete.
+  - Updated README and technical specification to describe the verified PNG conversion path.
+- Test scope:
+  - These results are based on the user's browser tests of the main application.
+  - The user did not report running `npm test` or `npm run build` as part of this verification, so those checks are not newly marked as passed here.
+- Remaining limitations:
+  - JPEG, WebP, and BMP output encoders are not implemented.
+  - GIF, TIFF, HEIC, HEIF, and SVG decoding remain planned.
+  - Phase 2 remains in progress.
+- Next steps:
+  - Implement and verify JPEG output, including quality handling and an explicit background for transparent source pixels.
+  - Keep WebP and BMP output disabled until their respective encoders pass real-file tests.
 
 ### 2026-11-18 - Initial PNG conversion pipeline
 
