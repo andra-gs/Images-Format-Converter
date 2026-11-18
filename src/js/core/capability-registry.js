@@ -42,9 +42,9 @@ const FORMAT_CAPABILITIES = Object.freeze({
       note: "Real-file decoding was verified in the browser."
     },
     encoding: {
-      status: "planned",
+      status: "implemented",
       strategy: "canvas",
-      note: "The returned Blob MIME type must be checked because browser encoder support can vary."
+      note: "WebP output uses Canvas with quality control. The returned Blob MIME type is checked because browser encoder support can vary."
     }
   },
   bmp: {
