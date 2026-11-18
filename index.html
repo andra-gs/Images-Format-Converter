@@ -135,10 +135,15 @@
             <i data-lucide="info"></i>
             <span>PNG, JPEG, WebP, and BMP conversion run locally in your browser. BMP transparency is composited onto white.</span>
           </div>
-          <button class="convert-button" id="convert-button" type="button" disabled>
-            <i data-lucide="file-output"></i>
-            Convert images
-          </button>
+          <div class="conversion-actions">
+            <button class="convert-button" id="convert-button" type="button" disabled>
+              <i data-lucide="file-output"></i>
+              Convert images
+            </button>
+            <button class="cancel-button" id="cancel-button" type="button" hidden>
+              Cancel remaining
+            </button>
+          </div>
         </section>
 
         <section class="results-panel" id="results-panel" aria-labelledby="results-title" hidden>
@@ -148,6 +153,13 @@
               <h2 id="results-title">Conversion results</h2>
               <p>Your converted files will appear here.</p>
             </div>
+          </div>
+          <div class="batch-progress" id="batch-progress" hidden>
+            <div class="batch-progress-heading">
+              <span id="batch-progress-text">0 of 0 files processed</span>
+              <span id="batch-progress-percent">0%</span>
+            </div>
+            <progress id="batch-progress-bar" max="100" value="0" aria-label="Batch conversion progress"></progress>
           </div>
           <div class="results-empty" id="results-empty">
             <div class="results-empty-icon"><i data-lucide="image"></i></div>
