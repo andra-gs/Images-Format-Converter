@@ -119,6 +119,7 @@ const selectFormat = (option) => {
   });
   closeFormatMenu();
   updateQualityVisibility();
+  updateConvertButton();
   formatTrigger.focus();
 };
 
