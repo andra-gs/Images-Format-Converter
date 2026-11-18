@@ -29,24 +29,24 @@ test("unknown formats return null and are not marked as supported", () => {
   assert.equal(canEncodeFormat("avif"), false);
 });
 
-test("detected formats are not automatically treated as decodable or encodable", () => {
-  assert.deepEqual(getAvailableInputFormats(), []);
-  assert.deepEqual(getAvailableOutputFormats(), []);
-  assert.deepEqual(getPlannedOutputFormats(), ["png", "jpeg", "webp", "bmp"]);
+test("only verified input decoders and output encoders are available", () => {
+  assert.deepEqual(getAvailableInputFormats(), ["png", "jpeg", "webp", "bmp"]);
+  assert.deepEqual(getAvailableOutputFormats(), ["png"]);
+  assert.deepEqual(getPlannedOutputFormats(), ["jpeg", "webp", "bmp"]);
 });
 
 test("capability data keeps decoding and encoding separate", () => {
   const jpeg = getFormatCapabilities("jpeg");
 
   assert.equal(jpeg.detection.status, "implemented");
-  assert.equal(jpeg.decoding.status, "planned");
+  assert.equal(jpeg.decoding.status, "implemented");
   assert.equal(jpeg.encoding.status, "planned");
   assert.equal(jpeg.encoding.strategy, "canvas");
 });
 
 test("returned capability data cannot mutate the internal registry", () => {
   const png = getFormatCapabilities("png");
-  png.encoding.status = "implemented";
+  png.encoding.status = "planned";
 
-  assert.equal(getFormatCapabilities("png").encoding.status, "planned");
+  assert.equal(getFormatCapabilities("png").encoding.status, "implemented");
 });
