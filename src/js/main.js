@@ -1,3 +1,4 @@
+import JSZip from "jszip";
 import {
   createIcons,
   Images,
@@ -70,6 +71,9 @@ const batchProgressPercent = document.querySelector("#batch-progress-percent");
 const batchProgressBar = document.querySelector("#batch-progress-bar");
 const resultsEmpty = document.querySelector("#results-empty");
 const resultsList = document.querySelector("#results-list");
+const zipActions = document.querySelector("#zip-actions");
+const downloadZipButton = document.querySelector("#download-zip-button");
+const zipStatus = document.querySelector("#zip-status");
 
 const selectedFiles = new Map();
 const conversionResults = new Map();
@@ -233,8 +237,11 @@ const showFileFeedback = (messages, state = "info") => {
 
 const updateResultsVisibility = () => {
   const hasResults = conversionResults.size > 0;
+  const hasDownloadableResults = [...conversionResults.values()].some((result) => result.blob instanceof Blob);
   resultsEmpty.hidden = hasResults;
   resultsList.hidden = !hasResults;
+  zipActions.hidden = !hasDownloadableResults;
+  downloadZipButton.disabled = !hasDownloadableResults;
 };
 
 const removeConversionResult = (fileId) => {
@@ -305,7 +312,7 @@ const renderConversionResult = (entry, result) => {
   const formatLabel = result.format.toUpperCase();
   const outputName = `${entry.file.name.replace(/\.[^.]+$/, "") || "image"}.${extension}`;
   const url = URL.createObjectURL(result.blob);
-  conversionResults.set(entry.id, { url, outputName });
+  conversionResults.set(entry.id, { url, outputName, blob: result.blob });
 
   const item = document.createElement("li");
   item.className = "result-item";
@@ -333,6 +340,70 @@ const renderConversionResult = (entry, result) => {
   resultsList.append(item);
   updateResultsVisibility();
 };
+
+
+const getUniqueArchiveName = (fileName, usedNames) => {
+  const dotIndex = fileName.lastIndexOf(".");
+  const baseName = dotIndex > 0 ? fileName.slice(0, dotIndex) : fileName;
+  const extension = dotIndex > 0 ? fileName.slice(dotIndex) : "";
+  let candidate = fileName;
+  let suffix = 2;
+
+  while (usedNames.has(candidate.toLowerCase())) {
+    candidate = `${baseName} (${suffix})${extension}`;
+    suffix += 1;
+  }
+
+  usedNames.add(candidate.toLowerCase());
+  return candidate;
+};
+
+const downloadAllAsZip = async () => {
+  const completedResults = [...conversionResults.values()].filter(
+    (result) => result.blob instanceof Blob && result.outputName
+  );
+  if (completedResults.length === 0 || downloadZipButton.disabled) return;
+
+  downloadZipButton.disabled = true;
+  downloadZipButton.textContent = "Preparing ZIP...";
+  zipStatus.textContent = "Preparing converted files for the ZIP archive.";
+
+  try {
+    const zip = new JSZip();
+    const usedNames = new Set();
+
+    for (const result of completedResults) {
+      const archiveName = getUniqueArchiveName(result.outputName, usedNames);
+      zip.file(archiveName, result.blob);
+    }
+
+    const archive = await zip.generateAsync(
+      { type: "blob", compression: "STORE" },
+      (metadata) => {
+        zipStatus.textContent = `Creating ZIP archive: ${Math.round(metadata.percent)}%`;
+      }
+    );
+
+    const url = URL.createObjectURL(archive);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "converted-images.zip";
+    document.body.append(link);
+    link.click();
+    link.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    zipStatus.textContent = `ZIP archive created with ${completedResults.length} ${completedResults.length === 1 ? "image" : "images"}.`;
+  } catch (error) {
+    zipStatus.textContent = error.message || "Could not create the ZIP archive.";
+  } finally {
+    downloadZipButton.disabled = false;
+    downloadZipButton.innerHTML = '<i data-lucide="file-archive"></i>Download all as ZIP';
+    renderIcons();
+    updateResultsVisibility();
+  }
+};
+
+downloadZipButton.addEventListener("click", downloadAllAsZip);
 
 const renderConversionError = (entry, error) => {
   removeConversionResult(entry.id);
