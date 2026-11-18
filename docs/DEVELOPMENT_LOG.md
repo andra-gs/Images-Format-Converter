@@ -4,8 +4,8 @@ This file records actual repository progress. Update it after meaningful impleme
 
 ## Project status
 
-- Current stage: Phase 2 - Core conversion engine
-- Current phase status: Phase 2 conversion paths for PNG, JPEG, WebP, and BMP are user-verified; automated test and build confirmation after BMP changes remains pending
+- Current stage: Phase 3 - Batch processing
+- Current phase status: Phase 3 in progress; batch job statuses, progress UI, cancellation of remaining jobs, and Web Worker conversion are implemented; browser and automated verification are pending
 - Latest release: None
 - Last updated: 2026-11-18
 
@@ -23,8 +23,8 @@ This file records actual repository progress. Update it after meaningful impleme
 |---|---|---|
 | Phase 0: Project foundation | Tested | User confirmed localhost works and `npm run build` succeeds; `package-lock.json` is present in the GitHub repository |
 | Phase 1: UI development | Tested | User confirmed the skeleton follows light/dark themes, theme persists after refresh, no unstyled flash appears, and `npm run build` succeeds |
-| Phase 2: Core conversion engine | In progress | PNG, JPEG, WebP, and BMP output are user-verified; latest automated test/build confirmation after BMP changes is pending |
-| Phase 3: Batch processing | Not started | Workers, queue, ZIP |
+| Phase 2: Core conversion engine | Functionally complete | PNG, JPEG, WebP, and BMP conversion paths are user-verified; automated test/build confirmation after BMP changes remains pending |
+| Phase 3: Batch processing | In progress | Worker-backed sequential jobs, per-file status, batch progress, cancellation of remaining jobs; ZIP pending |
 | Phase 4: Advanced formats | Not started | HEIC, TIFF, SVG, GIF |
 | Phase 5: Image manipulation | Not started | Resize, compression, metadata |
 | Phase 6: Testing and release | Not started | QA and v1.0.0 |
@@ -32,6 +32,38 @@ This file records actual repository progress. Update it after meaningful impleme
 ## Change log
 
 Add newest entries first.
+
+### 2026-11-18 - Phase 3 batch processing foundation
+
+- Status: Implemented; browser verification and automated test/build run pending
+- Changes:
+  - Added visible per-file states: pending, processing, completed, failed, and cancelled.
+  - Added an indeterminate per-file processing indicator and overall batch completion progress.
+  - Added a cancel-remaining action. The active conversion is allowed to finish; queued files are marked cancelled.
+  - Added a module Web Worker for PNG, JPEG, WebP, and BMP conversion.
+  - Added feature detection for Worker, OffscreenCanvas, and createImageBitmap.
+  - Added main-thread fallback for browsers without the required worker capabilities or when worker conversion cannot complete, preserving HTML image and Canvas fallback APIs.
+  - Kept concurrency at one job at a time to limit memory pressure.
+  - Added worker cleanup on application unload.
+  - Kept decoded image cleanup and output Object URL cleanup in the conversion lifecycle.
+- Files changed:
+  - `src/js/main.js`
+  - `src/js/core/conversion-service.js`
+  - `src/js/workers/conversion.worker.js`
+  - `index.html`
+  - `src/styles/components.css`
+  - `docs/DEVELOPMENT_ROADMAP.md`
+  - `docs/DEVELOPMENT_LOG.md`
+  - `docs/TECHNICAL_SPECIFICATION.md`
+  - `README.md`
+- Remaining Phase 3 work:
+  - Add ZIP download for completed outputs using JSZip.
+  - Verify worker processing, main-thread fallback, status transitions, cancellation behavior, and memory cleanup in a real browser.
+  - Run `npm test` and `npm run build`.
+- Known behavior:
+  - Cancellation does not interrupt the active image operation. It finishes the current file and skips the remaining queued files.
+  - The queue processes one file at a time.
+  - ZIP export is not implemented yet.
 
 ### 2026-11-18 - BMP output verified with real files
 
