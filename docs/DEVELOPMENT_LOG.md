@@ -5,7 +5,7 @@ This file records actual repository progress. Update it after meaningful impleme
 ## Project status
 
 - Current stage: Phase 3 - Batch processing
-- Current phase status: Phase 3 in progress; batch job statuses, progress UI, cancellation of remaining jobs, and Web Worker conversion are implemented; browser and automated verification are pending
+- Current phase status: Batch queue, worker execution, cancellation, progress, and resource cleanup are user-verified. ZIP export is implemented; dependency-lock synchronization and ZIP-specific verification remain pending.
 - Latest release: None
 - Last updated: 2026-11-18
 
@@ -23,8 +23,8 @@ This file records actual repository progress. Update it after meaningful impleme
 |---|---|---|
 | Phase 0: Project foundation | Tested | User confirmed localhost works and `npm run build` succeeds; `package-lock.json` is present in the GitHub repository |
 | Phase 1: UI development | Tested | User confirmed the skeleton follows light/dark themes, theme persists after refresh, no unstyled flash appears, and `npm run build` succeeds |
-| Phase 2: Core conversion engine | Functionally complete | PNG, JPEG, WebP, and BMP conversion paths are user-verified; automated test/build confirmation after BMP changes remains pending |
-| Phase 3: Batch processing | In progress | Worker-backed sequential jobs, per-file status, batch progress, cancellation of remaining jobs; ZIP pending |
+| Phase 2: Core conversion engine | Tested | PNG, JPEG, WebP, and BMP conversion paths are user-verified; user reports the requested automated tests and build checks passed |
+| Phase 3: Batch processing | In progress | Batch and worker behavior user-verified; ZIP export implementation awaits dependency-lock synchronization and browser verification |
 | Phase 4: Advanced formats | Not started | HEIC, TIFF, SVG, GIF |
 | Phase 5: Image manipulation | Not started | Resize, compression, metadata |
 | Phase 6: Testing and release | Not started | QA and v1.0.0 |
@@ -32,6 +32,58 @@ This file records actual repository progress. Update it after meaningful impleme
 ## Change log
 
 Add newest entries first.
+
+### 2026-11-18 - ZIP export implementation
+- Status: Implemented, pending user verification
+- Changes:
+  - Added JSZip as an application dependency.
+  - Added a Download all as ZIP action to the conversion results panel.
+  - Included only successfully converted outputs in the archive.
+  - Added duplicate filename handling with numeric suffixes.
+  - Used ZIP STORE mode to avoid spending additional CPU time compressing already encoded image files.
+  - Added accessible archive-generation status text and disabled the action while the archive is being created.
+  - Kept individual image download links available.
+- Files changed:
+  - `package.json`
+  - `index.html`
+  - `src/js/main.js`
+  - `src/styles/components.css`
+  - `docs/DEVELOPMENT_ROADMAP.md`
+  - `docs/TECHNICAL_SPECIFICATION.md`
+  - `README.md`
+- Tests performed:
+  - Reviewed the ZIP flow, successful-result filtering, duplicate filename handling, and cleanup of the temporary archive Object URL.
+  - Dependency installation, automated tests, production build, and browser ZIP extraction have not yet been verified.
+- Test results:
+  - Implementation committed to `main`.
+  - `package-lock.json` must be refreshed by running `npm install` after pulling the update.
+- Known issues:
+  - ZIP generation runs on the main thread. STORE mode avoids compression work, but archive assembly still uses browser memory.
+  - ZIP download and archive integrity need user verification.
+- Next steps:
+  - Pull `main`, run `npm install`, `npm test`, and `npm run build`.
+  - Test ZIP downloads with multiple successful files, duplicate output names, mixed successful and failed conversions, and a single successful result.
+  - Extract the downloaded archive and confirm each image opens.
+
+
+### 2026-11-18 - User verification of Phase 3 batch processing
+- Status: Tested
+- Tests performed by the user:
+  - Verified that multiple images enter the queue.
+  - Verified per-file queue states and batch progress.
+  - Verified that a failed file does not stop other conversions.
+  - Verified cancellation after the active file finishes.
+  - Verified large-image processing keeps the interface responsive.
+  - Verified file removal, Clear all, and resource cleanup.
+  - Verified converted files can be downloaded and opened.
+  - User reported that all requested Phase 3 tests behaved as expected.
+- Test results:
+  - Phase 3 batch and worker foundation is user-verified.
+  - ZIP export is the remaining Phase 3 item and has been implemented separately; its tests are pending.
+- Next steps:
+  - Install JSZip and refresh `package-lock.json`.
+  - Run `npm test` and `npm run build`.
+  - Verify ZIP extraction and image integrity in the browser.
 
 ### 2026-11-18 - Phase 3 batch processing foundation
 
@@ -707,58 +759,6 @@ Add newest entries first.
 - Recorded light and dark themes, hybrid processing, and phased MVP development.
 - No application features had been implemented or tested at this point.
 
-
-### 2026-11-18 - ZIP export implementation
-- Status: Implemented, pending user verification
-- Changes:
-  - Added JSZip as an application dependency.
-  - Added a Download all as ZIP action to the conversion results panel.
-  - Included only successfully converted outputs in the archive.
-  - Added duplicate filename handling with numeric suffixes.
-  - Used ZIP STORE mode to avoid spending additional CPU time compressing already encoded image files.
-  - Added accessible archive-generation status text and disabled the action while the archive is being created.
-  - Kept individual image download links available.
-- Files changed:
-  - `package.json`
-  - `index.html`
-  - `src/js/main.js`
-  - `src/styles/components.css`
-  - `docs/DEVELOPMENT_ROADMAP.md`
-  - `docs/TECHNICAL_SPECIFICATION.md`
-  - `README.md`
-- Tests performed:
-  - Reviewed the ZIP flow, successful-result filtering, duplicate filename handling, and cleanup of the temporary archive Object URL.
-  - Dependency installation, automated tests, production build, and browser ZIP extraction have not yet been verified.
-- Test results:
-  - Implementation committed to `main`.
-  - `package-lock.json` must be refreshed by running `npm install` after pulling the update.
-- Known issues:
-  - ZIP generation runs on the main thread. STORE mode avoids compression work, but archive assembly still uses browser memory.
-  - ZIP download and archive integrity need user verification.
-- Next steps:
-  - Pull `main`, run `npm install`, `npm test`, and `npm run build`.
-  - Test ZIP downloads with multiple successful files, duplicate output names, mixed successful and failed conversions, and a single successful result.
-  - Extract the downloaded archive and confirm each image opens.
-
-
-### 2026-11-18 - User verification of Phase 3 batch processing
-- Status: Tested
-- Tests performed by the user:
-  - Verified that multiple images enter the queue.
-  - Verified per-file queue states and batch progress.
-  - Verified that a failed file does not stop other conversions.
-  - Verified cancellation after the active file finishes.
-  - Verified large-image processing keeps the interface responsive.
-  - Verified file removal, Clear all, and resource cleanup.
-  - Verified converted files can be downloaded and opened.
-  - User reported that all requested Phase 3 tests behaved as expected.
-- Test results:
-  - Phase 3 batch and worker foundation is user-verified.
-  - ZIP export is the remaining Phase 3 item and has been implemented separately; its tests are pending.
-- Next steps:
-  - Install JSZip and refresh `package-lock.json`.
-  - Run `npm test` and `npm run build`.
-  - Verify ZIP extraction and image integrity in the browser.
 
 ## Entry template
 
