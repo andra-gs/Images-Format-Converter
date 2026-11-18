@@ -30,7 +30,7 @@ test("unknown formats return null and are not marked as supported", () => {
 });
 
 test("only verified input decoders and output encoders are available", () => {
-  assert.deepEqual(getAvailableInputFormats(), ["png", "jpeg", "webp", "bmp"]);
+  assert.deepEqual(getAvailableInputFormats(), ["png", "jpeg", "webp", "bmp", "heic", "heif"]);
   assert.deepEqual(getAvailableOutputFormats(), ["png", "jpeg", "webp", "bmp"]);
   assert.deepEqual(getPlannedOutputFormats(), []);
 });
@@ -53,6 +53,17 @@ test("capability data keeps decoding and encoding separate", () => {
   assert.equal(webp.encoding.strategy, "canvas");
   assert.match(webp.encoding.note, /Real-file browser verification passed/);
   assert.match(jpeg.encoding.note, /Real-file browser conversion was verified/);
+
+  const heic = getFormatCapabilities("heic");
+  const heif = getFormatCapabilities("heif");
+  assert.equal(heic.decoding.status, "implemented");
+  assert.equal(heif.decoding.status, "implemented");
+  assert.equal(heic.encoding.status, "not-planned");
+  assert.equal(heif.encoding.status, "not-planned");
+
+  const tiff = getFormatCapabilities("tiff");
+  assert.equal(tiff.decoding.status, "planned");
+  assert.equal(tiff.decoding.strategy, "utif2");
 });
 
 test("returned capability data cannot mutate the internal registry", () => {
