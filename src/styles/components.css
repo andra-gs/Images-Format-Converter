@@ -354,6 +354,83 @@
   font-weight: 700;
 }
 
+.result-status {
+  width: fit-content;
+  padding: 4px 8px;
+  border-radius: 999px;
+  color: var(--color-muted);
+  background: var(--color-surface);
+  font-size: 0.66rem;
+  font-weight: 750;
+}
+
+.result-status-processing {
+  color: var(--color-accent);
+  background: var(--color-accent-soft);
+}
+
+.result-status-completed {
+  color: #15803d;
+  background: #dcfce7;
+}
+
+.result-status-failed {
+  color: var(--color-danger);
+  background: #fef2f2;
+}
+
+.result-status-cancelled {
+  color: var(--color-muted);
+  background: var(--color-surface);
+}
+
+.result-progress {
+  height: 4px;
+  overflow: hidden;
+  background: var(--color-border);
+  border-radius: 999px;
+}
+
+.result-progress span {
+  display: block;
+  width: 38%;
+  height: 100%;
+  background: var(--color-accent);
+  border-radius: inherit;
+  animation: result-progress 1.2s ease-in-out infinite;
+}
+
+@keyframes result-progress {
+  from { transform: translateX(-110%); }
+  to { transform: translateX(290%); }
+}
+
+.batch-progress {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.batch-progress-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--color-muted);
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.batch-progress progress {
+  width: 100%;
+  height: 7px;
+  overflow: hidden;
+  accent-color: var(--color-accent);
+}
+
+.batch-progress[hidden] {
+  display: none;
+}
+
 .result-detail {
   color: var(--color-muted);
   font-size: 0.72rem;
@@ -570,10 +647,18 @@
   color: var(--color-accent);
 }
 
-.convert-button {
+.conversion-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.convert-button,
+.cancel-button {
   display: inline-flex;
   min-height: 44px;
-  margin-top: 18px;
   padding: 0 18px;
   align-items: center;
   justify-content: center;
@@ -587,9 +672,27 @@
   font-weight: 750;
 }
 
-.convert-button:disabled {
+.convert-button:disabled,
+.cancel-button:disabled {
   cursor: not-allowed;
   opacity: 0.48;
+}
+
+.cancel-button {
+  min-height: 44px;
+  padding: 0 16px;
+  color: var(--color-danger);
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: 11px;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.cancel-button:hover:not(:disabled) {
+  background: var(--color-surface-muted);
 }
 
 .convert-button svg {
@@ -665,7 +768,13 @@
     gap: 18px;
   }
 
-  .convert-button {
+  .conversion-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .convert-button,
+  .cancel-button {
     width: 100%;
   }
 }
