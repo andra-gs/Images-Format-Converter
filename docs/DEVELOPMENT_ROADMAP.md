@@ -65,6 +65,8 @@ Deliverable: reliable local conversion for implemented and tested formats.
 
 ## Phase 3: Batch processing
 
+Status: Complete. The user verified batch queue behavior, worker execution, progress, cancellation, failure isolation, large-image responsiveness, cleanup, individual downloads, ZIP download, archive extraction, and image integrity.
+
 Tasks:
 - [x] Multiple-file queue (existing UI queue and independent per-file conversion).
 - [x] Queue job states: pending, processing, completed, failed, and cancelled.
@@ -74,16 +76,18 @@ Tasks:
 - [x] Concurrency limit of one conversion job at a time to control memory usage.
 - [x] Cancel remaining queued files after the active file finishes.
 - [x] Quality adjustment for JPEG and WebP.
-- [ ] Verify ZIP download using JSZip (implementation committed; dependency-lock synchronization and user verification pending).
+- [x] Verify ZIP download using JSZip (user-confirmed archive extraction and image integrity).
 - [x] Resource cleanup for decoded images, output object URLs, and worker shutdown.
 
-Deliverable: batch conversion without freezing the UI under normal test loads. Batch and worker behavior are user-verified; ZIP export awaits dependency installation and browser verification.
+Deliverable: batch conversion without freezing the UI under normal test loads. Batch processing, worker execution, cancellation, cleanup, and ZIP export are user-verified.
 
 ## Phase 4: Advanced format support
 
+Status: In progress. The HEIC/HEIF decoder adapter is implemented; real-file verification remains pending.
+
 Tasks:
-- [ ] Evaluate and integrate HEIC/HEIF decoder.
-- [ ] Test HEIC and HEIF fixtures.
+- [x] Evaluate and integrate HEIC/HEIF decoder adapter using heic-to (real-file verification pending).
+- [ ] Test real HEIC and HEIF fixtures in the browser and through the conversion pipeline.
 - [ ] Integrate TIFF decoding.
 - [ ] Evaluate TIFF encoder separately.
 - [ ] Implement safe SVG rasterization.
