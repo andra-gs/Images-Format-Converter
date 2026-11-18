@@ -28,21 +28,27 @@ async function createCanvasBlob(decodedImage) {
   const { source, width, height } = decodedImage;
 
   if (typeof globalThis.OffscreenCanvas === "function") {
-    const canvas = new globalThis.OffscreenCanvas(width, height);
-    const context = canvas.getContext("2d");
+    try {
+      const canvas = new globalThis.OffscreenCanvas(width, height);
+      const context = canvas.getContext("2d");
 
-    if (!context) {
-      throw new Error("A 2D canvas context is not available.");
+      if (context && typeof canvas.convertToBlob === "function") {
+        context.drawImage(source, 0, 0, width, height);
+        return await canvas.convertToBlob({ type: PNG_MIME_TYPE });
+      }
+    } catch {
+      // Fall through to the HTML canvas implementation.
     }
-
-    context.drawImage(source, 0, 0, width, height);
-    return canvas.convertToBlob({ type: PNG_MIME_TYPE });
   }
 
   const { canvas, context, toBlob } = createHtmlCanvas(width, height);
 
   if (!context) {
     throw new Error("A 2D canvas context is not available.");
+  }
+
+  if (typeof canvas.toBlob !== "function") {
+    throw new Error("PNG canvas encoding is not available in this browser.");
   }
 
   context.drawImage(source, 0, 0, width, height);
