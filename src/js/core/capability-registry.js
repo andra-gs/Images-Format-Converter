@@ -86,8 +86,8 @@ const FORMAT_CAPABILITIES = Object.freeze({
     detection: { status: "implemented" },
     decoding: {
       status: "planned",
-      strategy: "dedicated-decoder",
-      note: "A TIFF decoder must be evaluated and integrated."
+      strategy: "utif2",
+      note: "The UTIF2 adapter is implemented and renders the first TIFF page to Canvas. Keep planned until representative real TIFF files pass browser and worker tests."
     },
     encoding: {
       status: "not-planned",
@@ -101,9 +101,9 @@ const FORMAT_CAPABILITIES = Object.freeze({
     mime: "image/heic",
     detection: { status: "implemented" },
     decoding: {
-      status: "planned",
+      status: "implemented",
       strategy: "heic-to",
-      note: "The heic-to decoder adapter is implemented. Keep this capability planned until real HEIC fixtures pass in the browser."
+      note: "Real HEIC files passed browser decoder, main conversion pipeline, and Web Worker verification."
     },
     encoding: {
       status: "not-planned",
@@ -117,9 +117,9 @@ const FORMAT_CAPABILITIES = Object.freeze({
     mime: "image/heif",
     detection: { status: "implemented" },
     decoding: {
-      status: "planned",
+      status: "implemented",
       strategy: "heic-to",
-      note: "The heic-to decoder adapter is implemented. Keep this capability planned until real HEIF fixtures pass in the browser."
+      note: "Real HEIF files passed browser decoder, main conversion pipeline, and Web Worker verification."
     },
     encoding: {
       status: "not-planned",
