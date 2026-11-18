@@ -5,7 +5,7 @@ This file records actual repository progress. Update it after meaningful impleme
 ## Project status
 
 - Current stage: Phase 2 - Core conversion engine
-- Current phase status: Phase 2 in progress; PNG and JPEG conversion are user-verified and enabled in the main UI; WebP and BMP output encoders remain pending
+- Current phase status: Phase 2 in progress; PNG and JPEG conversion are user-verified and enabled in the main UI; WebP encoder code is implemented but browser verification is pending; BMP output remains pending
 - Latest release: None
 - Last updated: 2026-11-18
 
@@ -23,7 +23,7 @@ This file records actual repository progress. Update it after meaningful impleme
 |---|---|---|
 | Phase 0: Project foundation | Tested | User confirmed localhost works and `npm run build` succeeds; `package-lock.json` is present in the GitHub repository |
 | Phase 1: UI development | Tested | User confirmed the skeleton follows light/dark themes, theme persists after refresh, no unstyled flash appears, and `npm run build` succeeds |
-| Phase 2: Core conversion engine | In progress | PNG and JPEG output are user-verified; WebP and BMP output encoders remain pending |
+| Phase 2: Core conversion engine | In progress | PNG and JPEG output are user-verified; WebP encoder code is implemented but browser verification is pending; BMP output remains pending |
 | Phase 3: Batch processing | Not started | Workers, queue, ZIP |
 | Phase 4: Advanced formats | Not started | HEIC, TIFF, SVG, GIF |
 | Phase 5: Image manipulation | Not started | Resize, compression, metadata |
