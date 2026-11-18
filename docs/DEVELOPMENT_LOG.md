@@ -52,9 +52,10 @@ Add newest entries first.
   - Added the `.webp` output extension.
   - Updated capability-registry test expectations.
   - Updated README, Technical Specification, and Development Roadmap.
-- Test status:
-  - The 11 real-browser checks above were confirmed by the user.
-  - The automated test suite and production build still need to be rerun after these repository changes.
+- Automated validation confirmed by the user after enabling WebP in the main interface:
+  - `npm test`: 25 passed, 0 failed, 0 skipped.
+  - `npm run build`: successful with Vite 7.3.8; 2,109 modules transformed.
+  - Main-interface browser checks: WebP selectable; PNG, JPEG, WebP, and BMP sources convert; quality control works; preview and `.webp` download work; PNG transparency is preserved.
 - Remaining limitations:
   - BMP output encoding is not implemented.
   - Browser support for WebP encoding varies. Unsupported browsers receive an explicit conversion error.
