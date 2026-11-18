@@ -114,11 +114,11 @@
                 <ul class="custom-select-menu" id="output-format-menu" role="listbox" aria-labelledby="output-format-label" hidden>
                   <li class="custom-select-option" role="option" tabindex="-1" data-value="image/png" aria-selected="true">PNG</li>
                   <li class="custom-select-option" role="option" tabindex="-1" data-value="image/jpeg" aria-selected="false">JPEG</li>
-                  <li class="custom-select-option" role="option" tabindex="-1" data-value="image/webp" aria-selected="false">WebP</li>
+                  <li class="custom-select-option" role="option" tabindex="-1" data-value="image/webp" aria-selected="false" aria-disabled="true">WebP · Testing</li>
                   <li class="custom-select-option" role="option" tabindex="-1" data-value="image/bmp" aria-selected="false" aria-disabled="true">BMP · Coming soon</li>
                 </ul>
               </div>
-              <span class="field-hint">PNG, JPEG, and WebP output are available. BMP is still in development.</span>
+              <span class="field-hint">PNG and JPEG output are available. WebP is being tested. BMP is still in development.</span>
             </div>
 
             <div class="field-group quality-field" id="quality-field">
@@ -133,7 +133,7 @@
 
           <div class="settings-notice">
             <i data-lucide="info"></i>
-            <span>PNG, JPEG, and WebP conversion run locally in your browser. BMP output is still in development.</span>
+            <span>PNG and JPEG conversion run locally in your browser. WebP is being tested before release. BMP output is still in development.</span>
           </div>
           <button class="convert-button" id="convert-button" type="button" disabled>
             <i data-lucide="file-output"></i>
@@ -157,7 +157,7 @@
           <ul class="results-list" id="results-list" aria-live="polite" hidden></ul>
         </section>
 
-        <p class="phase-note">PNG, JPEG, and WebP conversion are available · BMP output is in development.</p>
+        <p class="phase-note">PNG and JPEG conversion are available · WebP is being tested · BMP output is in development.</p>
       </main>
 
       <footer class="app-footer">
