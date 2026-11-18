@@ -58,9 +58,9 @@ const FORMAT_CAPABILITIES = Object.freeze({
       note: "Real BMP decoding was verified in the browser."
     },
     encoding: {
-      status: "planned",
+      status: "implemented",
       strategy: "dedicated-encoder",
-      note: "BMP output requires a dedicated encoder."
+      note: "A dedicated 24-bit BMP encoder writes bottom-up BGR pixel rows with 4-byte alignment. Transparent pixels are composited onto white. Real-file browser verification is pending."
     }
   },
   gif: {
