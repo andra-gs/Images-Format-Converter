@@ -55,7 +55,7 @@ Tasks:
 - [x] Browser image decoding for PNG, JPEG, WebP, and BMP (user-confirmed successful real-file tests).
 - [x] PNG output (encoder, conversion service, and UI flow; user verified PNG, JPEG, WebP, and BMP inputs convert successfully, output opens as PNG, dimensions and PNG transparency are preserved, filenames use .png, downloads work, and multiple files convert independently).
 - [x] JPEG output (encoder, conversion service, quality control, white compositing for transparency, and main-interface download; user verified real-file conversion).
-- [ ] WebP output (encoder and conversion service implemented; real-browser verification pending).
+- [x] WebP output (encoder, conversion service, quality control, and main-interface download; user verified PNG, JPEG, WebP, and BMP inputs, transparency, MIME type, dimensions, preview, download, and unsupported-browser error handling).
 - [ ] BMP encoder.
 - [x] Blob result generation for PNG output.
 - [x] PNG output validation by reopening/decoding and checking dimensions.
