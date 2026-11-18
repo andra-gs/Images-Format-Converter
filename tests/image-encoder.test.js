@@ -89,3 +89,42 @@ test("rejects empty PNG output", async (t) => {
     /empty PNG output/
   );
 });
+
+test("falls back to an HTML canvas when OffscreenCanvas is unavailable", async (t) => {
+  let drawArguments;
+  let requestedMime;
+  const output = new Blob(["fallback-png"], { type: "image/png" });
+  const canvas = {
+    width: 0,
+    height: 0,
+    getContext(type) {
+      assert.equal(type, "2d");
+      return {
+        drawImage(...args) {
+          drawArguments = args;
+        }
+      };
+    },
+    toBlob(callback, mime) {
+      requestedMime = mime;
+      callback(output);
+    }
+  };
+
+  mockGlobal(t, "OffscreenCanvas", undefined);
+  mockGlobal(t, "document", {
+    createElement(tagName) {
+      assert.equal(tagName, "canvas");
+      return canvas;
+    }
+  });
+
+  const source = { width: 800, height: 600 };
+  const result = await encodeImage({ source, width: 800, height: 600 });
+
+  assert.equal(canvas.width, 800);
+  assert.equal(canvas.height, 600);
+  assert.equal(requestedMime, "image/png");
+  assert.equal(result, output);
+  assert.deepEqual(drawArguments, [source, 0, 0, 800, 600]);
+});
