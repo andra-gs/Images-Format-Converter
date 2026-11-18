@@ -49,7 +49,7 @@ Decoding and encoding are separate capabilities. The application must not advert
 Special cases:
 - Canvas commonly supports PNG output and browser-dependent JPEG/WebP output. Verify the returned Blob MIME type.
 - BMP may require a dedicated encoder.
-- HEIC/HEIF requires a suitable decoder, such as an evaluated `heic-to` implementation.
+- HEIC/HEIF uses the integrated `heic-to` decoder adapter. Real-file verification is still pending.
 - TIFF decoding and encoding must be evaluated separately.
 - SVG-to-raster requires safe rasterization. Raster wrapped in SVG is not true vector conversion.
 - Animated GIF requires frame-aware decoding and encoding. A simple Canvas pipeline may only process one frame.
@@ -65,7 +65,8 @@ Special cases:
 | Icons | Lucide NPM package |
 | Standard image processing | Canvas API, ImageBitmap |
 | Background processing | Web Workers, OffscreenCanvas where supported |
-| ZIP downloads | JSZip |\n| HEIC/HEIF decoding | heic-to (WebAssembly, browser and worker entry points) |
+| ZIP downloads | JSZip |
+| HEIC/HEIF decoding | heic-to (WebAssembly, browser and worker entry points) |
 | Version control | Git and GitHub |
 
 No backend, database, cloud storage, or remote image-processing API is planned.
