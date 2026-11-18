@@ -36,11 +36,11 @@ There is no planned backend, database, or remote image-processing service.
 | Lucide via NPM | Interface icons |
 | Canvas API / ImageBitmap | Standard raster processing |
 | Web Workers / OffscreenCanvas | Background processing where supported |
-| JSZip | ZIP downloads, planned for batch phase |
-| heic-to | Candidate HEIC/HEIF decoder |
+| JSZip | ZIP downloads |\n| heic-to | HEIC/HEIF decoding through WebAssembly in the browser or conversion worker |
+| heic-to | Selected HEIC/HEIF decoder; real-file verification pending |
 | UTIF.js | Candidate TIFF decoder |
 
-Advanced format libraries remain provisional until compatibility, maintenance, bundle size, license, and browser support have been checked.
+Advanced format libraries remain provisional until compatibility, maintenance, bundle size, license, and browser support have been checked. heic-to 1.6.7 is selected for HEIC/HEIF decoding. It exposes a browser entry and a worker-specific `heic-to/next` entry. The adapter prefers native ImageBitmap decoding, then falls back to heic-to's bitmap output. Capability status remains planned until real HEIC and HEIF fixtures pass.
 
 ## 4. Current project structure
 
@@ -136,7 +136,7 @@ Consider file size, extension and MIME hints, actual decoder support, dimensions
 
 ## 8. Browser image decoder
 
-The initial browser decoder module handles PNG, JPEG, WebP, and BMP through `createImageBitmap()` when available, with an `HTMLImageElement` and Object URL fallback. It returns a common result containing the decoded source, width, height, detected format, and a `close()` method. Callers must close the result after processing to release the ImageBitmap or Object URL. SVG, GIF, TIFF, HEIC, and HEIF remain outside this decoder's scope. Do not mark decoding as supported in the capability registry until real image fixtures pass in target browsers.
+The browser decoder handles PNG, JPEG, WebP, and BMP through `createImageBitmap()` when available, with an `HTMLImageElement` and Object URL fallback. HEIC/HEIF first attempt native ImageBitmap decoding, then use heic-to's WebAssembly decoder. The worker uses the package's `heic-to/next` entry; the main-thread fallback uses `heic-to`. The decoder returns a common result containing the decoded source, width, height, detected format, and a `close()` method. Callers must close the result after processing. HEIC/HEIF capability status remains planned until real fixtures pass. SVG, GIF, and TIFF remain outside this decoder's scope.
 
 ## 9. Initial PNG conversion pipeline
 
@@ -205,4 +205,4 @@ The application keeps the UI and queue orchestration on the main thread. When Wo
 
 The queue processes one image at a time to limit simultaneous decoded-image memory usage. Each job moves through pending, processing, completed, failed, or cancelled. The interface shows an indeterminate per-file processing indicator and overall batch completion progress. The cancel action allows the active conversion to finish, then marks remaining queued files as cancelled. It does not interrupt a running Canvas operation.
 
-Decoded ImageBitmap resources are closed by the conversion service. The UI revokes input and output Object URLs when their items are removed, when the queue is cleared, or when the page unloads. The conversion worker is terminated on page unload. ZIP export uses JSZip on the main thread. Only successfully converted results are added. Duplicate output names receive numeric suffixes to prevent overwriting entries inside the archive. The archive uses STORE mode to avoid additional CPU cost from compression. ZIP integrity and browser download behavior require user verification.
+Decoded ImageBitmap resources are closed by the conversion service. The UI revokes input and output Object URLs when their items are removed, when the queue is cleared, or when the page unloads. The conversion worker is terminated on page unload. ZIP export uses JSZip on the main thread. Only successfully converted results are added. Duplicate output names receive numeric suffixes to prevent overwriting entries inside the archive. The archive uses STORE mode to avoid additional CPU cost from compression. ZIP integrity and browser download behavior have been user-verified.
