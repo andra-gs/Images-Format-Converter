@@ -16,6 +16,7 @@ import {
 } from "lucide";
 import "../styles/main.css";
 import { validateImageFile } from "./core/file-validator.js";
+import { convertImageToPng } from "./core/conversion-service.js";
 
 const iconSet = {
   Images,
@@ -61,14 +62,23 @@ let selectedFormat = "image/png";
 const qualityField = document.querySelector("#quality-field");
 const outputQuality = document.querySelector("#output-quality");
 const qualityValue = document.querySelector("#quality-value");
+const convertButton = document.querySelector("#convert-button");
+const resultsEmpty = document.querySelector("#results-empty");
+const resultsList = document.querySelector("#results-list");
 
 const selectedFiles = new Map();
+const conversionResults = new Map();
 let nextFileId = 0;
+let isConverting = false;
 
 const formatBytes = (bytes) => {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 ** 2) return `${(bytes / 1024).toFixed(1)} KB`;
   return `${(bytes / 1024 ** 2).toFixed(2)} MB`;
+};
+
+const updateConvertButton = () => {
+  convertButton.disabled = selectedFiles.size === 0 || selectedFormat !== "image/png" || isConverting;
 };
 
 const updateQueueSummary = () => {
@@ -77,6 +87,7 @@ const updateQueueSummary = () => {
   queueSection.hidden = count === 0;
   settingsPanel.hidden = count === 0;
   resultsPanel.hidden = count === 0;
+  updateConvertButton();
 };
 
 const updateQualityVisibility = () => {
@@ -98,6 +109,7 @@ const openFormatMenu = (focusSelected = false) => {
 };
 
 const selectFormat = (option) => {
+  if (option.getAttribute("aria-disabled") === "true") return;
   selectedFormat = option.dataset.value;
   formatValue.textContent = option.textContent.trim();
   formatOptions.forEach((item) => {
@@ -115,14 +127,24 @@ formatTrigger.addEventListener("click", () => {
   else closeFormatMenu();
 });
 
-formatOptions.forEach((option, index) => {
-  option.addEventListener("click", () => selectFormat(option));
+formatOptions.forEach((option) => {
+  option.addEventListener("click", () => {
+    if (option.getAttribute("aria-disabled") !== "true") selectFormat(option);
+  });
+
   option.addEventListener("keydown", (event) => {
+    if (option.getAttribute("aria-disabled") === "true") return;
+
+    const enabledOptions = formatOptions.filter(
+      (item) => item.getAttribute("aria-disabled") !== "true"
+    );
+    const index = enabledOptions.indexOf(option);
     let nextIndex = index;
-    if (event.key === "ArrowDown") nextIndex = (index + 1) % formatOptions.length;
-    else if (event.key === "ArrowUp") nextIndex = (index - 1 + formatOptions.length) % formatOptions.length;
+
+    if (event.key === "ArrowDown") nextIndex = (index + 1) % enabledOptions.length;
+    else if (event.key === "ArrowUp") nextIndex = (index - 1 + enabledOptions.length) % enabledOptions.length;
     else if (event.key === "Home") nextIndex = 0;
-    else if (event.key === "End") nextIndex = formatOptions.length - 1;
+    else if (event.key === "End") nextIndex = enabledOptions.length - 1;
     else if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
       selectFormat(option);
@@ -134,8 +156,9 @@ formatOptions.forEach((option, index) => {
     } else {
       return;
     }
+
     event.preventDefault();
-    formatOptions[nextIndex].focus();
+    enabledOptions[nextIndex].focus();
   });
 });
 
@@ -201,6 +224,114 @@ const showFileFeedback = (messages, state = "info") => {
   fileFeedback.textContent = messages.join(" ");
 };
 
+const updateResultsVisibility = () => {
+  const hasResults = conversionResults.size > 0;
+  resultsEmpty.hidden = hasResults;
+  resultsList.hidden = !hasResults;
+};
+
+const removeConversionResult = (fileId) => {
+  const result = conversionResults.get(fileId);
+  if (result?.url) URL.revokeObjectURL(result.url);
+  conversionResults.delete(fileId);
+  resultsList.querySelector(`[data-result-id="${fileId}"]`)?.remove();
+  updateResultsVisibility();
+};
+
+const clearConversionResults = () => {
+  for (const result of conversionResults.values()) {
+    if (result.url) URL.revokeObjectURL(result.url);
+  }
+  conversionResults.clear();
+  resultsList.replaceChildren();
+  updateResultsVisibility();
+};
+
+const renderConversionResult = (entry, result) => {
+  removeConversionResult(entry.id);
+
+  const outputName = `${entry.file.name.replace(/\\.[^.]+$/, "") || "image"}.png`;
+  const url = URL.createObjectURL(result.blob);
+  conversionResults.set(entry.id, { url, outputName });
+
+  const item = document.createElement("li");
+  item.className = "result-item";
+  item.dataset.resultId = String(entry.id);
+
+  const heading = document.createElement("div");
+  heading.className = "result-name";
+  heading.textContent = outputName;
+
+  const detail = document.createElement("div");
+  detail.className = "result-detail";
+  detail.textContent = `PNG · ${result.width} × ${result.height} · ${formatBytes(result.blob.size)}`;
+
+  const download = document.createElement("a");
+  download.className = "result-download";
+  download.href = url;
+  download.download = outputName;
+  download.textContent = "Download PNG";
+
+  item.append(heading, detail, download);
+  resultsList.append(item);
+  updateResultsVisibility();
+};
+
+const renderConversionError = (entry, error) => {
+  removeConversionResult(entry.id);
+
+  const item = document.createElement("li");
+  item.className = "result-item result-item-error";
+  item.dataset.resultId = String(entry.id);
+
+  const heading = document.createElement("div");
+  heading.className = "result-name";
+  heading.textContent = entry.file.name;
+
+  const detail = document.createElement("div");
+  detail.className = "result-detail";
+  detail.textContent = error.message || "Conversion failed.";
+
+  item.append(heading, detail);
+  resultsList.append(item);
+  conversionResults.set(entry.id, { url: null });
+  updateResultsVisibility();
+};
+
+const runConversion = async () => {
+  if (selectedFormat !== "image/png" || isConverting) return;
+
+  isConverting = true;
+  updateConvertButton();
+  convertButton.textContent = "Converting...";
+
+  const failures = [];
+  const filesToConvert = [...selectedFiles.values()];
+
+  for (const entry of filesToConvert) {
+    if (!selectedFiles.has(entry.id)) continue;
+
+    try {
+      const result = await convertImageToPng(entry.file);
+      if (!selectedFiles.has(entry.id)) continue;
+      renderConversionResult(entry, result);
+    } catch (error) {
+      if (!selectedFiles.has(entry.id)) continue;
+      renderConversionError(entry, error);
+      failures.push(`${entry.file.name}: ${error.message}`);
+    }
+  }
+
+  isConverting = false;
+  convertButton.innerHTML = '<i data-lucide="file-output"></i>Convert images';
+  renderIcons();
+  updateConvertButton();
+
+  if (failures.length > 0) {
+    showFileFeedback(failures, "error");
+  }
+};
+
 const addFiles = async (files) => {
   const rejected = [];
   const warnings = [];
@@ -251,6 +382,7 @@ const removeFile = (id) => {
   URL.revokeObjectURL(entry.url);
   selectedFiles.delete(id);
   fileList.querySelector(`[data-file-id="${id}"]`)?.remove();
+  removeConversionResult(id);
   updateQueueSummary();
 };
 
@@ -261,6 +393,7 @@ const clearFiles = () => {
 
   selectedFiles.clear();
   fileList.replaceChildren();
+  clearConversionResults();
   fileInput.value = "";
   updateQueueSummary();
 };
@@ -308,6 +441,8 @@ outputQuality.addEventListener("input", () => {
   qualityValue.value = `${outputQuality.value}%`;
   qualityValue.textContent = `${outputQuality.value}%`;
 });
+
+convertButton.addEventListener("click", runConversion);
 
 const savedTheme = localStorage.getItem("ifc-theme");
 const preferredTheme = window.matchMedia("(prefers-color-scheme: dark)").matches
