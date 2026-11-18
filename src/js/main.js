@@ -16,7 +16,7 @@ import {
 } from "lucide";
 import "../styles/main.css";
 import { validateImageFile } from "./core/file-validator.js";
-import { convertImageToPng } from "./core/conversion-service.js";
+import { convertImageToJpeg, convertImageToPng } from "./core/conversion-service.js";
 
 const iconSet = {
   Images,
@@ -78,7 +78,7 @@ const formatBytes = (bytes) => {
 };
 
 const updateConvertButton = () => {
-  convertButton.disabled = selectedFiles.size === 0 || selectedFormat !== "image/png" || isConverting;
+  convertButton.disabled = selectedFiles.size === 0 || !["image/png", "image/jpeg"].includes(selectedFormat) || isConverting;
 };
 
 const updateQueueSummary = () => {
@@ -251,7 +251,9 @@ const clearConversionResults = () => {
 const renderConversionResult = (entry, result) => {
   removeConversionResult(entry.id);
 
-  const outputName = `${entry.file.name.replace(/\.[^.]+$/, "") || "image"}.png`;
+  const extension = result.format === "jpeg" ? "jpg" : "png";
+  const formatLabel = result.format.toUpperCase();
+  const outputName = `${entry.file.name.replace(/\.[^.]+$/, "") || "image"}.${extension}`;
   const url = URL.createObjectURL(result.blob);
   conversionResults.set(entry.id, { url, outputName });
 
@@ -265,13 +267,13 @@ const renderConversionResult = (entry, result) => {
 
   const detail = document.createElement("div");
   detail.className = "result-detail";
-  detail.textContent = `PNG · ${result.width} × ${result.height} · ${formatBytes(result.blob.size)}`;
+  detail.textContent = `${formatLabel} · ${result.width} × ${result.height} · ${formatBytes(result.blob.size)}`;
 
   const download = document.createElement("a");
   download.className = "result-download";
   download.href = url;
   download.download = outputName;
-  download.textContent = "Download PNG";
+  download.textContent = `Download ${formatLabel}`;
 
   item.append(heading, detail, download);
   resultsList.append(item);
@@ -300,7 +302,7 @@ const renderConversionError = (entry, error) => {
 };
 
 const runConversion = async () => {
-  if (selectedFormat !== "image/png" || isConverting) return;
+  if (!["image/png", "image/jpeg"].includes(selectedFormat) || isConverting) return;
 
   isConverting = true;
   updateConvertButton();
@@ -313,7 +315,9 @@ const runConversion = async () => {
     if (!selectedFiles.has(entry.id)) continue;
 
     try {
-      const result = await convertImageToPng(entry.file);
+      const result = selectedFormat === "image/jpeg"
+        ? await convertImageToJpeg(entry.file, { quality: Number(outputQuality.value) / 100 })
+        : await convertImageToPng(entry.file);
       if (!selectedFiles.has(entry.id)) continue;
       renderConversionResult(entry, result);
     } catch (error) {
