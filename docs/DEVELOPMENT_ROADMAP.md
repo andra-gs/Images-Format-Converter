@@ -54,7 +54,7 @@ Tasks:
 - [x] Capability registry separating input decoding from output encoding (automated tests passed; user-confirmed).
 - [x] Browser image decoding for PNG, JPEG, WebP, and BMP (user-confirmed successful real-file tests).
 - [x] PNG output (encoder, conversion service, and UI flow; user verified PNG, JPEG, WebP, and BMP inputs convert successfully, output opens as PNG, dimensions and PNG transparency are preserved, filenames use .png, downloads work, and multiple files convert independently).
-- [ ] JPEG output.
+- [ ] JPEG output (encoder and conversion service implemented; real-browser verification pending).
 - [ ] WebP output with MIME verification.
 - [ ] BMP encoder.
 - [x] Blob result generation for PNG output.
