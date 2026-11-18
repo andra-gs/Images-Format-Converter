@@ -14,7 +14,7 @@ The current interface includes:
 - File selection through the file picker and drag-and-drop.
 - A selected-file queue with image previews, file details, individual removal, and clear-all behavior.
 - Light and dark themes with saved preference.
-- Conversion settings for PNG and JPEG, with quality control for JPEG. WebP encoder code is implemented but remains in browser testing and disabled in the main converter. BMP output is not implemented.
+- Conversion settings for PNG, JPEG, and WebP, with quality control for JPEG and WebP. BMP output is not implemented.
 - Startup skeleton that follows the selected theme and prevents an unstyled-content flash.
 - Initial file validation and image-format signature detection.
 - An explicit capability registry that keeps detection, decoding, and encoding status separate.
@@ -25,7 +25,7 @@ The current interface includes:
 - The user verified that all four input formats convert successfully, output files open as PNG, dimensions match the originals, PNG transparency is preserved, filenames use the .png extension, downloads work, and multiple files convert independently.
 - Automated Node.js tests for the capability registry, image decoder, and PNG/JPEG/WebP encoder code using the built-in test runner.
 
-PNG and JPEG decoding and encoding are marked implemented. WebP encoder code is implemented but not yet verified in the browser. BMP output encoding is not implemented. GIF, TIFF, HEIC, HEIF, and SVG decoding remain planned.
+PNG, JPEG, and WebP decoding and encoding are marked implemented. WebP was verified in the browser with PNG, JPEG, WebP, and BMP source files. The tests confirmed transparency preservation, quality control, the exact `image/webp` MIME type, matching dimensions, preview, download, and a clear error when the browser does not support WebP encoding. BMP output encoding is not implemented. GIF, TIFF, HEIC, HEIF, and SVG decoding remain planned.
 
 ## Project goals
 
