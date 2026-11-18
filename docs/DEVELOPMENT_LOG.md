@@ -740,6 +740,26 @@ Add newest entries first.
   - Test ZIP downloads with multiple successful files, duplicate output names, mixed successful and failed conversions, and a single successful result.
   - Extract the downloaded archive and confirm each image opens.
 
+
+### 2026-11-18 - User verification of Phase 3 batch processing
+- Status: Tested
+- Tests performed by the user:
+  - Verified that multiple images enter the queue.
+  - Verified per-file queue states and batch progress.
+  - Verified that a failed file does not stop other conversions.
+  - Verified cancellation after the active file finishes.
+  - Verified large-image processing keeps the interface responsive.
+  - Verified file removal, Clear all, and resource cleanup.
+  - Verified converted files can be downloaded and opened.
+  - User reported that all requested Phase 3 tests behaved as expected.
+- Test results:
+  - Phase 3 batch and worker foundation is user-verified.
+  - ZIP export is the remaining Phase 3 item and has been implemented separately; its tests are pending.
+- Next steps:
+  - Install JSZip and refresh `package-lock.json`.
+  - Run `npm test` and `npm run build`.
+  - Verify ZIP extraction and image integrity in the browser.
+
 ## Entry template
 
 ```markdown
