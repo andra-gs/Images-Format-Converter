@@ -695,6 +695,17 @@
   background: var(--color-surface-muted);
 }
 
+.cancel-button[hidden] {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .result-progress span {
+    animation: none;
+    width: 100%;
+  }
+}
+
 .convert-button svg {
   width: 17px;
   height: 17px;
