@@ -251,7 +251,7 @@ test("rejects invalid JPEG quality and background settings", async () => {
   );
 });
 
-test("rejects empty PNG output", async (t) => {
+test("falls back to HTML canvas when OffscreenCanvas returns an empty PNG Blob", async (t) => {
   class EmptyOffscreenCanvas {
     constructor(width, height) {
       this.width = width;
