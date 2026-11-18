@@ -1,6 +1,6 @@
 import { detectImageFormat } from "./format-detector.js";
 
-const BROWSER_RASTER_FORMATS = new Set(["png", "jpeg", "webp", "bmp"]);
+const BROWSER_RASTER_FORMATS = new Set(["png", "jpeg", "webp", "bmp", "heic", "heif"]);
 
 function getImageDimensions(source) {
   const width = source.width || source.naturalWidth;
@@ -36,6 +36,26 @@ async function decodeWithImageBitmap(file, format) {
   }
 
   const bitmap = await globalThis.createImageBitmap(file);
+
+  try {
+    return createDecodedResult(bitmap, format, () => bitmap.close?.());
+  } catch (error) {
+    bitmap.close?.();
+    throw error;
+  }
+}
+
+async function decodeWithHeicLibrary(file, format) {
+  // heic-to provides a worker-specific entry so the WASM decoder can run
+  // inside the existing conversion worker without requiring DOM APIs.
+  const decoderModule = typeof document === "undefined"
+    ? await import("heic-to/next")
+    : await import("heic-to");
+
+  const bitmap = await decoderModule.heicTo({
+    blob: file,
+    type: "bitmap"
+  });
 
   try {
     return createDecodedResult(bitmap, format, () => bitmap.close?.());
@@ -113,6 +133,14 @@ export async function decodeImage(file, { format } = {}) {
     return await decodeWithImageBitmap(file, detectedFormat);
   } catch (error) {
     decodingErrors.push(error);
+  }
+
+  if (detectedFormat === "heic" || detectedFormat === "heif") {
+    try {
+      return await decodeWithHeicLibrary(file, detectedFormat);
+    } catch (error) {
+      decodingErrors.push(error);
+    }
   }
 
   try {
