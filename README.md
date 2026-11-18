@@ -18,10 +18,11 @@ The current interface includes:
 - Startup skeleton that follows the selected theme and prevents an unstyled-content flash.
 - Initial file validation and image-format signature detection.
 - An explicit capability registry that keeps detection, decoding, and encoding status separate.
-- An initial browser image decoder module for PNG, JPEG, WebP, and BMP, with an ImageBitmap path and HTML image fallback. Real PNG, JPEG, WebP, and BMP files have been successfully decoded in the browser, as confirmed by the user.
+- A browser image decoder for PNG, JPEG, WebP, and BMP, with an ImageBitmap path and HTML image fallback. The user verified all four formats with real files in the browser.
+- An initial PNG encoder and conversion service using Canvas. The service checks the PNG signature and reopens the output to verify its dimensions. The main interface now offers PNG conversion and individual downloads; final browser verification is pending.
 - Automated Node.js tests for the capability registry and image decoder using the built-in test runner.
 
-The decoder is not connected to the conversion workflow yet. PNG, JPEG, WebP, and BMP decoding are marked implemented after successful real-file browser tests. Encoders, conversion execution, output generation, and downloads are not available. The Convert button remains disabled.
+PNG decoding and conversion code are implemented. PNG conversion has not yet completed user verification in the main interface. JPEG, WebP, and BMP output encoders are not implemented, so those choices remain disabled. Conversion status is not marked as fully supported until the browser conversion test passes.
 
 ## Project goals
 
