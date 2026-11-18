@@ -128,3 +128,49 @@ test("falls back to an HTML canvas when OffscreenCanvas is unavailable", async (
   assert.equal(result, output);
   assert.deepEqual(drawArguments, [source, 0, 0, 800, 600]);
 });
+
+test("falls back to HTML canvas when OffscreenCanvas encoding throws", async (t) => {
+  const output = new Blob(["fallback-after-error"], { type: "image/png" });
+  class BrokenOffscreenCanvas {
+    constructor(width, height) {
+      this.width = width;
+      this.height = height;
+    }
+
+    getContext() {
+      return { drawImage() {} };
+    }
+
+    async convertToBlob() {
+      throw new Error("OffscreenCanvas encoding failed.");
+    }
+  }
+
+  const fallbackCanvas = {
+    width: 0,
+    height: 0,
+    getContext() {
+      return { drawImage() {} };
+    },
+    toBlob(callback) {
+      callback(output);
+    }
+  };
+
+  mockGlobal(t, "OffscreenCanvas", BrokenOffscreenCanvas);
+  mockGlobal(t, "document", {
+    createElement() {
+      return fallbackCanvas;
+    }
+  });
+
+  const result = await encodeImage({
+    source: {},
+    width: 64,
+    height: 64
+  });
+
+  assert.equal(result, output);
+  assert.equal(fallbackCanvas.width, 64);
+  assert.equal(fallbackCanvas.height, 64);
+});
