@@ -10,9 +10,9 @@ const FORMAT_CAPABILITIES = Object.freeze({
       note: "Real-file decoding was verified in the browser."
     },
     encoding: {
-      status: "planned",
+      status: "implemented",
       strategy: "canvas",
-      note: "PNG output will use the browser Canvas API."
+      note: "PNG output uses OffscreenCanvas with an HTML Canvas fallback. Real-file conversion was verified in the main UI for PNG, JPEG, WebP, and BMP inputs."
     }
   },
   jpeg: {
