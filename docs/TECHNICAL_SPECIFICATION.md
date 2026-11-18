@@ -136,7 +136,7 @@ Consider file size, extension and MIME hints, actual decoder support, dimensions
 
 ## 8. Browser image decoder
 
-The browser decoder handles PNG, JPEG, WebP, and BMP through `createImageBitmap()` when available, with an `HTMLImageElement` and Object URL fallback. HEIC/HEIF first attempt native ImageBitmap decoding, then use heic-to's WebAssembly decoder. The worker uses the package's `heic-to/next` entry; the main-thread fallback uses `heic-to`. The decoder returns a common result containing the decoded source, width, height, detected format, and a `close()` method. Callers must close the result after processing. HEIC/HEIF capability status remains planned until real fixtures pass. SVG, GIF, and TIFF remain outside this decoder's scope.
+The browser decoder handles PNG, JPEG, WebP, and BMP through `createImageBitmap()` when available, with an `HTMLImageElement` and Object URL fallback. HEIC/HEIF first attempt native ImageBitmap decoding, then use heic-to's WebAssembly decoder. The worker uses the package's `heic-to/next` entry; the main-thread fallback uses `heic-to`. The decoder returns a common result containing the decoded source, width, height, detected format, and a `close()` method. Callers must close the result after processing. HEIC/HEIF capability status remains planned until real fixtures pass. The committed package-lock file must be refreshed with `npm install` after this dependency addition. SVG, GIF, and TIFF remain outside this decoder's scope.
 
 ## 9. Initial PNG conversion pipeline
 
