@@ -5,7 +5,7 @@ This file records actual repository progress. Update it after meaningful impleme
 ## Project status
 
 - Current stage: Phase 2 - Core conversion engine
-- Current phase status: Phase 2 in progress; PNG and JPEG conversion are user-verified and enabled in the main UI; WebP encoder code is implemented but browser verification is pending; BMP output remains pending
+- Current phase status: Phase 2 in progress; PNG, JPEG, and WebP conversion are user-verified and enabled in the main UI; BMP output remains pending
 - Latest release: None
 - Last updated: 2026-11-18
 
@@ -23,7 +23,7 @@ This file records actual repository progress. Update it after meaningful impleme
 |---|---|---|
 | Phase 0: Project foundation | Tested | User confirmed localhost works and `npm run build` succeeds; `package-lock.json` is present in the GitHub repository |
 | Phase 1: UI development | Tested | User confirmed the skeleton follows light/dark themes, theme persists after refresh, no unstyled flash appears, and `npm run build` succeeds |
-| Phase 2: Core conversion engine | In progress | PNG and JPEG output are user-verified; WebP encoder code is implemented but browser verification is pending; BMP output remains pending |
+| Phase 2: Core conversion engine | In progress | PNG, JPEG, and WebP output are user-verified; BMP output remains pending |
 | Phase 3: Batch processing | Not started | Workers, queue, ZIP |
 | Phase 4: Advanced formats | Not started | HEIC, TIFF, SVG, GIF |
 | Phase 5: Image manipulation | Not started | Resize, compression, metadata |
@@ -32,6 +32,32 @@ This file records actual repository progress. Update it after meaningful impleme
 ## Change log
 
 Add newest entries first.
+
+### 2026-11-18 - WebP conversion verified and enabled in the main interface
+
+- Status: Tested; user-confirmed real-file browser verification
+- User-confirmed checks:
+  - PNG, JPEG, WebP, and BMP inputs convert successfully to WebP.
+  - PNG transparency remains intact.
+  - Quality adjustment works.
+  - The output MIME type is exactly `image/webp`.
+  - Output dimensions match the source image.
+  - The output preview displays correctly.
+  - Download produces a `.webp` file.
+  - Browsers without WebP encoding support show a clear error.
+- Repository changes:
+  - Marked WebP encoding as `implemented` in the capability registry.
+  - Enabled WebP in the custom output-format dropdown.
+  - Connected the main conversion action to `convertImageToWebp()` and passed the selected quality value.
+  - Added the `.webp` output extension.
+  - Updated capability-registry test expectations.
+  - Updated README, Technical Specification, and Development Roadmap.
+- Test status:
+  - The 11 real-browser checks above were confirmed by the user.
+  - The automated test suite and production build still need to be rerun after these repository changes.
+- Remaining limitations:
+  - BMP output encoding is not implemented.
+  - Browser support for WebP encoding varies. Unsupported browsers receive an explicit conversion error.
 
 ### 2026-11-18 - Initial WebP encoder and conversion integration
 
