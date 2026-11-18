@@ -12,8 +12,8 @@
   "dependencies": {
     "heic-to": "^1.6.7",
     "jszip": "^3.10.1",
-    "utif2": "^4.1.0",
-    "lucide": "^1.74.0"
+    "lucide": "^1.74.0",
+    "utif2": "^4.1.0"
   },
   "devDependencies": {
     "vite": "^7.3.8"
