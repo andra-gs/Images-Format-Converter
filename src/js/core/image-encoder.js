@@ -101,7 +101,7 @@ export async function encodeImage(
 
   if (["jpeg", "webp"].includes(normalizedFormat)) {
     if (!Number.isFinite(quality) || quality < 0 || quality > 1) {
-      throw new RangeError("JPEG and WebP quality must be a number between 0 and 1.");
+      throw new RangeError(`${normalizedFormat.toUpperCase()} quality must be a number between 0 and 1.`);
     }
 
     if (normalizedFormat === "jpeg" && (typeof backgroundColor !== "string" || backgroundColor.trim() === "")) {
