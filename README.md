@@ -23,7 +23,7 @@ The current interface includes:
 - A JPEG encoder and conversion service have been added using OffscreenCanvas with an HTML Canvas fallback. The encoder accepts a quality setting, composites transparency onto a white background by default, and checks the output MIME type. Real-browser verification is pending through `/tests/browser-encoder.html`.
 - The main interface supports PNG output from PNG, JPEG, WebP, and BMP inputs, with individual PNG downloads and per-file error results.
 - The user verified that all four input formats convert successfully, output files open as PNG, dimensions match the originals, PNG transparency is preserved, filenames use the .png extension, downloads work, and multiple files convert independently.
-- Automated Node.js tests for the capability registry, image decoder, and PNG encoder using the built-in test runner.
+- Automated Node.js tests for the capability registry, image decoder, and PNG/JPEG encoders using the built-in test runner.
 
 PNG decoding and encoding are marked implemented. JPEG encoding code is implemented but remains disabled in the main interface pending real-browser verification. WebP and BMP output encoders are not implemented. GIF, TIFF, HEIC, HEIF, and SVG decoding remain planned.
 
