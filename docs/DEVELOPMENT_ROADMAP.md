@@ -86,7 +86,7 @@ Deliverable: batch conversion without freezing the UI under normal test loads. B
 Status: In progress. HEIC/HEIF decoder and conversion paths are user-verified. The TIFF decoder adapter is implemented; real-file verification remains pending.
 
 Tasks:
-- [x] Evaluate and integrate HEIC/HEIF decoder adapter using heic-to (real-file verification pending).
+- [x] Evaluate and integrate HEIC/HEIF decoder adapter using heic-to (real-file decoder, conversion, and Worker tests user-confirmed).
 - [x] Test real HEIC and HEIF fixtures in the browser, main conversion pipeline, and Web Worker (user-confirmed).
 - [x] Integrate a UTIF2-based TIFF decoder adapter that renders the first page to Canvas.
 - [ ] Test real TIFF fixtures, including single-page/multi-page files and representative compression variants, in the browser and conversion pipeline.
