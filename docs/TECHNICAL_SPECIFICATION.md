@@ -64,10 +64,13 @@ Images-Format-Converter/
 │           ├── file-validator.js
 │           ├── format-detector.js
 │           ├── capability-registry.js
-│           └── image-decoder.js
+│           ├── image-decoder.js
+│           ├── image-encoder.js
+│           └── conversion-service.js
 ├── tests/
 │   ├── capability-registry.test.js
 │   ├── image-decoder.test.js
+│   ├── image-encoder.test.js
 │   ├── browser-decoder.html
 │   ├── browser-decoder.css
 │   └── browser-decoder.js
@@ -135,7 +138,11 @@ Consider file size, extension and MIME hints, actual decoder support, dimensions
 
 The initial browser decoder module handles PNG, JPEG, WebP, and BMP through `createImageBitmap()` when available, with an `HTMLImageElement` and Object URL fallback. It returns a common result containing the decoded source, width, height, detected format, and a `close()` method. Callers must close the result after processing to release the ImageBitmap or Object URL. SVG, GIF, TIFF, HEIC, and HEIF remain outside this decoder's scope. Do not mark decoding as supported in the capability registry until real image fixtures pass in target browsers.
 
-## 9. Conversion settings
+## 9. Initial PNG conversion pipeline
+
+The first conversion path decodes a supported source image, draws it to a 2D Canvas, and encodes the canvas as PNG. The encoder prefers `OffscreenCanvas` and falls back to an HTML canvas. The conversion service checks the generated PNG signature, decodes the generated output again, and confirms that its dimensions match the source. It closes both decoded image resources after use. PNG output does not use the lossy quality slider. JPEG, WebP, and BMP output remain unavailable until their encoders are implemented and verified.
+
+## 10. Conversion settings
 
 - Output format.
 - Quality for supported lossy encoders.
@@ -146,7 +153,7 @@ The initial browser decoder module handles PNG, JPEG, WebP, and BMP through `cre
 
 Quality controls must be format-aware. PNG must not be presented as if its quality slider behaves like JPEG quality.
 
-## 10. Conversion result
+## 11. Conversion result
 
 Show original and output filename/format, file sizes, dimensions, status, preview, and download action.
 
@@ -156,18 +163,18 @@ savingsPercent = ((originalSize - outputSize) / originalSize) * 100
 
 A negative value means the output is larger. Display that honestly.
 
-## 11. Browser compatibility
+## 12. Browser compatibility
 
 Target Chrome, Edge, Firefox, and Safari. Feature-detect Canvas encoding, OffscreenCanvas, worker support, and decoding capabilities.
 
-## 12. Resource management
+## 13. Resource management
 
 Revoke Object URLs, close ImageBitmap instances, release workers and large references, limit concurrency, handle cancellation, and avoid retaining duplicate image data longer than necessary.
 
-## 13. Testing requirements
+## 14. Testing requirements
 
 Test PNG/JPEG/WebP paths, transparency to JPEG with a selected background, corrupt and unsupported inputs, multiple files with independent failures, large dimensions, output MIME type, reopening generated files, ZIP integrity, themes, responsive layout, SVG safety, and format-specific HEIC/TIFF/GIF fixtures when those phases begin.
 
-## 14. Definition of Done
+## 15. Definition of Done
 
 A feature is complete when it matches the agreed behavior, handles errors, passes relevant tests, preserves local processing, releases temporary resources, and has appropriate documentation.
