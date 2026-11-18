@@ -1,0 +1,97 @@
+import { convertImageToJpeg } from "../src/js/core/conversion-service.js";
+
+const fileInput = document.querySelector("#encoder-file-input");
+const resultsList = document.querySelector("#encoder-results");
+const emptyState = document.querySelector("#empty-state");
+const clearButton = document.querySelector("#clear-results");
+const qualityInput = document.querySelector("#jpeg-quality");
+const qualityValue = document.querySelector("#jpeg-quality-value");
+const resultUrls = new Set();
+
+qualityInput.addEventListener("input", () => {
+  qualityValue.value = `${qualityInput.value}%`;
+  qualityValue.textContent = `${qualityInput.value}%`;
+});
+
+const formatBytes = (bytes) => {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 ** 2) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / 1024 ** 2).toFixed(2)} MB`;
+};
+
+const addResult = ({ file, result, error }) => {
+  const item = document.createElement("li");
+  item.className = "result-item";
+
+  const name = document.createElement("div");
+  name.className = "result-name";
+  name.textContent = file.name;
+
+  const metadata = document.createElement("div");
+  metadata.className = "result-detail";
+  metadata.textContent = `${formatBytes(file.size)} · ${file.type || "MIME type unavailable"}`;
+
+  const status = document.createElement("div");
+  status.className = `result-status ${result ? "success" : "error"}`;
+  status.textContent = result ? "JPEG conversion and validation successful" : "JPEG conversion failed";
+
+  const detail = document.createElement("div");
+  detail.className = "result-detail";
+
+  item.append(name, metadata, status, detail);
+
+  if (result) {
+    const outputName = `${file.name.replace(/\.[^.]+$/, "") || "image"}.jpg`;
+    const url = URL.createObjectURL(result.blob);
+    resultUrls.add(url);
+    detail.textContent = `MIME: ${result.blob.type} · Dimensions: ${result.width} × ${result.height} · Output: ${formatBytes(result.blob.size)}`;
+
+    const preview = document.createElement("img");
+    preview.className = "result-preview";
+    preview.src = url;
+    preview.alt = `JPEG output preview for ${file.name}`;
+
+    const download = document.createElement("a");
+    download.className = "download-link";
+    download.href = url;
+    download.download = outputName;
+    download.textContent = `Download ${outputName}`;
+
+    item.append(preview, download);
+  } else {
+    detail.textContent = error?.message || "Unknown conversion error.";
+  }
+
+  resultsList.append(item);
+  emptyState.hidden = true;
+};
+
+fileInput.addEventListener("change", async () => {
+  const files = [...fileInput.files];
+  const quality = Number(qualityInput.value) / 100;
+
+  for (const file of files) {
+    try {
+      const result = await convertImageToJpeg(file, {
+        quality,
+        backgroundColor: "#ffffff"
+      });
+      addResult({ file, result });
+    } catch (error) {
+      addResult({ file, error });
+    }
+  }
+
+  fileInput.value = "";
+});
+
+clearButton.addEventListener("click", () => {
+  for (const url of resultUrls) URL.revokeObjectURL(url);
+  resultUrls.clear();
+  resultsList.replaceChildren();
+  emptyState.hidden = false;
+});
+
+window.addEventListener("beforeunload", () => {
+  for (const url of resultUrls) URL.revokeObjectURL(url);
+});
