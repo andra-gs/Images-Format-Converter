@@ -63,6 +63,11 @@ const qualityField = document.querySelector("#quality-field");
 const outputQuality = document.querySelector("#output-quality");
 const qualityValue = document.querySelector("#quality-value");
 const convertButton = document.querySelector("#convert-button");
+const cancelButton = document.querySelector("#cancel-button");
+const batchProgress = document.querySelector("#batch-progress");
+const batchProgressText = document.querySelector("#batch-progress-text");
+const batchProgressPercent = document.querySelector("#batch-progress-percent");
+const batchProgressBar = document.querySelector("#batch-progress-bar");
 const resultsEmpty = document.querySelector("#results-empty");
 const resultsList = document.querySelector("#results-list");
 
@@ -70,6 +75,7 @@ const selectedFiles = new Map();
 const conversionResults = new Map();
 let nextFileId = 0;
 let isConverting = false;
+let cancelRequested = false;
 
 const formatBytes = (bytes) => {
   if (bytes < 1024) return `${bytes} B`;
@@ -248,6 +254,50 @@ const clearConversionResults = () => {
   updateResultsVisibility();
 };
 
+const renderConversionStatus = (entry, status, detailText) => {
+  removeConversionResult(entry.id);
+
+  const item = document.createElement("li");
+  item.className = `result-item result-item-${status}`;
+  item.dataset.resultId = String(entry.id);
+
+  const heading = document.createElement("div");
+  heading.className = "result-name";
+  heading.textContent = entry.file.name;
+
+  const statusLabel = document.createElement("span");
+  statusLabel.className = `result-status result-status-${status}`;
+  statusLabel.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+
+  const detail = document.createElement("div");
+  detail.className = "result-detail";
+  detail.textContent = detailText;
+
+  item.append(heading, statusLabel, detail);
+
+  if (status === "processing") {
+    const progress = document.createElement("div");
+    progress.className = "result-progress";
+    progress.setAttribute("role", "progressbar");
+    progress.setAttribute("aria-label", `Converting ${entry.file.name}`);
+    const indicator = document.createElement("span");
+    progress.append(indicator);
+    item.append(progress);
+  }
+
+  resultsList.append(item);
+  conversionResults.set(entry.id, { url: null, status });
+  updateResultsVisibility();
+};
+
+const updateBatchProgress = (total, finished) => {
+  const percentage = total === 0 ? 0 : Math.round((finished / total) * 100);
+  batchProgress.hidden = total === 0;
+  batchProgressText.textContent = `${finished} of ${total} files processed`;
+  batchProgressPercent.textContent = `${percentage}%`;
+  batchProgressBar.value = percentage;
+};
+
 const renderConversionResult = (entry, result) => {
   removeConversionResult(entry.id);
 
@@ -275,7 +325,11 @@ const renderConversionResult = (entry, result) => {
   download.download = outputName;
   download.textContent = `Download ${formatLabel}`;
 
-  item.append(heading, detail, download);
+  const status = document.createElement("span");
+  status.className = "result-status result-status-completed";
+  status.textContent = "Completed";
+
+  item.append(heading, status, detail, download);
   resultsList.append(item);
   updateResultsVisibility();
 };
@@ -295,9 +349,13 @@ const renderConversionError = (entry, error) => {
   detail.className = "result-detail";
   detail.textContent = error.message || "Conversion failed.";
 
-  item.append(heading, detail);
+  const status = document.createElement("span");
+  status.className = "result-status result-status-failed";
+  status.textContent = "Failed";
+
+  item.append(heading, status, detail);
   resultsList.append(item);
-  conversionResults.set(entry.id, { url: null });
+  conversionResults.set(entry.id, { url: null, status: "failed" });
   updateResultsVisibility();
 };
 
@@ -305,14 +363,34 @@ const runConversion = async () => {
   if (!["image/png", "image/jpeg", "image/webp", "image/bmp"].includes(selectedFormat) || isConverting) return;
 
   isConverting = true;
+  cancelRequested = false;
   updateConvertButton();
   convertButton.textContent = "Converting...";
+  cancelButton.hidden = false;
+  cancelButton.disabled = false;
+  cancelButton.textContent = "Cancel remaining";
 
   const failures = [];
   const filesToConvert = [...selectedFiles.values()];
+  let finished = 0;
+
+  updateBatchProgress(filesToConvert.length, finished);
 
   for (const entry of filesToConvert) {
-    if (!selectedFiles.has(entry.id)) continue;
+    if (!selectedFiles.has(entry.id)) {
+      finished += 1;
+      updateBatchProgress(filesToConvert.length, finished);
+      continue;
+    }
+
+    if (cancelRequested) {
+      renderConversionStatus(entry, "cancelled", "This file was not processed.");
+      finished += 1;
+      updateBatchProgress(filesToConvert.length, finished);
+      continue;
+    }
+
+    renderConversionStatus(entry, "processing", `Converting to ${selectedFormat.replace("image/", "").toUpperCase()}...`);
 
     try {
       const quality = Number(outputQuality.value) / 100;
@@ -323,25 +401,44 @@ const runConversion = async () => {
           : selectedFormat === "image/bmp"
             ? await convertImageToBmp(entry.file)
             : await convertImageToPng(entry.file);
-      if (!selectedFiles.has(entry.id)) continue;
-      renderConversionResult(entry, result);
+
+      if (selectedFiles.has(entry.id)) {
+        renderConversionResult(entry, result);
+      }
     } catch (error) {
-      if (!selectedFiles.has(entry.id)) continue;
-      renderConversionError(entry, error);
-      failures.push(`${entry.file.name}: ${error.message}`);
+      if (selectedFiles.has(entry.id)) {
+        renderConversionError(entry, error);
+        failures.push(`${entry.file.name}: ${error.message}`);
+      }
     }
+
+    finished += 1;
+    updateBatchProgress(filesToConvert.length, finished);
   }
 
   isConverting = false;
+  cancelRequested = false;
+  cancelButton.hidden = true;
+  cancelButton.disabled = false;
   convertButton.innerHTML = '<i data-lucide="file-output"></i>Convert images';
   renderIcons();
   updateConvertButton();
 
   if (failures.length > 0) {
     showFileFeedback(failures, "error");
+  } else if (filesToConvert.length > 0 && cancelButton.dataset.cancelled === "true") {
+    showFileFeedback(["Conversion stopped after the current file. Remaining files were skipped."], "warning");
   }
+  cancelButton.dataset.cancelled = "false";
 };
 
+cancelButton.addEventListener("click", () => {
+  if (!isConverting || cancelRequested) return;
+  cancelRequested = true;
+  cancelButton.disabled = true;
+  cancelButton.textContent = "Stopping after current file...";
+  cancelButton.dataset.cancelled = "true";
+});
 const addFiles = async (files) => {
   const rejected = [];
   const warnings = [];
