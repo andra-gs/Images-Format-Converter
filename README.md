@@ -2,7 +2,7 @@
 
 A local-first image format conversion web application. Image files are processed in the user's browser and are not uploaded to a remote server.
 
-> Project status: Phase 3 - Batch processing (in progress)
+> Project status: Phase 4 - Advanced format support (in progress)
 > Stack: Vanilla JavaScript + Vite + plain CSS
 > Icons: Lucide via NPM
 > Architecture: Client-side, modular, hybrid processing
@@ -15,21 +15,21 @@ The current interface includes:
 - A selected-file queue with image previews, file details, individual removal, and clear-all behavior.
 - Batch conversion with per-file pending, processing, completed, failed, and cancelled states, plus overall batch progress.
 - Web Worker conversion when supported, with a main-thread fallback and a sequential concurrency limit.
-- Cancellation of remaining queued files after the active conversion finishes. Successful outputs can be downloaded individually or together in a ZIP archive using JSZip. The ZIP export implementation is committed and awaits dependency-lock synchronization and browser verification.
+- Cancellation of remaining queued files after the active conversion finishes. Successful outputs can be downloaded individually or together in a ZIP archive using JSZip. The user has verified ZIP export, including archive extraction and image integrity.
 - Light and dark themes with saved preference.
 - Conversion settings for PNG, JPEG, WebP, and BMP, with quality control for JPEG and WebP. The dedicated 24-bit BMP encoder is implemented and user-verified with real PNG, JPEG, WebP, and BMP files.
 - Startup skeleton that follows the selected theme and prevents an unstyled-content flash.
 - Initial file validation and image-format signature detection.
 - An explicit capability registry that keeps detection, decoding, and encoding status separate.
-- A browser image decoder for PNG, JPEG, WebP, and BMP, with an ImageBitmap path and HTML image fallback. The user verified all four formats with real files in the browser.
+- A browser image decoder for PNG, JPEG, WebP, and BMP, with an ImageBitmap path and HTML image fallback. The user verified all four formats with real files in the browser. A HEIC/HEIF decoder adapter using heic-to is now implemented and awaits real-file verification.
 - A PNG encoder and conversion service using OffscreenCanvas with an HTML Canvas fallback. The service checks the PNG signature and reopens the output to verify its dimensions.
 - A dedicated 24-bit BMP encoder that writes bottom-up BGR pixel rows with 4-byte alignment. Transparent pixels are composited onto white. Automated tests cover its header, pixel data, row padding, and Canvas fallback. Real-file browser conversion has been user-verified.
 - JPEG output is implemented and enabled in the main interface. The user verified PNG, JPEG, WebP, and BMP inputs convert to JPEG, transparent PNG areas become white, quality settings work, output MIME type is `image/jpeg`, dimensions match, previews display, and `.jpg` downloads work.
 - The main interface supports PNG output from PNG, JPEG, WebP, and BMP inputs, with individual PNG downloads and per-file error results.
 - The user verified that all four input formats convert successfully, output files open as PNG, dimensions match the originals, PNG transparency is preserved, filenames use the .png extension, downloads work, and multiple files convert independently.
-- The user has verified the Phase 3 batch queue, worker processing, progress states, cancellation behavior, failure isolation, large-image responsiveness, resource cleanup, and individual downloads. The user reports that all requested tests passed. ZIP export has been implemented and still requires dependency installation, build/test verification, and archive extraction checks.
+- The user has verified Phase 3 batch processing, worker execution, progress states, cancellation, failure isolation, responsiveness, cleanup, individual downloads, and ZIP archive integrity.
 
-PNG, JPEG, WebP, and BMP conversion paths are user-verified with real files. The user has confirmed that the Phase 3 worker and batch-processing tests pass. The ZIP export feature is implemented but awaits dependency installation and browser verification. GIF, TIFF, HEIC, HEIF, and SVG decoding remain planned.
+PNG, JPEG, WebP, and BMP conversion paths are user-verified with real files. Phase 3, including ZIP export, is user-verified. HEIC/HEIF decoding is implemented but remains unverified with real fixtures. GIF, TIFF, and SVG decoding remain planned.
 
 ## Project goals
 
@@ -65,7 +65,7 @@ Special cases:
 | Icons | Lucide NPM package |
 | Standard image processing | Canvas API, ImageBitmap |
 | Background processing | Web Workers, OffscreenCanvas where supported |
-| ZIP downloads | JSZip |
+| ZIP downloads | JSZip |\n| HEIC/HEIF decoding | heic-to (WebAssembly, browser and worker entry points) |
 | Version control | Git and GitHub |
 
 No backend, database, cloud storage, or remote image-processing API is planned.
