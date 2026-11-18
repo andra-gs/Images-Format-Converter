@@ -50,16 +50,15 @@ Deliverable: complete interface with file-selection and conversion-settings cont
 
 Tasks:
 - [x] File validation and signature detection (implementation exists; full manual verification remains part of QA).
-
 - [x] Capability registry separating input decoding from output encoding (automated tests passed; user-confirmed).
 - [x] Browser image decoding for PNG, JPEG, WebP, and BMP (user-confirmed successful real-file tests).
 - [x] PNG output (encoder, conversion service, and UI flow; user verified PNG, JPEG, WebP, and BMP inputs convert successfully, output opens as PNG, dimensions and PNG transparency are preserved, filenames use .png, downloads work, and multiple files convert independently).
 - [x] JPEG output (encoder, conversion service, quality control, white compositing for transparency, and main-interface download; user verified real-file conversion).
 - [x] WebP output (encoder, conversion service, quality control, and main-interface download; user verified PNG, JPEG, WebP, and BMP inputs, transparency, MIME type, dimensions, preview, download, and unsupported-browser error handling).
 - [x] BMP encoder (user verified PNG, JPEG, WebP, and BMP inputs; output opens, dimensions match, and transparent pixels become white).
-- [x] Blob result generation for PNG output.
-- [x] PNG output validation by reopening/decoding and checking dimensions.
-- [x] Individual PNG download.
+- [x] Blob result generation for PNG, JPEG, WebP, and BMP output.
+- [x] Output signature validation, reopening/decoding, and dimension checks for implemented formats.
+- [x] Individual downloads for implemented output formats.
 - [x] Per-file conversion error results.
 
 Deliverable: reliable local conversion for implemented and tested formats.
@@ -67,16 +66,16 @@ Deliverable: reliable local conversion for implemented and tested formats.
 ## Phase 3: Batch processing
 
 Tasks:
-- [ ] Multiple-file queue.
-- [ ] Queue state management.
-- [ ] Per-file progress/status.
-- [ ] Web Worker processing.
-- [ ] OffscreenCanvas feature detection and fallback.
-- [ ] Concurrency limits.
-- [ ] Cancellation where practical.
-- [ ] Quality adjustment for supported lossy formats.
+- [x] Multiple-file queue (existing UI queue and independent per-file conversion).
+- [x] Queue job states: pending, processing, completed, failed, and cancelled.
+- [x] Per-file status and indeterminate processing indicator, plus batch completion progress.
+- [x] Web Worker conversion for supported browsers.
+- [x] OffscreenCanvas and createImageBitmap feature detection with main-thread HTML API fallback.
+- [x] Concurrency limit of one conversion job at a time to control memory usage.
+- [x] Cancel remaining queued files after the active file finishes.
+- [x] Quality adjustment for JPEG and WebP.
 - [ ] ZIP download using JSZip.
-- [ ] Resource cleanup.
+- [x] Resource cleanup for decoded images, output object URLs, and worker shutdown.
 
 Deliverable: batch conversion without freezing the UI under normal test loads.
 
