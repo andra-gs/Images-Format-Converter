@@ -75,7 +75,7 @@ The application should maintain an explicit capability registry. The UI should o
 - Validate generated files by decoding them with an independent decoder or browser-supported path.
 
 **HEIC / HEIF**
-- Use `heic-to` as the selected browser-compatible decoder candidate. Version 1.6.7 is integrated as a decoder fallback with a worker-specific entry point. Keep HEIC/HEIF support unadvertised until representative real-file tests pass. Continue monitoring bundle size, licensing, and browser compatibility.
+- Use `heic-to` as the selected browser-compatible decoder candidate. Version 1.6.7 is integrated as a decoder fallback with a worker-specific entry point. Keep HEIC/HEIF support unadvertised until representative real-file tests pass. After adding the dependency, refresh and commit `package-lock.json` with `npm install`. Continue monitoring bundle size, licensing, and browser compatibility.
 - Treat HEIC and HEIF as related but not automatically identical in every implementation detail.
 - HEIC input conversion does not imply HEIC output support.
 
