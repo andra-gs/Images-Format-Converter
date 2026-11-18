@@ -53,7 +53,7 @@ Tasks:
 - [ ] Image format signature detection (implemented; manual verification pending).
 - [x] Capability registry separating input decoding from output encoding (automated tests passed; user-confirmed).
 - [x] Browser image decoding for PNG, JPEG, WebP, and BMP (user-confirmed successful real-file tests).
-- [ ] PNG output.
+- [ ] PNG output (encoder, conversion service, and UI flow implemented; real browser conversion verification pending).
 - [ ] JPEG output.
 - [ ] WebP output with MIME verification.
 - [ ] BMP encoder.
