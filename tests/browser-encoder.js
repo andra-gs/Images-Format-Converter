@@ -1,17 +1,13 @@
-import { convertImageToJpeg } from "../src/js/core/conversion-service.js";
+import { convertImageToJpeg, convertImageToWebp } from "../src/js/core/conversion-service.js";
 
 const fileInput = document.querySelector("#encoder-file-input");
+const outputFormat = document.querySelector("#output-format");
+const outputQuality = document.querySelector("#output-quality");
+const qualityValue = document.querySelector("#quality-value");
 const resultsList = document.querySelector("#encoder-results");
 const emptyState = document.querySelector("#empty-state");
 const clearButton = document.querySelector("#clear-results");
-const qualityInput = document.querySelector("#jpeg-quality");
-const qualityValue = document.querySelector("#jpeg-quality-value");
 const resultUrls = new Set();
-
-qualityInput.addEventListener("input", () => {
-  qualityValue.value = `${qualityInput.value}%`;
-  qualityValue.textContent = `${qualityInput.value}%`;
-});
 
 const formatBytes = (bytes) => {
   if (bytes < 1024) return `${bytes} B`;
@@ -19,7 +15,7 @@ const formatBytes = (bytes) => {
   return `${(bytes / 1024 ** 2).toFixed(2)} MB`;
 };
 
-const addResult = ({ file, result, error }) => {
+const addResult = ({ file, result, error, format }) => {
   const item = document.createElement("li");
   item.className = "result-item";
 
@@ -29,27 +25,28 @@ const addResult = ({ file, result, error }) => {
 
   const metadata = document.createElement("div");
   metadata.className = "result-detail";
-  metadata.textContent = `${formatBytes(file.size)} · ${file.type || "MIME type unavailable"}`;
+  metadata.textContent = `Source: ${formatBytes(file.size)} · ${file.type || "MIME type unavailable"}`;
 
   const status = document.createElement("div");
   status.className = `result-status ${result ? "success" : "error"}`;
-  status.textContent = result ? "JPEG conversion and validation successful" : "JPEG conversion failed";
+  status.textContent = result ? `${format.toUpperCase()} conversion and validation successful` : `${format.toUpperCase()} conversion failed`;
 
   const detail = document.createElement("div");
   detail.className = "result-detail";
-
   item.append(name, metadata, status, detail);
 
   if (result) {
-    const outputName = `${file.name.replace(/\.[^.]+$/, "") || "image"}.jpg`;
+    const extension = format === "jpeg" ? "jpg" : "webp";
+    const outputName = `${file.name.replace(/\.[^.]+$/, "") || "image"}.${extension}`;
     const url = URL.createObjectURL(result.blob);
     resultUrls.add(url);
+
     detail.textContent = `MIME: ${result.blob.type} · Dimensions: ${result.width} × ${result.height} · Output: ${formatBytes(result.blob.size)}`;
 
     const preview = document.createElement("img");
     preview.className = "result-preview";
     preview.src = url;
-    preview.alt = `JPEG output preview for ${file.name}`;
+    preview.alt = `${format.toUpperCase()} output preview for ${file.name}`;
 
     const download = document.createElement("a");
     download.className = "download-link";
@@ -68,21 +65,26 @@ const addResult = ({ file, result, error }) => {
 
 fileInput.addEventListener("change", async () => {
   const files = [...fileInput.files];
-  const quality = Number(qualityInput.value) / 100;
+  const format = outputFormat.value;
+  const quality = Number(outputQuality.value) / 100;
 
   for (const file of files) {
     try {
-      const result = await convertImageToJpeg(file, {
-        quality,
-        backgroundColor: "#ffffff"
-      });
-      addResult({ file, result });
+      const result = format === "jpeg"
+        ? await convertImageToJpeg(file, { quality, backgroundColor: "#ffffff" })
+        : await convertImageToWebp(file, { quality });
+      addResult({ file, result, format });
     } catch (error) {
-      addResult({ file, error });
+      addResult({ file, error, format });
     }
   }
 
   fileInput.value = "";
+});
+
+outputQuality.addEventListener("input", () => {
+  qualityValue.value = `${outputQuality.value}%`;
+  qualityValue.textContent = `${outputQuality.value}%`;
 });
 
 clearButton.addEventListener("click", () => {
