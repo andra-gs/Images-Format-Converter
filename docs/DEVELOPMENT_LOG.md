@@ -5,7 +5,7 @@ This file records actual repository progress. Update it after meaningful impleme
 ## Project status
 
 - Current stage: Phase 2 - Core conversion engine
-- Current phase status: Phase 2 in progress; file validation, signature detection, and capability registry implemented; registry tests and build confirmed by user; browser decoding for PNG, JPEG, WebP, and BMP verified with real files
+- Current phase status: Phase 2 in progress; file validation, signature detection, and capability registry implemented; registry tests and build confirmed by user; browser decoding for PNG, JPEG, WebP, and BMP verified with real files; initial PNG conversion pipeline implemented, browser verification pending
 - Latest release: None
 - Last updated: 2026-11-18
 
@@ -32,6 +32,43 @@ This file records actual repository progress. Update it after meaningful impleme
 ## Change log
 
 Add newest entries first.
+
+### 2026-11-18 - Initial PNG conversion pipeline
+
+- Status: Implemented; main-interface browser verification pending
+- Changes:
+  - Added `image-encoder.js` with PNG output through `OffscreenCanvas` and an HTML canvas fallback.
+  - Added `conversion-service.js` to orchestrate decoding, PNG encoding, PNG signature validation, output re-decoding, and dimension verification.
+  - Added cleanup for decoded source and verification resources.
+  - Connected the Convert images button to the PNG conversion service.
+  - Added individual PNG download links and per-file conversion error results.
+  - Disabled JPEG, WebP, and BMP output choices until their encoders are implemented.
+  - Added unit tests for PNG encoder behavior and validation.
+- Files changed:
+  - `src/js/core/image-encoder.js`
+  - `src/js/core/conversion-service.js`
+  - `src/js/main.js`
+  - `index.html`
+  - `src/styles/components.css`
+  - `tests/image-encoder.test.js`
+  - `README.md`
+  - `docs/TECHNICAL_SPECIFICATION.md`
+  - `docs/DEVELOPMENT_ROADMAP.md`
+  - `docs/DEVELOPMENT_LOG.md`
+- Tests performed:
+  - Added automated tests for OffscreenCanvas PNG encoding, unsupported output formats, invalid decoded input, and empty output.
+  - Source changes have been reviewed, but the complete test suite and production build have not yet been run after this implementation.
+- Test results:
+  - Automated test execution is pending in the user's local checkout.
+  - Real PNG conversion, output reopening, dimensions, and download behavior must be verified in the main application.
+- Known issues:
+  - PNG encoding has not yet been marked implemented in the capability registry.
+  - JPEG, WebP, and BMP encoders are not implemented.
+- Next steps:
+  - Pull the latest `main`, run `npm test` and `npm run build`.
+  - Convert real PNG, JPEG, WebP, and BMP input files to PNG from the main UI.
+  - Verify the output files open correctly, preserve dimensions and transparency, and download with a `.png` extension.
+  - Mark PNG encoding as implemented only after those checks pass.
 
 ### 2026-11-18 - Browser image decoder verification
 
