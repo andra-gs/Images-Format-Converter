@@ -42,9 +42,9 @@ const FORMAT_CAPABILITIES = Object.freeze({
       note: "Real-file decoding was verified in the browser."
     },
     encoding: {
-      status: "planned",
+      status: "implemented",
       strategy: "canvas",
-      note: "WebP encoder code is implemented, but real-browser verification is pending. The returned Blob MIME type must be checked because browser encoder support can vary."
+      note: "WebP output uses OffscreenCanvas with an HTML Canvas fallback. Real-file browser verification passed for PNG, JPEG, WebP, and BMP inputs, including transparency, quality, MIME type, dimensions, preview, download, and unsupported-browser errors."
     }
   },
   bmp: {
