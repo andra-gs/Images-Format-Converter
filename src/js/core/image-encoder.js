@@ -1,7 +1,8 @@
 const FORMAT_MIME_TYPES = Object.freeze({
   png: "image/png",
   jpeg: "image/jpeg",
-  webp: "image/webp"
+  webp: "image/webp",
+  bmp: "image/bmp"
 });
 
 function createHtmlCanvas(width, height, mimeType, quality) {
@@ -75,10 +76,106 @@ async function createCanvasBlob(decodedImage, { mimeType, quality, backgroundCol
   return toBlob();
 }
 
+function encodeBmpPixels(imageData, width, height) {
+  const bytesPerPixel = 3;
+  const rowBytes = width * bytesPerPixel;
+  const rowStride = Math.ceil(rowBytes / 4) * 4;
+  const pixelArraySize = rowStride * height;
+  const headerSize = 14 + 40;
+  const fileSize = headerSize + pixelArraySize;
+
+  if (!Number.isSafeInteger(fileSize) || fileSize > 0xffffffff) {
+    throw new RangeError("The image is too large to encode as a BMP file.");
+  }
+
+  const output = new ArrayBuffer(fileSize);
+  const view = new DataView(output);
+  const pixels = new Uint8Array(output);
+
+  view.setUint8(0, 0x42);
+  view.setUint8(1, 0x4d);
+  view.setUint32(2, fileSize, true);
+  view.setUint32(6, 0, true);
+  view.setUint32(10, headerSize, true);
+
+  view.setUint32(14, 40, true);
+  view.setInt32(18, width, true);
+  view.setInt32(22, height, true);
+  view.setUint16(26, 1, true);
+  view.setUint16(28, 24, true);
+  view.setUint32(30, 0, true);
+  view.setUint32(34, pixelArraySize, true);
+  view.setInt32(38, 2835, true);
+  view.setInt32(42, 2835, true);
+  view.setUint32(46, 0, true);
+  view.setUint32(50, 0, true);
+
+  const source = imageData.data;
+  let targetOffset = headerSize;
+
+  // BMP stores rows bottom-up. A 24-bit BMP uses BGR pixels and 4-byte row alignment.
+  for (let y = height - 1; y >= 0; y -= 1) {
+    const sourceRow = y * width * 4;
+
+    for (let x = 0; x < width; x += 1) {
+      const sourceOffset = sourceRow + x * 4;
+      const alpha = source[sourceOffset + 3] / 255;
+
+      // 24-bit BMP has no alpha channel, so transparent pixels are composited onto white.
+      const red = Math.round(source[sourceOffset] * alpha + 255 * (1 - alpha));
+      const green = Math.round(source[sourceOffset + 1] * alpha + 255 * (1 - alpha));
+      const blue = Math.round(source[sourceOffset + 2] * alpha + 255 * (1 - alpha));
+
+      pixels[targetOffset++] = blue;
+      pixels[targetOffset++] = green;
+      pixels[targetOffset++] = red;
+    }
+
+    targetOffset += rowStride - rowBytes;
+  }
+
+  return new Blob([output], { type: "image/bmp" });
+}
+
+async function createBmpBlob(decodedImage) {
+  const { source, width, height } = decodedImage;
+  let imageData;
+
+  if (typeof globalThis.OffscreenCanvas === "function") {
+    try {
+      const canvas = new globalThis.OffscreenCanvas(width, height);
+      const context = canvas.getContext("2d");
+
+      if (context?.getImageData) {
+        context.drawImage(source, 0, 0, width, height);
+        imageData = context.getImageData(0, 0, width, height);
+      }
+    } catch {
+      // Fall through to the HTML canvas implementation.
+    }
+  }
+
+  if (!imageData) {
+    const { canvas, context } = createHtmlCanvas(width, height, "image/bmp");
+    if (!context || typeof context.getImageData !== "function") {
+      throw new Error("A readable 2D canvas context is not available for BMP encoding.");
+    }
+
+    context.drawImage(source, 0, 0, width, height);
+    imageData = context.getImageData(0, 0, width, height);
+  }
+
+  if (!imageData?.data || imageData.data.length !== width * height * 4) {
+    throw new Error("The browser returned invalid pixel data for BMP encoding.");
+  }
+
+  return encodeBmpPixels(imageData, width, height);
+}
+
 /**
- * Encode a decoded browser image as PNG, JPEG, or WebP.
- * JPEG and WebP quality values are numbers from 0 to 1. Transparent JPEG
- * pixels are composited onto the supplied background color, which defaults to white.
+ * Encode a decoded browser image as PNG, JPEG, WebP, or 24-bit BMP.
+ * JPEG and WebP quality values are numbers from 0 to 1. JPEG and BMP
+ * transparent pixels are composited onto the supplied background (white by default).
  */
 export async function encodeImage(
   decodedImage,
@@ -88,7 +185,8 @@ export async function encodeImage(
     throw new TypeError("A valid decoded image result is required.");
   }
 
-  if (decodedImage.width <= 0 || decodedImage.height <= 0) {
+  if (decodedImage.width <= 0 || decodedImage.height <= 0 ||
+      !Number.isInteger(decodedImage.width) || !Number.isInteger(decodedImage.height)) {
     throw new Error("The decoded image has invalid dimensions.");
   }
 
@@ -96,7 +194,7 @@ export async function encodeImage(
   const mimeType = FORMAT_MIME_TYPES[normalizedFormat];
 
   if (!mimeType) {
-    throw new Error("Only PNG, JPEG, and WebP encoding are currently implemented.");
+    throw new Error("Only PNG, JPEG, WebP, and BMP encoding are currently implemented.");
   }
 
   if (["jpeg", "webp"].includes(normalizedFormat)) {
@@ -106,6 +204,14 @@ export async function encodeImage(
 
     if (normalizedFormat === "jpeg" && (typeof backgroundColor !== "string" || backgroundColor.trim() === "")) {
       throw new TypeError("A valid JPEG background color is required.");
+    }
+  }
+
+  if (normalizedFormat === "bmp") {
+    try {
+      return await createBmpBlob(decodedImage);
+    } catch (error) {
+      throw new Error("BMP encoding failed in this browser.", { cause: error });
     }
   }
 
