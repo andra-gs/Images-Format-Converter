@@ -33,6 +33,40 @@ This file records actual repository progress. Update it after meaningful impleme
 
 Add newest entries first.
 
+### 2026-11-18 - Initial JPEG encoder and conversion service
+
+- Status: Implemented; real-browser verification pending
+- Changes:
+  - Extended the shared image encoder to support JPEG alongside PNG.
+  - Added JPEG quality handling using a normalized value from 0 to 1.
+  - Added explicit background compositing before drawing the source image. The default background is white (`#ffffff`) because JPEG does not support transparency.
+  - Kept OffscreenCanvas as the preferred path and added HTML Canvas fallback when OffscreenCanvas is unavailable, throws, or returns the wrong MIME type.
+  - Required the final JPEG Blob to use the exact `image/jpeg` MIME type.
+  - Refactored the conversion service to share output signature validation, output re-decoding, dimension checks, and resource cleanup between PNG and JPEG.
+  - Added unit tests for JPEG quality, background compositing, fallback behavior, MIME mismatch fallback, invalid settings, and empty output.
+  - Added a standalone browser test page at `/tests/browser-encoder.html` for real-file validation before enabling JPEG in the main interface.
+- Files changed:
+  - `src/js/core/image-encoder.js`
+  - `src/js/core/conversion-service.js`
+  - `tests/image-encoder.test.js`
+  - `tests/browser-encoder.html`
+  - `tests/browser-encoder.js`
+  - `docs/TECHNICAL_SPECIFICATION.md`
+  - `docs/DEVELOPMENT_ROADMAP.md`
+  - `README.md`
+  - `docs/DEVELOPMENT_LOG.md`
+- Tests performed:
+  - Added automated tests. They have not yet been run in the user's local environment.
+  - Added a browser test page. Real-file browser validation is pending.
+- Known limitations:
+  - JPEG output remains disabled in the main application until the browser test confirms real output behavior.
+  - Transparent source pixels currently use a white background. User-selectable JPEG background color remains a later UI enhancement.
+- Next steps:
+  - Pull the latest `main`, run `npm test` and `npm run build`.
+  - Open `/tests/browser-encoder.html` and test PNG, JPEG, WebP, and BMP sources.
+  - Include a transparent PNG, verify the transparent areas become white, and check output quality, MIME type, dimensions, preview, and download.
+  - Enable JPEG output in the main interface only after the user confirms these checks.
+
 ### 2026-11-18 - Capability registry tests pass after expectation update
 
 - Status: Tested; user-confirmed
