@@ -6,7 +6,7 @@ import { detectImageFormat } from "./format-detector.js";
  * Convert a supported source image and verify the generated output.
  * The returned Blob is owned by the caller.
  */
-async function convertImage(file, format, options = {}) {
+async function convertImageDirect(file, format, options = {}) {
   const source = await decodeImage(file);
   let output;
 
@@ -38,6 +38,130 @@ async function convertImage(file, format, options = {}) {
     source.close();
   }
 }
+
+let conversionWorker = null;
+let nextWorkerRequestId = 0;
+const pendingWorkerRequests = new Map();
+
+function rejectPendingWorkerRequests(error) {
+  for (const pending of pendingWorkerRequests.values()) {
+    pending.reject(error);
+  }
+  pendingWorkerRequests.clear();
+}
+
+function stopConversionWorker(error) {
+  if (conversionWorker) {
+    conversionWorker.terminate();
+    conversionWorker = null;
+  }
+  rejectPendingWorkerRequests(error);
+}
+
+function getConversionWorker() {
+  if (conversionWorker) return conversionWorker;
+
+  conversionWorker = new Worker(
+    new URL("../workers/conversion.worker.js", import.meta.url),
+    { type: "module" }
+  );
+
+  conversionWorker.addEventListener("message", (event) => {
+    const { id, ok, result, error } = event.data || {};
+    const pending = pendingWorkerRequests.get(id);
+    if (!pending) return;
+
+    pendingWorkerRequests.delete(id);
+
+    if (ok) {
+      pending.resolve(result);
+    } else {
+      const conversionError = new Error(error?.message || "Image conversion failed in the worker.");
+      conversionError.name = "WorkerConversionError";
+      pending.reject(conversionError);
+    }
+  });
+
+  conversionWorker.addEventListener("error", (event) => {
+    event.preventDefault();
+    const workerError = new Error(event.message || "The conversion worker stopped unexpectedly.");
+    workerError.workerUnavailable = true;
+    stopConversionWorker(workerError);
+  });
+
+  conversionWorker.addEventListener("messageerror", () => {
+    const workerError = new Error("The conversion worker returned an unreadable message.");
+    workerError.workerUnavailable = true;
+    stopConversionWorker(workerError);
+  });
+
+  return conversionWorker;
+}
+
+function supportsWorkerConversion(format) {
+  if (
+    typeof globalThis.Worker !== "function" ||
+    typeof globalThis.OffscreenCanvas !== "function" ||
+    typeof globalThis.createImageBitmap !== "function"
+  ) {
+    return false;
+  }
+
+  try {
+    const canvas = new globalThis.OffscreenCanvas(1, 1);
+    if (typeof canvas.getContext !== "function" || !canvas.getContext("2d")) return false;
+    return format === "bmp" || typeof canvas.convertToBlob === "function";
+  } catch {
+    return false;
+  }
+}
+
+function convertInWorker(file, format, options) {
+  return new Promise((resolve, reject) => {
+    let worker;
+
+    try {
+      worker = getConversionWorker();
+    } catch (error) {
+      error.workerUnavailable = true;
+      reject(error);
+      return;
+    }
+
+    const id = ++nextWorkerRequestId;
+    pendingWorkerRequests.set(id, { resolve, reject });
+
+    try {
+      worker.postMessage({ id, file, format, options });
+    } catch (error) {
+      pendingWorkerRequests.delete(id);
+      error.workerUnavailable = true;
+      reject(error);
+    }
+  });
+}
+
+async function convertImage(file, format, options = {}) {
+  if (typeof document === "undefined" || !supportsWorkerConversion(format)) {
+    return convertImageDirect(file, format, options);
+  }
+
+  try {
+    return await convertInWorker(file, format, options);
+  } catch (error) {
+    if (!error.workerUnavailable) throw error;
+    return convertImageDirect(file, format, options);
+  }
+}
+
+export function disposeConversionWorker() {
+  if (conversionWorker) {
+    conversionWorker.terminate();
+    conversionWorker = null;
+  }
+  pendingWorkerRequests.clear();
+}
+
 
 /**
  * Convert a supported source image to PNG.
