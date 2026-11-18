@@ -33,9 +33,9 @@ This file records actual repository progress. Update it after meaningful impleme
 
 Add newest entries first.
 
-### 2026-11-18 - Align capability registry tests with verified support
+### 2026-11-18 - Capability registry tests pass after expectation update
 
-- Status: Test expectations updated; rerun pending
+- Status: Tested; user-confirmed
 - Findings from the user's local validation:
   - `npm run build` completed successfully with Vite 7.3.8.
   - `npm test` reported 14 passing and 3 failing tests out of 17.
@@ -51,10 +51,14 @@ Add newest entries first.
   - `docs/DEVELOPMENT_LOG.md`
 - Test results:
   - The user's production build passed before this test-only correction.
-  - The corrected test suite has not yet been rerun.
+  - The user pulled the updated `main` branch and reran `npm test`.
+- Test results:
+  - All 17 tests passed.
+  - 0 tests failed, cancelled, skipped, or marked todo.
+  - The passing tests cover format capability definitions, supported input/output availability, capability separation and immutability, image decoding paths and validation, PNG encoding, and canvas fallbacks.
+  - The user had already confirmed `npm run build` succeeded before this test-only correction.
 - Next steps:
-  - Pull the latest `main` and run `npm test`.
-  - Confirm all 17 tests pass. The production source was not changed by this test correction.
+  - Continue Phase 2 with implementation and verification of the JPEG output encoder.
 
 ### 2026-11-18 - PNG conversion verified in the main interface
 
