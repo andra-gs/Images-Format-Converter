@@ -83,12 +83,13 @@ Deliverable: batch conversion without freezing the UI under normal test loads. B
 
 ## Phase 4: Advanced format support
 
-Status: In progress. The HEIC/HEIF decoder adapter is implemented; real-file verification remains pending.
+Status: In progress. HEIC/HEIF decoder and conversion paths are user-verified. The TIFF decoder adapter is implemented; real-file verification remains pending.
 
 Tasks:
 - [x] Evaluate and integrate HEIC/HEIF decoder adapter using heic-to (real-file verification pending).
-- [ ] Test real HEIC and HEIF fixtures in the browser and through the conversion pipeline.
-- [ ] Integrate TIFF decoding.
+- [x] Test real HEIC and HEIF fixtures in the browser, main conversion pipeline, and Web Worker (user-confirmed).
+- [x] Integrate a UTIF2-based TIFF decoder adapter that renders the first page to Canvas.
+- [ ] Test real TIFF fixtures, including single-page/multi-page files and representative compression variants, in the browser and conversion pipeline.
 - [ ] Evaluate TIFF encoder separately.
 - [ ] Implement safe SVG rasterization.
 - [ ] Define and implement raster-to-SVG behavior with clear labeling.
