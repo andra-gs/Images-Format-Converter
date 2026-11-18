@@ -40,7 +40,7 @@ There is no planned backend, database, or remote image-processing service.
 | heic-to | Selected HEIC/HEIF decoder; real-file verification pending |
 | UTIF.js | Candidate TIFF decoder |
 
-Advanced format libraries remain provisional until compatibility, maintenance, bundle size, license, and browser support have been checked. heic-to 1.6.7 is selected for HEIC/HEIF decoding. It exposes a browser entry and a worker-specific `heic-to/next` entry. The adapter prefers native ImageBitmap decoding, then falls back to heic-to's bitmap output. Capability status remains planned until real HEIC and HEIF fixtures pass.
+Advanced format libraries remain subject to compatibility, bundle size, license, and browser testing. heic-to 1.6.7 is selected for HEIC/HEIF decoding. It exposes a browser entry and a worker-specific `heic-to/next` entry. The adapter prefers native ImageBitmap decoding, then falls back to heic-to's bitmap output. The user has verified real HEIC and HEIF files through the browser decoder, main conversion pipeline, and Web Worker. UTIF2 4.1.0 is selected for TIFF input decoding; its adapter decodes the first IFD and renders it to Canvas. TIFF capability remains planned until representative real files pass browser and Worker tests.
 
 ## 4. Current project structure
 
@@ -136,7 +136,7 @@ Consider file size, extension and MIME hints, actual decoder support, dimensions
 
 ## 8. Browser image decoder
 
-The browser decoder handles PNG, JPEG, WebP, and BMP through `createImageBitmap()` when available, with an `HTMLImageElement` and Object URL fallback. HEIC/HEIF first attempt native ImageBitmap decoding, then use heic-to's WebAssembly decoder. The worker uses the package's `heic-to/next` entry; the main-thread fallback uses `heic-to`. The decoder returns a common result containing the decoded source, width, height, detected format, and a `close()` method. Callers must close the result after processing. HEIC/HEIF capability status remains planned until real fixtures pass. The committed package-lock file must be refreshed with `npm install` after this dependency addition. SVG, GIF, and TIFF remain outside this decoder's scope.
+The browser decoder handles PNG, JPEG, WebP, and BMP through `createImageBitmap()` when available, with an `HTMLImageElement` and Object URL fallback. HEIC/HEIF first attempt native ImageBitmap decoding, then use heic-to's WebAssembly decoder. The worker uses the package's `heic-to/next` entry; the main-thread fallback uses `heic-to`. The user verified HEIC and HEIF with real files through the decoder test, main conversion pipeline, and Worker. TIFF uses UTIF2 to decode the first IFD, convert it to RGBA, and render it to Canvas or OffscreenCanvas. The current TIFF adapter intentionally uses only the first page of a multi-page file. Its capability remains planned until real TIFF fixtures pass browser and Worker tests. The decoder returns a common result containing the decoded source, width, height, detected format, and a `close()` method. Callers must close the result after processing. SVG and GIF remain outside this decoder's scope.
 
 ## 9. Initial PNG conversion pipeline
 
