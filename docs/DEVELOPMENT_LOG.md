@@ -4,8 +4,8 @@ This file records actual repository progress. Update it after meaningful impleme
 
 ## Project status
 
-- Current stage: Phase 3 - Batch processing
-- Current phase status: Batch queue, worker execution, cancellation, progress, and resource cleanup are user-verified. ZIP export is implemented; dependency-lock synchronization and ZIP-specific verification remain pending.
+- Current stage: Phase 4 - Advanced format support
+- Current phase status: HEIC/HEIF decoder adapter using heic-to is implemented. Real-file decoder and conversion verification are pending.
 - Latest release: None
 - Last updated: 2026-11-18
 
@@ -24,14 +24,64 @@ This file records actual repository progress. Update it after meaningful impleme
 | Phase 0: Project foundation | Tested | User confirmed localhost works and `npm run build` succeeds; `package-lock.json` is present in the GitHub repository |
 | Phase 1: UI development | Tested | User confirmed the skeleton follows light/dark themes, theme persists after refresh, no unstyled flash appears, and `npm run build` succeeds |
 | Phase 2: Core conversion engine | Tested | PNG, JPEG, WebP, and BMP conversion paths are user-verified; user reports the requested automated tests and build checks passed |
-| Phase 3: Batch processing | In progress | Batch and worker behavior user-verified; ZIP export implementation awaits dependency-lock synchronization and browser verification |
-| Phase 4: Advanced formats | Not started | HEIC, TIFF, SVG, GIF |
+| Phase 3: Batch processing | Tested | User verified batch queue, worker execution, progress, cancellation, failure isolation, large-image responsiveness, cleanup, individual downloads, ZIP extraction, and image integrity |
+| Phase 4: Advanced formats | In progress | HEIC/HEIF decoder adapter implemented; real-file tests pending. TIFF, SVG, and GIF remain |
 | Phase 5: Image manipulation | Not started | Resize, compression, metadata |
 | Phase 6: Testing and release | Not started | QA and v1.0.0 |
 
 ## Change log
 
 Add newest entries first.
+
+
+### 2026-11-18 - HEIC/HEIF decoder adapter
+- Status: Implemented, pending real-file verification
+- Evaluation:
+  - Selected `heic-to` version 1.6.7. Its published documentation describes browser-side HEIC/HEIF conversion, a bitmap output, and a worker-specific `heic-to/next` entry. The package tracks libheif releases.
+  - Native `createImageBitmap` remains the first decoding path. The WebAssembly decoder is the fallback for browsers without native HEIC/HEIF support.
+- Changes:
+  - Added `heic-to` to package dependencies.
+  - Added HEIC/HEIF decoding fallback to the shared image decoder.
+  - Selected the worker-specific package entry when running inside the conversion worker.
+  - Extended the browser decoder test page to accept HEIC and HEIF fixtures.
+  - Kept HEIC/HEIF capability status as planned until real files pass.
+  - Updated project documentation and advanced-format roadmap.
+- Files changed:
+  - `package.json`
+  - `src/js/core/image-decoder.js`
+  - `src/js/core/capability-registry.js`
+  - `tests/browser-decoder.html`
+  - `README.md`
+  - `docs/TECHNICAL_SPECIFICATION.md`
+  - `docs/DEVELOPMENT_ROADMAP.md`
+  - `docs/DEVELOPMENT_LOG.md`
+  - `docs/PROJECT_CONTEXT.md`
+- Tests performed:
+  - Reviewed package API documentation and worker entry-point instructions.
+  - No dependency installation, automated test, production build, or real-file browser test has been run for this change.
+- Known issues:
+  - Real HEIC and HEIF files still need to be tested.
+  - The package's WebAssembly decoder increases the application bundle and memory use when loaded.
+  - HEIC/HEIF must not be advertised as supported until real-file verification passes.
+- Next steps:
+  - Run `npm install`, `npm test`, and `npm run build`.
+  - Test at least one real HEIC and one real HEIF file using `/tests/browser-decoder.html`.
+  - Convert both formats to PNG, JPEG, WebP, and BMP in the main application.
+  - Verify dimensions, orientation, color, output MIME types, downloads, and worker/main-thread fallback.
+
+
+### 2026-11-18 - Phase 3 completion verified by user
+- Status: Tested
+- Tests performed by the user:
+  - Verified batch queue, per-file states, progress, and sequential worker processing.
+  - Verified failure isolation, cancellation, large-image responsiveness, and resource cleanup.
+  - Verified individual downloads and ZIP downloads.
+  - Extracted the ZIP archive and confirmed that all included images open correctly.
+- Test results:
+  - The user reports all Phase 3 tests behaved as expected.
+  - Phase 3 is complete.
+- Next steps:
+  - Begin Phase 4 with HEIC/HEIF decoder evaluation and integration.
 
 ### 2026-11-18 - ZIP export implementation
 - Status: Implemented, pending user verification
