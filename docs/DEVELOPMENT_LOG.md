@@ -63,8 +63,9 @@ Add newest entries first.
   - Real HEIC and HEIF files still need to be tested.
   - The package's WebAssembly decoder increases the application bundle and memory use when loaded.
   - HEIC/HEIF must not be advertised as supported until real-file verification passes.
+  - The existing `package-lock.json` does not yet include heic-to. Run `npm install` and commit the refreshed lockfile.
 - Next steps:
-  - Run `npm install`, `npm test`, and `npm run build`.
+  - Run `npm install` to synchronize `package-lock.json`, then run `npm test` and `npm run build`.
   - Test at least one real HEIC and one real HEIF file using `/tests/browser-decoder.html`.
   - Convert both formats to PNG, JPEG, WebP, and BMP in the main application.
   - Verify dimensions, orientation, color, output MIME types, downloads, and worker/main-thread fallback.
