@@ -5,7 +5,7 @@ This file records actual repository progress. Update it after meaningful impleme
 ## Project status
 
 - Current stage: Phase 2 - Core conversion engine
-- Current phase status: Phase 2 in progress; file validation, signature detection, and capability registry implemented; registry tests and build confirmed by user; browser decoder module added, real-browser verification pending
+- Current phase status: Phase 2 in progress; file validation, signature detection, and capability registry implemented; registry tests and build confirmed by user; browser decoding for PNG, JPEG, WebP, and BMP verified with real files
 - Latest release: None
 - Last updated: 2026-11-18
 
@@ -23,7 +23,7 @@ This file records actual repository progress. Update it after meaningful impleme
 |---|---|---|
 | Phase 0: Project foundation | Tested | User confirmed localhost works and `npm run build` succeeds; `package-lock.json` is present in the GitHub repository |
 | Phase 1: UI development | Tested | User confirmed the skeleton follows light/dark themes, theme persists after refresh, no unstyled flash appears, and `npm run build` succeeds |
-| Phase 2: Core conversion engine | In progress | Capability registry tests and build confirmed by user; browser decoder module added; real-file verification pending |
+| Phase 2: Core conversion engine | In progress | Capability registry tests and build confirmed; PNG, JPEG, WebP, and BMP decoding verified with real files; encoder work pending |
 | Phase 3: Batch processing | Not started | Workers, queue, ZIP |
 | Phase 4: Advanced formats | Not started | HEIC, TIFF, SVG, GIF |
 | Phase 5: Image manipulation | Not started | Resize, compression, metadata |
@@ -32,6 +32,30 @@ This file records actual repository progress. Update it after meaningful impleme
 ## Change log
 
 Add newest entries first.
+
+### 2026-11-18 - Browser image decoder verification
+
+- Status: Tested
+- User-confirmed tests:
+  - Tested real PNG files in the browser; status showed `Decode Successful`.
+  - Tested real JPEG files in the browser; status showed `Decode Successful`.
+  - Tested real WebP files in the browser; status showed `Decode Successful`.
+  - Tested real BMP files in the browser; status showed `Decode Successful`.
+- Changes:
+  - Marked PNG, JPEG, WebP, and BMP decoding as implemented in the capability registry.
+  - Kept GIF, TIFF, HEIC, HEIF, and SVG decoding planned.
+  - Updated the roadmap and README to reflect verified decoder support.
+- Test results:
+  - All four initial raster formats decoded successfully using real files in the browser.
+  - The decoder test page also reports the detected format and image dimensions.
+  - The complete automated test suite and production build have not yet been reconfirmed after the decoder addition.
+- Known issues:
+  - The decoder is not connected to the main conversion workflow.
+  - File validation and format signature detection still need separate manual verification.
+  - No output encoder or download flow is available yet.
+- Next steps:
+  - Run `npm test` and `npm run build` on the latest repository state.
+  - Begin the PNG encoder and conversion pipeline integration after those checks.
 
 ### 2026-11-18 - Initial browser image decoder
 
