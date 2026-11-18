@@ -40,8 +40,8 @@ Add newest entries first.
   - Extended the shared Canvas encoder to request WebP output and pass the quality setting to OffscreenCanvas and HTML Canvas.
   - Required the final Blob MIME type to be exactly `image/webp`; the conversion fails if the browser returns another format.
   - Added `convertImageToWebp()` with the shared signature, output-decoding, dimension, and resource-cleanup validation.
+  - Added a standalone browser encoder test page with JPEG/WebP selection, a quality slider, output preview, and download.
   - Kept WebP encoding in the planned state in the capability registry and marked the dropdown option as `Testing`; it remains unavailable in the main converter until real-browser verification passes.
-  - Added `convertImageToWebp()` for the standalone browser encoder test page. The main converter remains limited to verified PNG and JPEG output.
   - Kept BMP output disabled.
   - Added automated tests for OffscreenCanvas WebP encoding, HTML Canvas fallback, MIME mismatch rejection, and quality validation.
   - Updated README, Technical Specification, and Roadmap.
