@@ -113,12 +113,12 @@
                 </button>
                 <ul class="custom-select-menu" id="output-format-menu" role="listbox" aria-labelledby="output-format-label" hidden>
                   <li class="custom-select-option" role="option" tabindex="-1" data-value="image/png" aria-selected="true">PNG</li>
-                  <li class="custom-select-option" role="option" tabindex="-1" data-value="image/jpeg" aria-selected="false" aria-disabled="true">JPEG · Coming soon</li>
+                  <li class="custom-select-option" role="option" tabindex="-1" data-value="image/jpeg" aria-selected="false">JPEG</li>
                   <li class="custom-select-option" role="option" tabindex="-1" data-value="image/webp" aria-selected="false" aria-disabled="true">WebP · Coming soon</li>
                   <li class="custom-select-option" role="option" tabindex="-1" data-value="image/bmp" aria-selected="false" aria-disabled="true">BMP · Coming soon</li>
                 </ul>
               </div>
-              <span class="field-hint">PNG output is available. Other output formats will be enabled after their encoders are tested.</span>
+              <span class="field-hint">PNG and JPEG output are available. WebP and BMP are still in development.</span>
             </div>
 
             <div class="field-group quality-field" id="quality-field">
@@ -133,7 +133,7 @@
 
           <div class="settings-notice">
             <i data-lucide="info"></i>
-            <span>PNG conversion is available and runs locally in your browser. JPEG, WebP, and BMP output are still in development.</span>
+            <span>PNG and JPEG conversion run locally in your browser. WebP and BMP output are still in development.</span>
           </div>
           <button class="convert-button" id="convert-button" type="button" disabled>
             <i data-lucide="file-output"></i>
@@ -152,12 +152,12 @@
           <div class="results-empty" id="results-empty">
             <div class="results-empty-icon"><i data-lucide="image"></i></div>
             <strong>No converted files yet</strong>
-            <span>Converted PNG files and their download actions will appear here.</span>
+            <span>Converted files and their download actions will appear here.</span>
           </div>
           <ul class="results-list" id="results-list" aria-live="polite" hidden></ul>
         </section>
 
-        <p class="phase-note">PNG conversion is available · Additional output formats are in development.</p>
+        <p class="phase-note">PNG and JPEG conversion are available · WebP and BMP output are in development.</p>
       </main>
 
       <footer class="app-footer">
