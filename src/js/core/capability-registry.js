@@ -26,9 +26,9 @@ const FORMAT_CAPABILITIES = Object.freeze({
       note: "Real-file decoding was verified in the browser."
     },
     encoding: {
-      status: "planned",
+      status: "implemented",
       strategy: "canvas",
-      note: "JPEG output will use Canvas with an explicit background for transparent pixels."
+      note: "JPEG output uses Canvas with quality control and white compositing for transparent pixels. Real-file browser conversion was verified."
     }
   },
   webp: {
