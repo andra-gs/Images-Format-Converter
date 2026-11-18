@@ -19,10 +19,12 @@ The current interface includes:
 - Initial file validation and image-format signature detection.
 - An explicit capability registry that keeps detection, decoding, and encoding status separate.
 - A browser image decoder for PNG, JPEG, WebP, and BMP, with an ImageBitmap path and HTML image fallback. The user verified all four formats with real files in the browser.
-- An initial PNG encoder and conversion service using Canvas. The service checks the PNG signature and reopens the output to verify its dimensions. The main interface now offers PNG conversion and individual downloads; final browser verification is pending.
-- Automated Node.js tests for the capability registry and image decoder using the built-in test runner.
+- A PNG encoder and conversion service using OffscreenCanvas with an HTML Canvas fallback. The service checks the PNG signature and reopens the output to verify its dimensions.
+- The main interface supports PNG output from PNG, JPEG, WebP, and BMP inputs, with individual PNG downloads and per-file error results.
+- The user verified that all four input formats convert successfully, output files open as PNG, dimensions match the originals, PNG transparency is preserved, filenames use the .png extension, downloads work, and multiple files convert independently.
+- Automated Node.js tests for the capability registry, image decoder, and PNG encoder using the built-in test runner.
 
-PNG decoding and conversion code are implemented. PNG conversion has not yet completed user verification in the main interface. JPEG, WebP, and BMP output encoders are not implemented, so those choices remain disabled. Conversion status is not marked as fully supported until the browser conversion test passes.
+PNG decoding and encoding are marked implemented. JPEG, WebP, and BMP output encoders are not implemented, so those choices remain disabled. GIF, TIFF, HEIC, HEIF, and SVG decoding remain planned.
 
 ## Project goals
 
