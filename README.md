@@ -24,8 +24,8 @@ The current interface includes:
 - JPEG output is implemented and enabled in the main interface. The user verified PNG, JPEG, WebP, and BMP inputs convert to JPEG, transparent PNG areas become white, quality settings work, output MIME type is `image/jpeg`, dimensions match, previews display, and `.jpg` downloads work.
 - The main interface supports PNG output from PNG, JPEG, WebP, and BMP inputs, with individual PNG downloads and per-file error results.
 - The user verified that all four input formats convert successfully, output files open as PNG, dimensions match the originals, PNG transparency is preserved, filenames use the .png extension, downloads work, and multiple files convert independently.
-- Automated Node.js tests for the capability registry, image decoder, and PNG/JPEG/WebP encoder code using the built-in test runner. Latest user-reported run: 25 tests passed, 0 failed.
-- Production build verified by the user with `npm run build` using Vite 7.3.8.
+- Automated Node.js tests for the capability registry, image decoder, and PNG/JPEG/WebP encoder code using the built-in test runner. Latest user-reported run before the BMP encoder changes: 25 tests passed, 0 failed. Rerun the suite after pulling the BMP implementation.
+- Production build verified by the user with `npm run build` using Vite 7.3.8 before the BMP encoder changes. Rerun the build after pulling the BMP implementation.
 
 PNG, JPEG, and WebP decoding and encoding are user-verified. BMP encoding is implemented in the dedicated encoder and enabled in the main interface, but real-file browser verification is still pending. GIF, TIFF, HEIC, HEIF, and SVG decoding remain planned. GIF, TIFF, HEIC, HEIF, and SVG decoding remain planned.
 
