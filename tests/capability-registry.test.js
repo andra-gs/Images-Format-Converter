@@ -31,8 +31,8 @@ test("unknown formats return null and are not marked as supported", () => {
 
 test("only verified input decoders and output encoders are available", () => {
   assert.deepEqual(getAvailableInputFormats(), ["png", "jpeg", "webp", "bmp"]);
-  assert.deepEqual(getAvailableOutputFormats(), ["png", "jpeg", "webp"]);
-  assert.deepEqual(getPlannedOutputFormats(), ["bmp"]);
+  assert.deepEqual(getAvailableOutputFormats(), ["png", "jpeg", "webp", "bmp"]);
+  assert.deepEqual(getPlannedOutputFormats(), []);
 });
 
 test("capability data keeps decoding and encoding separate", () => {
@@ -42,6 +42,11 @@ test("capability data keeps decoding and encoding separate", () => {
   assert.equal(jpeg.decoding.status, "implemented");
   assert.equal(jpeg.encoding.status, "implemented");
   assert.equal(jpeg.encoding.strategy, "canvas");
+
+  const bmp = getFormatCapabilities("bmp");
+  assert.equal(bmp.encoding.status, "implemented");
+  assert.equal(bmp.encoding.strategy, "dedicated-encoder");
+  assert.match(bmp.encoding.note, /24-bit BMP encoder/);
 
   const webp = getFormatCapabilities("webp");
   assert.equal(webp.encoding.status, "implemented");
