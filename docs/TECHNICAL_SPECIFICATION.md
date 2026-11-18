@@ -148,7 +148,7 @@ The user verified the complete PNG conversion flow in the main interface with re
 
 The JPEG encoder uses the browser Canvas API. It accepts a quality value from 0 to 1 and composites the decoded source onto an explicit background color before drawing, because JPEG cannot store alpha transparency. The default background is white (`#ffffff`). The encoder prefers OffscreenCanvas and falls back to an HTML canvas. It verifies that the returned Blob has the exact `image/jpeg` MIME type. The conversion service checks the JPEG file signature, decodes the generated output again, and confirms that its dimensions match the source. It releases both decoded image resources after processing.
 
-A standalone browser test page at `/tests/browser-encoder.html` is used to verify real-file JPEG output, including MIME type, signature, dimensions, download, quality changes, and transparent-source compositing. JPEG output must remain unavailable in the main interface until these browser checks pass.
+The user verified real-file JPEG output through `/tests/browser-encoder.html`: PNG, JPEG, WebP, and BMP sources convert successfully; transparent PNG pixels are composited onto white; quality changes produce valid output; the MIME type is `image/jpeg`; dimensions match; the preview displays; and `.jpg` downloads work. JPEG is therefore enabled in the main interface. The capability registry marks JPEG encoding as implemented. The default background remains white; a user-selectable background control is a later enhancement.
 
 ## 11. Conversion settings
 
