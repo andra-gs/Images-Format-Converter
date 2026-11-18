@@ -225,8 +225,8 @@ test("falls back to HTML canvas when OffscreenCanvas returns the wrong MIME type
 
 test("rejects unsupported output formats", async () => {
   await assert.rejects(
-    encodeImage({ source: {}, width: 10, height: 10 }, { format: "webp" }),
-    /Only PNG and JPEG encoding are currently implemented/
+    encodeImage({ source: {}, width: 10, height: 10 }, { format: "bmp" }),
+    /Only PNG, JPEG, and WebP encoding are currently implemented/
   );
 });
 
@@ -307,5 +307,105 @@ test("rejects empty JPEG output", async (t) => {
   await assert.rejects(
     encodeImage({ source: {}, width: 10, height: 10 }, { format: "jpeg" }),
     /JPEG encoding failed/
+  );
+});
+
+
+test("encodes WebP with quality through OffscreenCanvas", async (t) => {
+  let optionsReceived;
+  const output = new Blob(["webp-output"], { type: "image/webp" });
+
+  class FakeOffscreenCanvas {
+    constructor(width, height) {
+      this.width = width;
+      this.height = height;
+    }
+
+    getContext(type) {
+      assert.equal(type, "2d");
+      return { drawImage() {} };
+    }
+
+    async convertToBlob(options) {
+      optionsReceived = options;
+      return output;
+    }
+  }
+
+  mockGlobal(t, "OffscreenCanvas", FakeOffscreenCanvas);
+
+  const result = await encodeImage(
+    { source: {}, width: 320, height: 240 },
+    { format: "webp", quality: 0.65 }
+  );
+
+  assert.equal(result, output);
+  assert.deepEqual(optionsReceived, { type: "image/webp", quality: 0.65 });
+});
+
+test("falls back to HTML canvas for WebP and passes quality", async (t) => {
+  let requestedMime;
+  let requestedQuality;
+  const output = new Blob(["webp-fallback"], { type: "image/webp" });
+  const canvas = {
+    width: 0,
+    height: 0,
+    getContext() {
+      return { drawImage() {} };
+    },
+    toBlob(callback, mime, quality) {
+      requestedMime = mime;
+      requestedQuality = quality;
+      callback(output);
+    }
+  };
+
+  mockGlobal(t, "OffscreenCanvas", undefined);
+  mockGlobal(t, "document", {
+    createElement() {
+      return canvas;
+    }
+  });
+
+  const result = await encodeImage(
+    { source: {}, width: 80, height: 60 },
+    { format: "webp", quality: 0.55 }
+  );
+
+  assert.equal(result, output);
+  assert.equal(requestedMime, "image/webp");
+  assert.equal(requestedQuality, 0.55);
+});
+
+test("rejects a WebP request when the browser returns PNG instead", async (t) => {
+  mockGlobal(t, "OffscreenCanvas", undefined);
+  mockGlobal(t, "document", {
+    createElement() {
+      return {
+        width: 0,
+        height: 0,
+        getContext() {
+          return { drawImage() {} };
+        },
+        toBlob(callback) {
+          callback(new Blob(["png-fallback"], { type: "image/png" }));
+        }
+      };
+    }
+  });
+
+  await assert.rejects(
+    encodeImage({ source: {}, width: 10, height: 10 }, { format: "webp" }),
+    /unexpected output MIME type/
+  );
+});
+
+test("rejects invalid WebP quality", async () => {
+  await assert.rejects(
+    encodeImage(
+      { source: {}, width: 10, height: 10 },
+      { format: "webp", quality: 1.5 }
+    ),
+    /WEBP quality must be a number between 0 and 1/
   );
 });
