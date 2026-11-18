@@ -64,3 +64,13 @@ export function convertImageToJpeg(file, { quality = 0.85, backgroundColor = "#f
 export function convertImageToWebp(file, { quality = 0.85 } = {}) {
   return convertImage(file, "webp", { quality });
 }
+
+
+/**
+ * Convert a supported source image to a 24-bit BMP.
+ * Transparent pixels are composited onto white because this BMP encoder
+ * writes a broadly compatible 24-bit bitmap without an alpha channel.
+ */
+export function convertImageToBmp(file) {
+  return convertImage(file, "bmp");
+}
