@@ -102,8 +102,8 @@ const FORMAT_CAPABILITIES = Object.freeze({
     detection: { status: "implemented" },
     decoding: {
       status: "planned",
-      strategy: "dedicated-decoder",
-      note: "A HEIC decoder must be evaluated and integrated."
+      strategy: "heic-to",
+      note: "The heic-to decoder adapter is implemented. Keep this capability planned until real HEIC fixtures pass in the browser."
     },
     encoding: {
       status: "not-planned",
@@ -118,8 +118,8 @@ const FORMAT_CAPABILITIES = Object.freeze({
     detection: { status: "implemented" },
     decoding: {
       status: "planned",
-      strategy: "dedicated-decoder",
-      note: "A HEIF decoder must be evaluated and integrated."
+      strategy: "heic-to",
+      note: "The heic-to decoder adapter is implemented. Keep this capability planned until real HEIF fixtures pass in the browser."
     },
     encoding: {
       status: "not-planned",
