@@ -13,7 +13,8 @@ import {
   Settings2,
   FileOutput,
   Info,
-  Image
+  Image,
+  FileArchive
 } from "lucide";
 import "../styles/main.css";
 import { validateImageFile } from "./core/file-validator.js";
@@ -32,7 +33,8 @@ const iconSet = {
   Settings2,
   FileOutput,
   Info,
-  Image
+  Image,
+  FileArchive
 };
 
 const renderIcons = () => createIcons({ icons: iconSet });
