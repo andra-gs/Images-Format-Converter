@@ -31,8 +31,8 @@ test("unknown formats return null and are not marked as supported", () => {
 
 test("only verified input decoders and output encoders are available", () => {
   assert.deepEqual(getAvailableInputFormats(), ["png", "jpeg", "webp", "bmp"]);
-  assert.deepEqual(getAvailableOutputFormats(), ["png"]);
-  assert.deepEqual(getPlannedOutputFormats(), ["jpeg", "webp", "bmp"]);
+  assert.deepEqual(getAvailableOutputFormats(), ["png", "jpeg"]);
+  assert.deepEqual(getPlannedOutputFormats(), ["webp", "bmp"]);
 });
 
 test("capability data keeps decoding and encoding separate", () => {
@@ -40,8 +40,9 @@ test("capability data keeps decoding and encoding separate", () => {
 
   assert.equal(jpeg.detection.status, "implemented");
   assert.equal(jpeg.decoding.status, "implemented");
-  assert.equal(jpeg.encoding.status, "planned");
+  assert.equal(jpeg.encoding.status, "implemented");
   assert.equal(jpeg.encoding.strategy, "canvas");
+  assert.match(jpeg.encoding.note, /Real-file browser conversion was verified/);
 });
 
 test("returned capability data cannot mutate the internal registry", () => {
