@@ -142,7 +142,7 @@ The initial browser decoder module handles PNG, JPEG, WebP, and BMP through `cre
 
 The first conversion path decodes a supported source image, draws it to a 2D Canvas, and encodes the canvas as PNG. The encoder prefers `OffscreenCanvas` and falls back to an HTML canvas. The conversion service checks the generated PNG signature, decodes the generated output again, and confirms that its dimensions match the source. It closes both decoded image resources after use. PNG output does not use the lossy quality slider.
 
-The user verified the complete PNG conversion flow in the main interface with real PNG, JPEG, WebP, and BMP input files. The generated files opened as PNG, retained the source dimensions, preserved PNG transparency, downloaded with the `.png` extension, and worked independently during multi-file conversion. PNG encoding is marked implemented in the capability registry. JPEG output is also implemented and enabled in the main interface after separate real-file browser verification. WebP and BMP output remain unavailable until their encoders are implemented and verified.
+The user verified the complete PNG conversion flow in the main interface with real PNG, JPEG, WebP, and BMP input files. The generated files opened as PNG, retained the source dimensions, preserved PNG transparency, downloaded with the `.png` extension, and worked independently during multi-file conversion. PNG encoding is marked implemented in the capability registry. JPEG output is also implemented and enabled in the main interface after separate real-file browser verification. WebP output is implemented separately and described in the next section. BMP output remains unavailable until its encoder is implemented and verified.
 
 ## 10. JPEG conversion pipeline
 
@@ -150,7 +150,13 @@ The JPEG encoder uses the browser Canvas API. It accepts a quality value from 0 
 
 The user verified real-file JPEG output in the main application interface: PNG, JPEG, WebP, and BMP sources convert successfully; transparent PNG pixels are composited onto white; quality changes produce valid output; the MIME type is `image/jpeg`; dimensions match; the preview displays; and `.jpg` downloads work. JPEG is enabled in the main interface and marked implemented in the capability registry. The default background remains white; a user-selectable background control is a later enhancement.
 
-## 11. Conversion settings
+## 11. WebP conversion pipeline
+
+The WebP encoder uses the browser Canvas API with a quality value from 0 to 1. It prefers OffscreenCanvas and falls back to an HTML canvas. Browser support for WebP encoding can vary, so the encoder must verify that the returned Blob MIME type is exactly `image/webp`. If a browser silently returns PNG or another format, the conversion must fail with a clear error rather than presenting the file as WebP. The conversion service validates the WebP signature, decodes the generated output again, and confirms that its dimensions match the source. WebP output is available in the main interface, and the quality slider is shared with JPEG.
+
+Real-file browser verification is still pending. Keep WebP marked as implemented in code but do not treat it as fully verified until the user tests PNG, JPEG, WebP, and BMP sources, quality changes, MIME type, dimensions, preview, and `.webp` download in the target browser.
+
+## 12. Conversion settings
 
 - Output format.
 - Quality for supported lossy encoders.
@@ -161,7 +167,7 @@ The user verified real-file JPEG output in the main application interface: PNG, 
 
 Quality controls must be format-aware. PNG must not be presented as if its quality slider behaves like JPEG quality.
 
-## 12. Conversion result
+## 13. Conversion result
 
 Show original and output filename/format, file sizes, dimensions, status, preview, and download action.
 
@@ -171,18 +177,18 @@ savingsPercent = ((originalSize - outputSize) / originalSize) * 100
 
 A negative value means the output is larger. Display that honestly.
 
-## 13. Browser compatibility
+## 14. Browser compatibility
 
 Target Chrome, Edge, Firefox, and Safari. Feature-detect Canvas encoding, OffscreenCanvas, worker support, and decoding capabilities.
 
-## 14. Resource management
+## 15. Resource management
 
 Revoke Object URLs, close ImageBitmap instances, release workers and large references, limit concurrency, handle cancellation, and avoid retaining duplicate image data longer than necessary.
 
-## 15. Testing requirements
+## 16. Testing requirements
 
 Test PNG/JPEG/WebP paths, transparency to JPEG with a selected background, corrupt and unsupported inputs, multiple files with independent failures, large dimensions, output MIME type, reopening generated files, ZIP integrity, themes, responsive layout, SVG safety, and format-specific HEIC/TIFF/GIF fixtures when those phases begin.
 
-## 16. Definition of Done
+## 17. Definition of Done
 
 A feature is complete when it matches the agreed behavior, handles errors, passes relevant tests, preserves local processing, releases temporary resources, and has appropriate documentation.
