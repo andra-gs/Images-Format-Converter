@@ -225,8 +225,8 @@ test("falls back to HTML canvas when OffscreenCanvas returns the wrong MIME type
 
 test("rejects unsupported output formats", async () => {
   await assert.rejects(
-    encodeImage({ source: {}, width: 10, height: 10 }, { format: "bmp" }),
-    /Only PNG, JPEG, and WebP encoding are currently implemented/
+    encodeImage({ source: {}, width: 10, height: 10 }, { format: "avif" }),
+    /Only PNG, JPEG, WebP, and BMP encoding are currently implemented/
   );
 });
 
@@ -408,4 +408,93 @@ test("rejects invalid WebP quality", async () => {
     ),
     /WEBP quality must be a number between 0 and 1/
   );
+});
+
+
+test("encodes a 24-bit BMP with BGR pixels, row padding, and white alpha compositing", async (t) => {
+  const imageData = {
+    data: new Uint8ClampedArray([
+      255, 0, 0, 255,
+      0, 0, 255, 0
+    ])
+  };
+
+  class FakeOffscreenCanvas {
+    constructor(width, height) {
+      this.width = width;
+      this.height = height;
+    }
+
+    getContext(type) {
+      assert.equal(type, "2d");
+      return {
+        drawImage() {},
+        getImageData(x, y, width, height) {
+          assert.deepEqual([x, y, width, height], [0, 0, 2, 1]);
+          return imageData;
+        }
+      };
+    }
+  }
+
+  mockGlobal(t, "OffscreenCanvas", FakeOffscreenCanvas);
+
+  const result = await encodeImage(
+    { source: {}, width: 2, height: 1 },
+    { format: "bmp" }
+  );
+
+  assert.equal(result.type, "image/bmp");
+  assert.equal(result.size, 62);
+
+  const bytes = new Uint8Array(await result.arrayBuffer());
+  const view = new DataView(bytes.buffer);
+
+  assert.equal(view.getUint8(0), 0x42);
+  assert.equal(view.getUint8(1), 0x4d);
+  assert.equal(view.getUint32(2, true), 62);
+  assert.equal(view.getUint32(10, true), 54);
+  assert.equal(view.getInt32(18, true), 2);
+  assert.equal(view.getInt32(22, true), 1);
+  assert.equal(view.getUint16(28, true), 24);
+  assert.deepEqual([...bytes.slice(54)], [
+    0, 0, 255,
+    255, 255, 255,
+    0, 0
+  ]);
+});
+
+test("encodes BMP through HTML Canvas when OffscreenCanvas is unavailable", async (t) => {
+  const canvas = {
+    width: 0,
+    height: 0,
+    getContext(type) {
+      assert.equal(type, "2d");
+      return {
+        drawImage() {},
+        getImageData() {
+          return { data: new Uint8ClampedArray([12, 34, 56, 255]) };
+        }
+      };
+    }
+  };
+
+  mockGlobal(t, "OffscreenCanvas", undefined);
+  mockGlobal(t, "document", {
+    createElement(tagName) {
+      assert.equal(tagName, "canvas");
+      return canvas;
+    }
+  });
+
+  const result = await encodeImage(
+    { source: {}, width: 1, height: 1 },
+    { format: "bmp" }
+  );
+
+  assert.equal(result.type, "image/bmp");
+  assert.equal(canvas.width, 1);
+  assert.equal(canvas.height, 1);
+  const bytes = new Uint8Array(await result.arrayBuffer());
+  assert.deepEqual([...bytes.slice(54, 58)], [56, 34, 12, 0]);
 });
