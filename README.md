@@ -14,7 +14,7 @@ The current interface includes:
 - File selection through the file picker and drag-and-drop.
 - A selected-file queue with image previews, file details, individual removal, and clear-all behavior.
 - Light and dark themes with saved preference.
-- Conversion settings UI for PNG, JPEG, WebP, and BMP. These are interface options only until the matching encoder is implemented and tested.
+- Conversion settings for PNG and JPEG, with quality control for JPEG. WebP and BMP remain disabled until their encoders are implemented and tested.
 - Startup skeleton that follows the selected theme and prevents an unstyled-content flash.
 - Initial file validation and image-format signature detection.
 - An explicit capability registry that keeps detection, decoding, and encoding status separate.
