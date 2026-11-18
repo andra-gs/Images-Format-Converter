@@ -15,7 +15,7 @@ The current interface includes:
 - A selected-file queue with image previews, file details, individual removal, and clear-all behavior.
 - Batch conversion with per-file pending, processing, completed, failed, and cancelled states, plus overall batch progress.
 - Web Worker conversion when supported, with a main-thread fallback and a sequential concurrency limit.
-- Cancellation of remaining queued files after the active conversion finishes. Successful outputs can be downloaded individually or together in a ZIP archive using JSZip.
+- Cancellation of remaining queued files after the active conversion finishes. Successful outputs can be downloaded individually or together in a ZIP archive using JSZip. The ZIP export implementation is committed and awaits dependency-lock synchronization and browser verification.
 - Light and dark themes with saved preference.
 - Conversion settings for PNG, JPEG, WebP, and BMP, with quality control for JPEG and WebP. The dedicated 24-bit BMP encoder is implemented and user-verified with real PNG, JPEG, WebP, and BMP files.
 - Startup skeleton that follows the selected theme and prevents an unstyled-content flash.
@@ -65,7 +65,7 @@ Special cases:
 | Icons | Lucide NPM package |
 | Standard image processing | Canvas API, ImageBitmap |
 | Background processing | Web Workers, OffscreenCanvas where supported |
-| ZIP downloads | JSZip, planned |
+| ZIP downloads | JSZip |
 | Version control | Git and GitHub |
 
 No backend, database, cloud storage, or remote image-processing API is planned.
