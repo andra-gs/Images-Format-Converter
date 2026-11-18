@@ -250,7 +250,7 @@ const clearConversionResults = () => {
 const renderConversionResult = (entry, result) => {
   removeConversionResult(entry.id);
 
-  const outputName = `${entry.file.name.replace(/\\.[^.]+$/, "") || "image"}.png`;
+  const outputName = `${entry.file.name.replace(/\.[^.]+$/, "") || "image"}.png`;
   const url = URL.createObjectURL(result.blob);
   conversionResults.set(entry.id, { url, outputName });
 
