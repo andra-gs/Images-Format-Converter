@@ -375,6 +375,11 @@ const runConversion = async () => {
   let finished = 0;
 
   updateBatchProgress(filesToConvert.length, finished);
+  for (const entry of filesToConvert) {
+    if (selectedFiles.has(entry.id)) {
+      renderConversionStatus(entry, "pending", "Waiting in the conversion queue.");
+    }
+  }
 
   for (const entry of filesToConvert) {
     if (!selectedFiles.has(entry.id)) {
