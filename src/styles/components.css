@@ -320,6 +320,67 @@
 }
 
 /* Conversion settings and results preview */
+
+.custom-select-option[aria-disabled="true"] {
+  opacity: 0.48;
+  cursor: not-allowed;
+}
+
+.results-empty[hidden],
+.results-list[hidden] {
+  display: none;
+}
+
+.results-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.result-item {
+  display: grid;
+  gap: 8px;
+  padding: 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 11px;
+  background: var(--color-surface-muted);
+}
+
+.result-name {
+  overflow-wrap: anywhere;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.result-detail {
+  color: var(--color-muted);
+  font-size: 0.72rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.result-item-error .result-detail {
+  color: var(--color-danger);
+}
+
+.result-download {
+  width: fit-content;
+  margin-top: 2px;
+  padding: 8px 12px;
+  color: white;
+  background: var(--color-accent);
+  border-radius: 8px;
+  font-size: 0.74rem;
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.result-download:hover {
+  filter: brightness(0.94);
+}
+
 .settings-panel,
 .results-panel {
   margin-top: 18px;
