@@ -149,7 +149,8 @@ async function convertImage(file, format, options = {}) {
   try {
     return await convertInWorker(file, format, options);
   } catch (error) {
-    if (!error.workerUnavailable) throw error;
+    if (!error.workerUnavailable && error.name !== "WorkerConversionError") throw error;
+    // Retry on the main thread so HTMLImageElement/HTMLCanvas fallbacks remain available.
     return convertImageDirect(file, format, options);
   }
 }
