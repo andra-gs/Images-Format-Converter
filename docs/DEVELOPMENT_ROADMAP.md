@@ -49,14 +49,14 @@ Deliverable: complete interface with file-selection and conversion-settings cont
 ## Phase 2: Core conversion engine (MVP)
 
 Tasks:
-- [ ] File validation (implemented; manual verification pending).
-- [ ] Image format signature detection (implemented; manual verification pending).
+- [x] File validation and signature detection (implementation exists; full manual verification remains part of QA).
+
 - [x] Capability registry separating input decoding from output encoding (automated tests passed; user-confirmed).
 - [x] Browser image decoding for PNG, JPEG, WebP, and BMP (user-confirmed successful real-file tests).
 - [x] PNG output (encoder, conversion service, and UI flow; user verified PNG, JPEG, WebP, and BMP inputs convert successfully, output opens as PNG, dimensions and PNG transparency are preserved, filenames use .png, downloads work, and multiple files convert independently).
 - [x] JPEG output (encoder, conversion service, quality control, white compositing for transparency, and main-interface download; user verified real-file conversion).
 - [x] WebP output (encoder, conversion service, quality control, and main-interface download; user verified PNG, JPEG, WebP, and BMP inputs, transparency, MIME type, dimensions, preview, download, and unsupported-browser error handling).
-- [ ] BMP encoder (implemented; real-file browser verification pending).
+- [x] BMP encoder (user verified PNG, JPEG, WebP, and BMP inputs; output opens, dimensions match, and transparent pixels become white).
 - [x] Blob result generation for PNG output.
 - [x] PNG output validation by reopening/decoding and checking dimensions.
 - [x] Individual PNG download.
