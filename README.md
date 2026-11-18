@@ -2,7 +2,7 @@
 
 A local-first image format conversion web application. Image files are processed in the user's browser and are not uploaded to a remote server.
 
-> Project status: Phase 2 - Core conversion engine (in progress)
+> Project status: Phase 3 - Batch processing (in progress)
 > Stack: Vanilla JavaScript + Vite + plain CSS
 > Icons: Lucide via NPM
 > Architecture: Client-side, modular, hybrid processing
@@ -13,6 +13,9 @@ The current interface includes:
 
 - File selection through the file picker and drag-and-drop.
 - A selected-file queue with image previews, file details, individual removal, and clear-all behavior.
+- Batch conversion with per-file pending, processing, completed, failed, and cancelled states, plus overall batch progress.
+- Web Worker conversion when supported, with a main-thread fallback and a sequential concurrency limit.
+- Cancellation of remaining queued files after the active conversion finishes. ZIP download is still pending.
 - Light and dark themes with saved preference.
 - Conversion settings for PNG, JPEG, WebP, and BMP, with quality control for JPEG and WebP. The dedicated 24-bit BMP encoder is implemented and user-verified with real PNG, JPEG, WebP, and BMP files.
 - Startup skeleton that follows the selected theme and prevents an unstyled-content flash.
@@ -27,7 +30,7 @@ The current interface includes:
 - Automated Node.js tests for the capability registry, image decoder, and PNG/JPEG/WebP encoder code using the built-in test runner. Latest user-reported run before the BMP encoder changes: 25 tests passed, 0 failed. Rerun the suite after pulling the BMP implementation.
 - Production build verified by the user with `npm run build` using Vite 7.3.8 before the BMP encoder changes. Rerun the build after pulling the BMP implementation.
 
-PNG, JPEG, and WebP decoding and encoding are user-verified. BMP encoding is implemented, enabled in the main interface, and user-verified with real files. The latest automated test suite and production build still need to be rerun after the BMP changes. GIF, TIFF, HEIC, HEIF, and SVG decoding remain planned. GIF, TIFF, HEIC, HEIF, and SVG decoding remain planned.
+PNG, JPEG, WebP, and BMP conversion paths are user-verified with real files. The latest automated test suite and production build still need to be rerun after the BMP changes. Batch worker execution and the new progress/cancellation UI are implemented but awaiting browser verification. GIF, TIFF, HEIC, HEIF, and SVG decoding remain planned.
 
 ## Project goals
 
