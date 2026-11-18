@@ -33,6 +33,29 @@ This file records actual repository progress. Update it after meaningful impleme
 
 Add newest entries first.
 
+### 2026-11-18 - Align capability registry tests with verified support
+
+- Status: Test expectations updated; rerun pending
+- Findings from the user's local validation:
+  - `npm run build` completed successfully with Vite 7.3.8.
+  - `npm test` reported 14 passing and 3 failing tests out of 17.
+  - All three failures were in `tests/capability-registry.test.js`; assertions still expected no supported decoders or encoders and expected PNG encoding to remain planned.
+- Changes:
+  - Updated the expected available input formats to PNG, JPEG, WebP, and BMP.
+  - Updated the expected available output formats to PNG.
+  - Updated planned output formats to JPEG, WebP, and BMP.
+  - Updated the JPEG capability assertion to reflect verified decoding while keeping JPEG encoding planned.
+  - Updated the immutability test to verify that changing a returned PNG capability object cannot change the internal `implemented` encoding status.
+- Files changed:
+  - `tests/capability-registry.test.js`
+  - `docs/DEVELOPMENT_LOG.md`
+- Test results:
+  - The user's production build passed before this test-only correction.
+  - The corrected test suite has not yet been rerun.
+- Next steps:
+  - Pull the latest `main` and run `npm test`.
+  - Confirm all 17 tests pass. The production source was not changed by this test correction.
+
 ### 2026-11-18 - PNG conversion verified in the main interface
 
 - Status: Tested; user-confirmed real-file browser verification
@@ -51,7 +74,7 @@ Add newest entries first.
   - Updated README and technical specification to describe the verified PNG conversion path.
 - Test scope:
   - These results are based on the user's browser tests of the main application.
-  - The user did not report running `npm test` or `npm run build` as part of this verification, so those checks are not newly marked as passed here.
+  - The user subsequently ran `npm test` and `npm run build`. The production build passed, while the test suite reported 14/17 passing because three capability-registry assertions still expected the pre-PNG-encoder state. Those stale assertions were corrected in a follow-up commit; the test suite must be rerun to verify the correction.
 - Remaining limitations:
   - JPEG, WebP, and BMP output encoders are not implemented.
   - GIF, TIFF, HEIC, HEIF, and SVG decoding remain planned.
