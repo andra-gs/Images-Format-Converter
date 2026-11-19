@@ -1,4 +1,5 @@
 import { decodeImage } from "../src/js/core/image-decoder.js";
+import { sanitizeSvgText } from "../src/js/core/svg-sanitizer.js";
 
 const fileInput = document.querySelector("#decoder-file-input");
 const resultsList = document.querySelector("#decoder-results");
@@ -41,8 +42,19 @@ fileInput.addEventListener("change", async () => {
 
   for (const file of files) {
     try {
+      const isSvg = file.type === "image/svg+xml" || file.name.toLowerCase().endsWith(".svg");
+      let sanitizationDetail = "";
+
+      if (isSvg) {
+        const sanitized = sanitizeSvgText(await file.text());
+        if (/<script\\b|<foreignObject\\b|<image\\b|\\bon[\\w:-]+\\s*=|(?:href|src)\\s*=/i.test(sanitized)) {
+          throw new Error("The SVG sanitizer left active or externally linked content in the document.");
+        }
+        sanitizationDetail = " · Active and external content removed";
+      }
+
       const decoded = await decodeImage(file);
-      const detail = `Detected: ${decoded.format.toUpperCase()} · Dimensions: ${decoded.width} × ${decoded.height}`;
+      const detail = `Detected: ${decoded.format.toUpperCase()} · Dimensions: ${decoded.width} × ${decoded.height}${sanitizationDetail}`;
       decoded.close();
 
       addResult({
