@@ -5,7 +5,7 @@ This file records actual repository progress. Update it after meaningful impleme
 ## Project status
 
 - Current stage: Phase 4 - Advanced format support
-- Current phase status: HEIC/HEIF decoder, main conversion, and Worker paths are user-verified. The UTIF2 TIFF decoder adapter is implemented and awaits real-file verification.
+- Current phase status: HEIC/HEIF and TIFF input decoding are user-verified. Baseline uncompressed TIFF output is integrated and awaits real-file verification.
 - Latest release: None
 - Last updated: 2026-11-18
 
@@ -25,13 +25,43 @@ This file records actual repository progress. Update it after meaningful impleme
 | Phase 1: UI development | Tested | User confirmed the skeleton follows light/dark themes, theme persists after refresh, no unstyled flash appears, and `npm run build` succeeds |
 | Phase 2: Core conversion engine | Tested | PNG, JPEG, WebP, and BMP conversion paths are user-verified; user reports the requested automated tests and build checks passed |
 | Phase 3: Batch processing | Tested | User verified batch queue, worker execution, progress, cancellation, failure isolation, large-image responsiveness, cleanup, individual downloads, ZIP extraction, and image integrity |
-| Phase 4: Advanced formats | In progress | HEIC/HEIF user-verified. TIFF adapter implemented, real-file tests pending. SVG and GIF remain |
+| Phase 4: Advanced formats | In progress | HEIC/HEIF and TIFF input paths user-verified. Baseline uncompressed TIFF output integrated, output tests pending. SVG and GIF remain |
 | Phase 5: Image manipulation | Not started | Resize, compression, metadata |
 | Phase 6: Testing and release | Not started | QA and v1.0.0 |
 
 ## Change log
 
 Add newest entries first.
+
+
+### 2026-11-19 - TIFF input verification and baseline TIFF encoder
+
+- TIFF input status: Tested, based on user-reported real-file checks.
+- User-confirmed TIFF checks:
+  - Single-page and multi-page TIFF behavior, with the adapter intentionally using the first page.
+  - Grayscale and RGB files.
+  - LZW, Deflate, and PackBits files where available.
+  - Main-interface conversion to PNG, JPEG, WebP, and BMP.
+  - Web Worker conversion.
+  - Output dimensions, image opening, and expected visual results.
+- Encoder evaluation:
+  - Selected the existing UTIF2 4.1.0 dependency. Its documented `encodeImage(rgba, width, height)` API returns a TIFF ArrayBuffer.
+  - The encoder currently writes uncompressed TIFF data. It does not provide compression options through this API.
+  - Reusing UTIF2 avoids adding another TIFF library or dependency.
+  - This is a baseline raster TIFF output path, not a feature-complete TIFF writer. Compression selection, metadata preservation, and multi-page output are not included.
+- Implementation:
+  - Added TIFF encoding through UTIF2 using RGBA pixels read from OffscreenCanvas or HTML Canvas.
+  - Added TIFF output to the capability registry, conversion service, Web Worker, and output-format selector.
+  - Added an automated test that reopens the generated TIFF with UTIF2 and checks its dimensions and pixel buffer length.
+- Verification still required:
+  - Run `npm ci`, `npm test`, and `npm run build`.
+  - Convert real PNG, JPEG, WebP, BMP, HEIC/HEIF, and TIFF sources to TIFF.
+  - Open the generated TIFF files in an independent image viewer.
+  - Verify dimensions, orientation, color, transparency behavior, MIME type, downloads, and Worker execution.
+  - Confirm that the larger uncompressed TIFF file size is clearly communicated.
+- Next steps:
+  - Complete real-file verification of TIFF output.
+  - Continue with safe SVG rasterization after TIFF output is stable.
 
 
 ### 2026-11-18 - HEIC/HEIF verification and TIFF decoder adapter
