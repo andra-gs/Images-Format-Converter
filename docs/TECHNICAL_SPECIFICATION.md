@@ -219,7 +219,7 @@ SVG input is parsed with the browser's DOMParser into an inert XML document. The
 
 The sanitizer requires usable dimensions from numeric width/height values or a valid viewBox. It limits each dimension to 16,384 pixels and the total raster area to 40 million pixels. The sanitized document is serialized to an image/svg+xml Blob and rasterized with createImageBitmap, falling back to an HTMLImageElement when necessary. Temporary object URLs are released when the decoded resource closes.
 
-SVG source conversion runs on the main thread because the sanitizer depends on DOMParser and XMLSerializer. Other supported formats continue to use the existing Worker path. SVG remains planned in the capability registry until real browser decoding and conversion tests pass. The current sanitizer intentionally supports a restricted SVG subset; unsupported SVG features may be removed and therefore may not appear in the rasterized result.
+SVG source conversion runs on the main thread because the sanitizer depends on DOMParser and XMLSerializer. Other supported formats continue to use the existing Worker path. The user verified SVG decoding and conversion in a real browser, including the sanitizer fixture and conversion to PNG, JPEG, WebP, BMP, and TIFF. The current sanitizer intentionally supports a restricted SVG subset; unsupported SVG features may be removed and therefore may not appear in the rasterized result.
 
 
 ## 22. Static GIF first-frame decoding
