@@ -29,7 +29,7 @@ test("unknown formats return null and are not marked as supported", () => {
   assert.equal(canEncodeFormat("avif"), false);
 });
 
-test("only verified input decoders and output encoders are available", () => {
+test("implemented input decoders and output encoders are available", () => {
   assert.deepEqual(getAvailableInputFormats(), ["png", "jpeg", "webp", "bmp", "gif", "tiff", "heic", "heif", "svg"]);
   assert.deepEqual(getAvailableOutputFormats(), ["png", "jpeg", "webp", "bmp", "gif", "tiff", "svg"]);
   assert.deepEqual(getPlannedOutputFormats(), []);
