@@ -1,5 +1,4 @@
 import { decode, decodeFrames, encode } from "modern-gif";
-import workerUrl from "modern-gif/worker?url";
 import { decodeImage } from "./image-decoder.js";
 import { detectImageFormat } from "./format-detector.js";
 
@@ -61,27 +60,13 @@ function hasWorkerSupport() {
   return typeof globalThis.Worker === "function";
 }
 
-async function decodeAllFrames(buffer, metadata) {
-  if (hasWorkerSupport()) {
-    try {
-      return await decodeFrames(buffer, { gif: metadata, workerUrl });
-    } catch {
-      // Retry synchronously if the library's worker cannot be created or used.
-    }
-  }
-
+function decodeAllFrames(buffer, metadata) {
+  // The application conversion worker owns this CPU-heavy operation. Avoid creating
+  // nested library workers, which do not expose a public termination API.
   return decodeFrames(buffer, { gif: metadata });
 }
 
-async function encodeFrames(options) {
-  if (hasWorkerSupport()) {
-    try {
-      return await encode({ ...options, workerUrl });
-    } catch {
-      // Retry without the library worker for browsers with restricted worker support.
-    }
-  }
-
+function encodeFrames(options) {
   return encode(options);
 }
 
@@ -121,7 +106,7 @@ async function createGifFromGif(file) {
     width,
     height,
     frames,
-    looped: metadata.looped,
+    looped: Boolean(metadata.looped),
     loopCount: metadata.loopCount
   };
 }
