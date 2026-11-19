@@ -570,3 +570,40 @@ test("rejects TIFF encoding when the browser cannot read canvas pixels", async (
     /TIFF encoding failed/
   );
 });
+
+
+test("encodes SVG as a wrapper containing an embedded PNG data URI", async (t) => {
+  const pngOutput = new Blob(["fake-png-data"], { type: "image/png" });
+  class FakeOffscreenCanvas {
+    constructor(width, height) {
+      this.width = width;
+      this.height = height;
+    }
+
+    getContext(type) {
+      assert.equal(type, "2d");
+      return { drawImage() {} };
+    }
+
+    async convertToBlob(options) {
+      assert.deepEqual(options, { type: "image/png" });
+      return pngOutput;
+    }
+  }
+
+  mockGlobal(t, "OffscreenCanvas", FakeOffscreenCanvas);
+
+  const result = await encodeImage(
+    { source: {}, width: 320, height: 240 },
+    { format: "svg" }
+  );
+
+  assert.equal(result.type, "image/svg+xml");
+  const svg = await result.text();
+  const expectedBase64 = btoa("fake-png-data");
+  assert.ok(svg.startsWith('<svg xmlns="http://www.w3.org/2000/svg"'));
+  assert.match(svg, /width="320" height="240" viewBox="0 0 320 240"/);
+  assert.ok(svg.includes(`href="data:image/png;base64,${expectedBase64}"`));
+  assert.ok(svg.includes('<image x="0" y="0" width="320" height="240"'));
+  assert.doesNotMatch(svg, /<path|<polygon|<circle/);
+});
