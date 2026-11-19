@@ -118,6 +118,7 @@
                   <li class="custom-select-option" role="option" tabindex="-1" data-value="image/bmp" aria-selected="false">BMP</li>
                   <li class="custom-select-option" role="option" tabindex="-1" data-value="image/tiff" aria-selected="false">TIFF</li>
                   <li class="custom-select-option" role="option" tabindex="-1" data-value="image/svg+xml" aria-selected="false">SVG (embedded PNG)</li>
+                  <li class="custom-select-option" role="option" tabindex="-1" data-value="image/gif" aria-selected="false">GIF (animated)</li>
                 </ul>
               </div>
               <span class="field-hint">SVG output embeds a PNG image. It does not convert pixels into editable vector shapes.</span>
@@ -135,7 +136,7 @@
 
           <div class="settings-notice">
             <i data-lucide="info"></i>
-            <span>All conversions run locally in your browser. TIFF output is uncompressed. SVG output wraps an embedded PNG and is not true vectorization.</span>
+            <span>All conversions run locally in your browser. TIFF output is uncompressed. SVG output wraps an embedded PNG. Animated GIF input keeps its animation only when the output is GIF. Other output formats use the first frame.</span>
           </div>
           <div class="conversion-actions">
             <button class="convert-button" id="convert-button" type="button" disabled>
@@ -178,7 +179,7 @@
           <ul class="results-list" id="results-list" aria-live="polite" hidden></ul>
         </section>
 
-        <p class="phase-note">PNG, JPEG, WebP, BMP, TIFF, and SVG wrapper output are available.</p>
+        <p class="phase-note">PNG, JPEG, WebP, BMP, TIFF, SVG wrapper, and GIF output are available.</p>
       </main>
 
       <footer class="app-footer">
