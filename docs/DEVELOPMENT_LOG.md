@@ -916,3 +916,34 @@ Add newest entries first.
 ## Important rule
 
 Only record work that actually happened in the repository. Do not mark a feature as implemented or tested based only on a plan, code suggestion, or mockup.
+
+
+### 2026-11-19 - Initial static GIF first-frame decoder
+- Status: Implemented; real-browser verification pending
+- Changes:
+  - Evaluated browser-compatible GIF parsing options and selected gifuct-js 2.1.2, an MIT-licensed parser/decompressor with a single runtime dependency.
+  - Added a GIF decoder adapter that parses logical-screen dimensions and decompresses only the first image frame.
+  - Rasterizes the first frame to OffscreenCanvas or HTML Canvas, respecting frame offsets, transparency, and the global background color when applicable.
+  - Added dimension and pixel-area limits before allocating the raster canvas.
+  - GIF conversion can use the existing Worker path and main-thread fallback.
+  - Documented the policy: animated GIF input becomes a still image from its first image frame. Animation, timing, and later frames are not preserved.
+  - Kept GIF decoding marked planned in the capability registry until the user completes real-browser verification.
+  - Added unit coverage for first-frame rasterization and malformed GIF errors, plus GIF support in the browser decoder test page.
+- Files changed:
+  - `package.json`, `package-lock.json`
+  - `src/js/core/image-decoder.js`, `src/js/core/capability-registry.js`
+  - `tests/image-decoder.test.js`, `tests/capability-registry.test.js`
+  - `tests/browser-decoder.html`, `tests/browser-decoder.js`
+  - `README.md`, `docs/PROJECT_CONTEXT.md`, `docs/TECHNICAL_SPECIFICATION.md`, `docs/DEVELOPMENT_ROADMAP.md`
+- Tests performed:
+  - Added automated test cases. They have not been run in this environment.
+  - Real browser and main-application verification remain pending.
+- Test results:
+  - No test or production build result is claimed yet.
+- Known issues:
+  - The browser file preview may still display an animated GIF as provided by the browser; the conversion result is explicitly based on the first image frame.
+  - GIF decoding remains unavailable in the capability registry until manual verification passes.
+- Next steps:
+  - Run npm test and npm run build.
+  - Test real static and animated GIF files in the browser decoder page and main application.
+  - Verify first-frame selection, transparency, logical dimensions, worker execution, downloads, and ZIP export.
