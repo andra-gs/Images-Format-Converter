@@ -226,7 +226,7 @@ test("falls back to HTML canvas when OffscreenCanvas returns the wrong MIME type
 test("rejects unsupported output formats", async () => {
   await assert.rejects(
     encodeImage({ source: {}, width: 10, height: 10 }, { format: "avif" }),
-    /Only PNG, JPEG, WebP, and BMP encoding are currently implemented/
+    /Only PNG, JPEG, WebP, BMP, and TIFF encoding are currently implemented/
   );
 });
 
