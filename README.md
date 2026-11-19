@@ -20,7 +20,7 @@ The current interface includes:
 - Conversion settings for PNG, JPEG, WebP, BMP, and baseline uncompressed TIFF, with quality control for JPEG and WebP. The dedicated 24-bit BMP encoder is implemented and user-verified with real PNG, JPEG, WebP, and BMP files.
 - Startup skeleton that follows the selected theme and prevents an unstyled-content flash.
 - Initial file validation and image-format signature detection.
-- An initial safe SVG rasterization path is integrated. SVG input is parsed and sanitized to a restricted vector subset before rasterization; scripts, CSS, external references, embedded images, and unsupported elements are removed. Real-browser verification is pending, so SVG is not yet listed as a supported input format.
+- An initial safe SVG rasterization path is integrated. SVG input is parsed and sanitized to a restricted vector subset before rasterization; scripts, CSS, external references, embedded images, and unsupported elements are removed. The user has verified SVG rasterization and conversion to PNG, JPEG, WebP, BMP, and TIFF in the real browser.
 - An initial GIF decoder using gifuct-js is integrated. It decompresses and rasterizes only the first image frame, including for animated GIF files. Animation and frame timing are not preserved. Real-browser verification is pending, so GIF is not yet listed as a supported input format.
 - An explicit capability registry that keeps detection, decoding, and encoding status separate.
 - A browser image decoder for PNG, JPEG, WebP, and BMP, with an ImageBitmap path and HTML image fallback. HEIC/HEIF decoding uses heic-to and has been user-verified in the decoder, main conversion pipeline, and Web Worker. TIFF decoding uses UTIF2 and has been user-verified with real fixtures in the browser, main conversion pipeline, and Web Worker.
@@ -32,7 +32,7 @@ The current interface includes:
 - The user verified that all four input formats convert successfully, output files open as PNG, dimensions match the originals, PNG transparency is preserved, filenames use the .png extension, downloads work, and multiple files convert independently.
 - The user has verified Phase 3 batch processing, worker execution, progress states, cancellation, failure isolation, responsiveness, cleanup, individual downloads, and ZIP archive integrity.
 
-PNG, JPEG, WebP, and BMP conversion paths are user-verified with real files. Phase 3, including ZIP export, is user-verified. HEIC/HEIF decoding is user-verified. TIFF input decoding and conversion are user-verified with real fixtures. The decoder reads the first page only. TIFF output is implemented as uncompressed baseline TIFF and has been user-verified with real files. GIF and SVG first-frame/rasterization code is integrated but remains unverified in real browsers. Do not treat either as supported until browser and main-interface tests pass.
+PNG, JPEG, WebP, and BMP conversion paths are user-verified with real files. Phase 3, including ZIP export, is user-verified. HEIC/HEIF decoding is user-verified. TIFF input decoding and conversion are user-verified with real fixtures. The decoder reads the first page only. TIFF output is implemented as uncompressed baseline TIFF and has been user-verified with real files. SVG decoding and conversion are user-verified. GIF first-frame decoding is integrated but remains unverified in real browsers, so GIF is not yet listed as a supported input format.
 
 ## Project goals
 
