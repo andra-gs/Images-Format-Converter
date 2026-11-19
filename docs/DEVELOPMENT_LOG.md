@@ -5,7 +5,7 @@ This file records actual repository progress. Update it after meaningful impleme
 ## Project status
 
 - Current stage: Phase 4 - Advanced format support
-- Current phase status: HEIC/HEIF and TIFF input/output paths are user-verified. Safe SVG rasterization is the next implementation task.
+- Current phase status: HEIC/HEIF and TIFF input/output paths are user-verified. SVG sanitization and rasterization are integrated but await browser verification.
 - Latest release: None
 - Last updated: 2026-11-19
 
@@ -25,13 +25,27 @@ This file records actual repository progress. Update it after meaningful impleme
 | Phase 1: UI development | Tested | User confirmed the skeleton follows light/dark themes, theme persists after refresh, no unstyled flash appears, and `npm run build` succeeds |
 | Phase 2: Core conversion engine | Tested | PNG, JPEG, WebP, and BMP conversion paths are user-verified; user reports the requested automated tests and build checks passed |
 | Phase 3: Batch processing | Tested | User verified batch queue, worker execution, progress, cancellation, failure isolation, large-image responsiveness, cleanup, individual downloads, ZIP extraction, and image integrity |
-| Phase 4: Advanced formats | In progress | HEIC/HEIF and TIFF input/output paths user-verified. SVG rasterization and GIF remain |
+| Phase 4: Advanced formats | In progress | HEIC/HEIF and TIFF input/output paths user-verified. SVG rasterization integrated, browser verification pending; GIF remains |
 | Phase 5: Image manipulation | Not started | Resize, compression, metadata |
 | Phase 6: Testing and release | Not started | QA and v1.0.0 |
 
 ## Change log
 
 Add newest entries first.
+
+
+### 2026-11-19 - Initial safe SVG rasterization
+
+- Added a browser-side SVG sanitizer that parses XML without inserting untrusted markup into the live document.
+- The sanitizer keeps a restricted set of vector shapes, text, gradients, and local clipping/mask references.
+- It removes scripts, event-handler attributes, style blocks/attributes, external links, embedded images, foreignObject content, animation, and unsupported elements.
+- DOCTYPE and entity declarations are rejected. SVG dimensions must be numeric or derivable from a valid viewBox, with per-dimension and pixel-count limits.
+- The sanitized SVG is rasterized through createImageBitmap with an HTMLImageElement fallback.
+- SVG source conversion runs on the main thread because safe parsing depends on browser DOMParser/XMLSerializer. Other formats retain their existing Worker path.
+- Added a malicious-content browser fixture and included SVG in the browser decoder test page.
+- SVG remains marked planned in the capability registry until real browser decoding and conversion checks pass.
+- Verification pending: run automated tests/build, decode the sanitizer fixture, confirm removed active/external content, test valid SVG variants, convert to each supported raster output, and verify downloads and dimensions.
+
 
 
 ### 2026-11-19 - TIFF output real-file verification
