@@ -1,7 +1,7 @@
 import { detectImageFormat } from "./format-detector.js";
 import { sanitizeSvgText } from "./svg-sanitizer.js";
 
-const BROWSER_RASTER_FORMATS = new Set(["png", "jpeg", "webp", "bmp", "heic", "heif", "tiff"]);
+const BROWSER_RASTER_FORMATS = new Set(["png", "jpeg", "webp", "bmp", "heic", "heif", "tiff", "svg"]);
 
 function getImageDimensions(source) {
   const width = source.width || source.naturalWidth;
