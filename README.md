@@ -21,15 +21,16 @@ The current interface includes:
 - Startup skeleton that follows the selected theme and prevents an unstyled-content flash.
 - Initial file validation and image-format signature detection.
 - An explicit capability registry that keeps detection, decoding, and encoding status separate.
-- A browser image decoder for PNG, JPEG, WebP, and BMP, with an ImageBitmap path and HTML image fallback. HEIC/HEIF decoding uses heic-to and has been user-verified in the decoder, main conversion pipeline, and Web Worker. A UTIF2-based TIFF adapter is integrated and awaits real-file verification.
+- A browser image decoder for PNG, JPEG, WebP, and BMP, with an ImageBitmap path and HTML image fallback. HEIC/HEIF decoding uses heic-to and has been user-verified in the decoder, main conversion pipeline, and Web Worker. TIFF decoding uses UTIF2 and has been user-verified with real fixtures in the browser, main conversion pipeline, and Web Worker.
 - A PNG encoder and conversion service using OffscreenCanvas with an HTML Canvas fallback. The service checks the PNG signature and reopens the output to verify its dimensions.
 - A dedicated 24-bit BMP encoder that writes bottom-up BGR pixel rows with 4-byte alignment. Transparent pixels are composited onto white. Automated tests cover its header, pixel data, row padding, and Canvas fallback. Real-file browser conversion has been user-verified.
+- Baseline TIFF output through UTIF2. The encoder writes uncompressed RGBA TIFF files and is integrated into the main interface and Web Worker. Real-file output verification is pending.
 - JPEG output is implemented and enabled in the main interface. The user verified PNG, JPEG, WebP, and BMP inputs convert to JPEG, transparent PNG areas become white, quality settings work, output MIME type is `image/jpeg`, dimensions match, previews display, and `.jpg` downloads work.
 - The main interface supports PNG output from PNG, JPEG, WebP, and BMP inputs, with individual PNG downloads and per-file error results.
 - The user verified that all four input formats convert successfully, output files open as PNG, dimensions match the originals, PNG transparency is preserved, filenames use the .png extension, downloads work, and multiple files convert independently.
 - The user has verified Phase 3 batch processing, worker execution, progress states, cancellation, failure isolation, responsiveness, cleanup, individual downloads, and ZIP archive integrity.
 
-PNG, JPEG, WebP, and BMP conversion paths are user-verified with real files. Phase 3, including ZIP export, is user-verified. HEIC/HEIF decoding is user-verified. TIFF decoding is integrated but remains unverified with real fixtures. The current TIFF adapter reads the first page only. GIF and SVG decoding remain planned.
+PNG, JPEG, WebP, and BMP conversion paths are user-verified with real files. Phase 3, including ZIP export, is user-verified. HEIC/HEIF decoding is user-verified. TIFF input decoding and conversion are user-verified with real fixtures. The decoder reads the first page only. TIFF output is implemented as uncompressed baseline TIFF and awaits real-file verification. GIF and SVG decoding remain planned.
 
 ## Project goals
 
@@ -50,8 +51,8 @@ Special cases:
 - Canvas commonly supports PNG output and browser-dependent JPEG/WebP output. Verify the returned Blob MIME type.
 - BMP may require a dedicated encoder.
 - HEIC/HEIF uses the integrated `heic-to` decoder adapter. The user verified real-file decoding, main conversion, and Worker processing.
-- TIFF uses the integrated UTIF2 decoder adapter. Real-file verification is pending; the current adapter reads only the first TIFF page.
-- TIFF decoding and encoding must be evaluated separately.
+- TIFF uses the integrated UTIF2 decoder adapter. Real-file input verification passed; the current adapter reads only the first TIFF page.
+- TIFF output uses UTIF2's uncompressed encoder. Compression, metadata preservation, and multi-page writing are not included, and real-file output verification is pending.
 - SVG-to-raster requires safe rasterization. Raster wrapped in SVG is not true vector conversion.
 - Animated GIF requires frame-aware decoding and encoding. A simple Canvas pipeline may only process one frame.
 
@@ -68,7 +69,7 @@ Special cases:
 | Background processing | Web Workers, OffscreenCanvas where supported |
 | ZIP downloads | JSZip |
 | HEIC/HEIF decoding | heic-to (WebAssembly, browser and worker entry points) |
-| TIFF decoding | UTIF2 (first-page raster decoding) |
+| TIFF decoding and baseline encoding | UTIF2 (first-page raster decoding; uncompressed TIFF output) |
 | Version control | Git and GitHub |
 
 No backend, database, cloud storage, or remote image-processing API is planned.
