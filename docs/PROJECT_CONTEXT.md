@@ -93,7 +93,7 @@ The application should maintain an explicit capability registry. The UI should o
 - DOCTYPE and entity declarations are rejected. Raster dimensions are bounded.
 - SVG conversion currently runs on the main thread because sanitization uses DOMParser and XMLSerializer.
 - The browser decoder test page includes a fixture containing script, event-handler, foreignObject, and external-image content.
-- Keep SVG decoding marked planned until real browser tests pass.
+- SVG decoding and conversion were verified by the user in a real browser, including safe-fixture sanitization and conversion to PNG, JPEG, WebP, BMP, and TIFF.
 - Raster-to-SVG wrapping is not true vectorization and is not offered.
 
 **GIF**
