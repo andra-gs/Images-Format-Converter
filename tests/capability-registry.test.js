@@ -66,6 +66,11 @@ test("capability data keeps decoding and encoding separate", () => {
   assert.equal(tiff.decoding.strategy, "utif2");
   assert.equal(tiff.encoding.status, "implemented");
   assert.equal(tiff.encoding.strategy, "utif2-uncompressed");
+
+  const svg = getFormatCapabilities("svg");
+  assert.equal(svg.detection.status, "implemented");
+  assert.equal(svg.decoding.status, "planned");
+  assert.equal(canDecodeFormat("svg"), false);
 });
 
 test("returned capability data cannot mutate the internal registry", () => {
