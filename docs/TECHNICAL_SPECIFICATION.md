@@ -211,3 +211,12 @@ Decoded ImageBitmap resources are closed by the conversion service. The UI revok
 ## 20. Baseline TIFF output
 
 The TIFF encoder reuses the existing UTIF2 dependency. It reads RGBA pixels from OffscreenCanvas where available, with an HTML Canvas fallback, then calls UTIF2 `encodeImage(rgba, width, height)`. The current API writes uncompressed TIFF data. This keeps the first output implementation small and local, but generated files may be substantially larger than compressed TIFF files. Compression selection, metadata preservation, and multi-page TIFF writing are not included. The conversion service validates the TIFF signature, reopens the generated file through the TIFF decoder, and checks dimensions. The user verified real source conversions, independent viewing, dimensions, visual output, Worker conversion, individual downloads, and ZIP export.
+
+
+## 21. Safe SVG rasterization
+
+SVG input is parsed with the browser's DOMParser into an inert XML document. The application does not insert the original or sanitized SVG markup into the live page DOM. A strict allowlist retains basic vector shapes, text, gradients, and local clipping/mask references. Script elements, event attributes, style blocks and attributes, external links, embedded images, foreignObject, animation, and unsupported elements are removed. DOCTYPE and entity declarations are rejected. External URL references are not retained.
+
+The sanitizer requires usable dimensions from numeric width/height values or a valid viewBox. It limits each dimension to 16,384 pixels and the total raster area to 40 million pixels. The sanitized document is serialized to an image/svg+xml Blob and rasterized with createImageBitmap, falling back to an HTMLImageElement when necessary. Temporary object URLs are released when the decoded resource closes.
+
+SVG source conversion runs on the main thread because the sanitizer depends on DOMParser and XMLSerializer. Other supported formats continue to use the existing Worker path. SVG remains planned in the capability registry until real browser decoding and conversion tests pass. The current sanitizer intentionally supports a restricted SVG subset; unsupported SVG features may be removed and therefore may not appear in the rasterized result.
