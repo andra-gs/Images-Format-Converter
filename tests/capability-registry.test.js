@@ -30,7 +30,7 @@ test("unknown formats return null and are not marked as supported", () => {
 });
 
 test("only verified input decoders and output encoders are available", () => {
-  assert.deepEqual(getAvailableInputFormats(), ["png", "jpeg", "webp", "bmp", "tiff", "heic", "heif"]);
+  assert.deepEqual(getAvailableInputFormats(), ["png", "jpeg", "webp", "bmp", "tiff", "heic", "heif", "svg"]);
   assert.deepEqual(getAvailableOutputFormats(), ["png", "jpeg", "webp", "bmp", "tiff"]);
   assert.deepEqual(getPlannedOutputFormats(), []);
 });
@@ -74,8 +74,9 @@ test("capability data keeps decoding and encoding separate", () => {
 
   const svg = getFormatCapabilities("svg");
   assert.equal(svg.detection.status, "implemented");
-  assert.equal(svg.decoding.status, "planned");
-  assert.equal(canDecodeFormat("svg"), false);
+  assert.equal(svg.decoding.status, "implemented");
+  assert.equal(svg.decoding.strategy, "safe-svg-rasterization");
+  assert.equal(canDecodeFormat("svg"), true);
 });
 
 test("returned capability data cannot mutate the internal registry", () => {
