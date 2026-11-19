@@ -110,7 +110,7 @@ function supportsWorkerConversion(format) {
   try {
     const canvas = new globalThis.OffscreenCanvas(1, 1);
     if (typeof canvas.getContext !== "function" || !canvas.getContext("2d")) return false;
-    return format === "bmp" || typeof canvas.convertToBlob === "function";
+    return ["bmp", "tiff"].includes(format) || typeof canvas.convertToBlob === "function";
   } catch {
     return false;
   }
@@ -198,4 +198,12 @@ export function convertImageToWebp(file, { quality = 0.85 } = {}) {
  */
 export function convertImageToBmp(file) {
   return convertImage(file, "bmp");
+}
+
+
+/**
+ * Convert a supported source image to an uncompressed baseline TIFF.
+ */
+export function convertImageToTiff(file) {
+  return convertImage(file, "tiff");
 }
