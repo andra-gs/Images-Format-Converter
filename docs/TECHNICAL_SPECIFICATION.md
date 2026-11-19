@@ -39,6 +39,8 @@ There is no planned backend, database, or remote image-processing service.
 | JSZip | ZIP downloads |
 | heic-to | HEIC/HEIF decoding through WebAssembly in the browser or conversion worker |
 | UTIF2 | TIFF first-page decoding and baseline uncompressed TIFF encoding |
+| gifuct-js | GIF first-frame extraction for conversion to static formats |
+| modern-gif | Animated GIF decoding and encoding, including frame composition and color quantization |
 
 Advanced format libraries remain subject to compatibility, bundle size, license, and browser testing. UTIF2 4.1.0 was published in May 2023, so its maintenance status and compatibility should be reviewed during ongoing testing. Its MIT license and documented compression coverage make it a reasonable initial candidate, not a guarantee of universal TIFF support. heic-to 1.6.7 is selected for HEIC/HEIF decoding. It exposes a browser entry and a worker-specific `heic-to/next` entry. The adapter prefers native ImageBitmap decoding, then falls back to heic-to's bitmap output. The user has verified real HEIC and HEIF files through the browser decoder, main conversion pipeline, and Web Worker. UTIF2 4.1.0 is selected for TIFF input decoding; its adapter decodes the first IFD and renders it to Canvas. The user has verified representative real TIFF files through browser and Worker tests.
 
