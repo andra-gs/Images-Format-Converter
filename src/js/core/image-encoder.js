@@ -269,7 +269,7 @@ export async function encodeImage(
   const mimeType = FORMAT_MIME_TYPES[normalizedFormat];
 
   if (!mimeType) {
-    throw new Error("Only PNG, JPEG, WebP, BMP, and TIFF encoding are currently implemented.");
+    throw new Error("Only PNG, JPEG, WebP, BMP, TIFF, and SVG encoding are currently implemented.");
   }
 
   if (["jpeg", "webp"].includes(normalizedFormat)) {
