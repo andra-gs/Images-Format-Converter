@@ -83,7 +83,7 @@ Deliverable: batch conversion without freezing the UI under normal test loads. B
 
 ## Phase 4: Advanced format support
 
-Status: In progress. HEIC/HEIF and TIFF input/output paths are user-verified. SVG rasterization is user-verified. GIF first-frame decoding and main-application conversion are user-verified.
+Status: In progress. HEIC/HEIF and TIFF input/output paths are user-verified. SVG input rasterization and raster-to-SVG wrapper output are user-verified. GIF first-frame decoding and main-application conversion are user-verified. Remaining work covers animated GIF evaluation/handling and format-specific errors and compatibility notes.
 
 Tasks:
 - [x] Evaluate and integrate HEIC/HEIF decoder adapter using heic-to (real-file decoder, conversion, and Worker tests user-confirmed).
@@ -97,7 +97,7 @@ Tasks:
 - [x] Verify SVG sanitization, browser rasterization, dimensions, and conversion to PNG, JPEG, WebP, BMP, and TIFF in the main application (user-confirmed on 2026-11-19).
 - [x] Define raster-to-SVG behavior as an SVG wrapper containing an embedded PNG, clearly distinguished from true vectorization.
 - [x] Implement the PNG-embedding SVG encoder, strict sanitizer support for embedded PNG data, main-thread conversion pipeline, and UI labeling.
-- [ ] Verify raster-to-SVG output in real browsers, including re-decoding, dimensions, transparency, downloads, and ZIP export.
+- [x] Verify raster-to-SVG output in the real browser, including transparent and opaque sources, re-decoding, dimensions, individual downloads, and ZIP export (user-confirmed; `npm test` and `npm run build` also passed).
 - [x] Implement and verify GIF first-frame decoding for raster conversion in the browser decoder and main application (user-confirmed).
 - [ ] Evaluate animated GIF decoder and encoder.
 - [ ] Implement animated GIF frame/timing handling if feasible.
