@@ -80,26 +80,40 @@ function parseSvgLength(value) {
 }
 
 function normalizeSvgDimensions(root) {
-  const viewBox = (root.getAttribute("viewBox") || "")
+  const viewBoxValue = root.getAttribute("viewBox");
+  const viewBox = (viewBoxValue || "")
     .trim()
-    .split(/[\s,]+/)
+    .split(/[\\s,]+/)
     .map(Number);
 
   const hasValidViewBox = viewBox.length === 4 &&
     viewBox.every(Number.isFinite) && viewBox[2] > 0 && viewBox[3] > 0;
 
+  if (viewBoxValue && !hasValidViewBox) {
+    root.removeAttribute("viewBox");
+  }
+
   let width = parseSvgLength(root.getAttribute("width"));
   let height = parseSvgLength(root.getAttribute("height"));
 
-  if (!width && hasValidViewBox) width = viewBox[2];
-  if (!height && hasValidViewBox) height = viewBox[3];
+  if (hasValidViewBox) {
+    const aspectRatio = viewBox[2] / viewBox[3];
+    if (!width && !height) {
+      width = viewBox[2];
+      height = viewBox[3];
+    } else if (!width) {
+      width = height * aspectRatio;
+    } else if (!height) {
+      height = width / aspectRatio;
+    }
+  }
 
   if (!width || !height) {
     throw new Error("SVG dimensions are missing or unsupported. Add numeric width and height or a valid viewBox.");
   }
 
   const pixelCount = width * height;
-  if (width > 16384 || height > 16384 || pixelCount > 100_000_000) {
+  if (width > 16384 || height > 16384 || pixelCount > 40_000_000) {
     throw new Error("The SVG dimensions exceed the supported rasterization limit.");
   }
 
