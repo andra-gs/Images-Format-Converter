@@ -83,7 +83,7 @@ Deliverable: batch conversion without freezing the UI under normal test loads. B
 
 ## Phase 4: Advanced format support
 
-Status: In progress. HEIC/HEIF and TIFF input/output paths are user-verified. SVG and static GIF first-frame rasterization paths are integrated; browser verification for both remains pending.
+Status: In progress. HEIC/HEIF and TIFF input/output paths are user-verified. SVG rasterization is user-verified. Static GIF first-frame rasterization is integrated; browser verification remains pending.
 
 Tasks:
 - [x] Evaluate and integrate HEIC/HEIF decoder adapter using heic-to (real-file decoder, conversion, and Worker tests user-confirmed).
@@ -94,7 +94,8 @@ Tasks:
 - [x] Integrate baseline uncompressed TIFF output in the main conversion pipeline and Web Worker.
 - [x] Verify generated TIFF files with real files, independent viewers, dimensions, pixel data, and downloads (user-confirmed).
 - [x] Implement a restricted SVG sanitizer and browser rasterization path without live-DOM insertion or external resource loading.
-- [ ] Verify safe SVG fixtures and convert SVG to PNG, JPEG, WebP, BMP, and TIFF in the main application.
+- [x] Verify SVG sanitization, browser rasterization, dimensions, and conversion to PNG, JPEG, WebP, BMP, and TIFF (user-confirmed on 2026-11-19).
+- [x] Verify safe SVG fixtures and convert SVG to PNG, JPEG, WebP, BMP, and TIFF in the main application (user-confirmed on 2026-11-19).
 - [ ] Define and implement raster-to-SVG behavior with clear labeling.
 - [x] Implement static GIF first-frame decoding for raster conversion (real-browser verification pending).
 - [ ] Verify static and animated GIF input, including first-frame selection, transparency, dimensions, and conversion through the main application and Worker.
