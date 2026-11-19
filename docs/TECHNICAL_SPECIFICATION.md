@@ -38,7 +38,7 @@ There is no planned backend, database, or remote image-processing service.
 | Web Workers / OffscreenCanvas | Background processing where supported |
 | JSZip | ZIP downloads |
 | heic-to | HEIC/HEIF decoding through WebAssembly in the browser or conversion worker |
-| UTIF2 | TIFF first-page decoding to RGBA and Canvas |
+| UTIF2 | TIFF first-page decoding and baseline uncompressed TIFF encoding |
 
 Advanced format libraries remain subject to compatibility, bundle size, license, and browser testing. UTIF2 4.1.0 was published in May 2023, so its maintenance status and compatibility should be reviewed during ongoing testing. Its MIT license and documented compression coverage make it a reasonable initial candidate, not a guarantee of universal TIFF support. heic-to 1.6.7 is selected for HEIC/HEIF decoding. It exposes a browser entry and a worker-specific `heic-to/next` entry. The adapter prefers native ImageBitmap decoding, then falls back to heic-to's bitmap output. The user has verified real HEIC and HEIF files through the browser decoder, main conversion pipeline, and Web Worker. UTIF2 4.1.0 is selected for TIFF input decoding; its adapter decodes the first IFD and renders it to Canvas. TIFF capability remains planned until representative real files pass browser and Worker tests.
 
@@ -206,3 +206,8 @@ The application keeps the UI and queue orchestration on the main thread. When Wo
 The queue processes one image at a time to limit simultaneous decoded-image memory usage. Each job moves through pending, processing, completed, failed, or cancelled. The interface shows an indeterminate per-file processing indicator and overall batch completion progress. The cancel action allows the active conversion to finish, then marks remaining queued files as cancelled. It does not interrupt a running Canvas operation.
 
 Decoded ImageBitmap resources are closed by the conversion service. The UI revokes input and output Object URLs when their items are removed, when the queue is cleared, or when the page unloads. The conversion worker is terminated on page unload. ZIP export uses JSZip on the main thread. Only successfully converted results are added. Duplicate output names receive numeric suffixes to prevent overwriting entries inside the archive. The archive uses STORE mode to avoid additional CPU cost from compression. ZIP integrity and browser download behavior have been user-verified.
+
+
+## 20. Baseline TIFF output
+
+The TIFF encoder reuses the existing UTIF2 dependency. It reads RGBA pixels from OffscreenCanvas where available, with an HTML Canvas fallback, then calls UTIF2 `encodeImage(rgba, width, height)`. The current API writes uncompressed TIFF data. This keeps the first output implementation small and local, but generated files may be substantially larger than compressed TIFF files. Compression selection, metadata preservation, and multi-page TIFF writing are not included. The conversion service validates the TIFF signature, reopens the generated file through the TIFF decoder, and checks dimensions. Real-file output verification is pending.
