@@ -17,10 +17,10 @@ The current interface includes:
 - Web Worker conversion when supported, with a main-thread fallback and a sequential concurrency limit.
 - Cancellation of remaining queued files after the active conversion finishes. Successful outputs can be downloaded individually or together in a ZIP archive using JSZip. The user has verified ZIP export, including archive extraction and image integrity.
 - Light and dark themes with saved preference.
-- Conversion settings for PNG, JPEG, WebP, BMP, and baseline uncompressed TIFF, with quality control for JPEG and WebP. The dedicated 24-bit BMP encoder is implemented and user-verified with real PNG, JPEG, WebP, and BMP files.
+- Conversion settings for PNG, JPEG, WebP, BMP, baseline uncompressed TIFF, and SVG wrapper output, with quality control for JPEG and WebP. The dedicated 24-bit BMP encoder is implemented and user-verified with real PNG, JPEG, WebP, and BMP files.
 - Startup skeleton that follows the selected theme and prevents an unstyled-content flash.
 - Initial file validation and image-format signature detection.
-- An initial safe SVG rasterization path is integrated. SVG input is parsed and sanitized to a restricted vector subset before rasterization; scripts, CSS, external references, embedded images, and unsupported elements are removed. The user has verified SVG rasterization and conversion to PNG, JPEG, WebP, BMP, and TIFF in the real browser.
+- SVG input is parsed and sanitized to a restricted vector subset before rasterization. SVG output embeds a PNG data resource in an SVG image element. This preserves the raster image but does not vectorize it. The sanitizer allows only bounded embedded PNG data for image elements and continues to reject external resources and active content. The user has verified SVG rasterization and conversion to PNG, JPEG, WebP, BMP, and TIFF in the real browser.
 - GIF input uses gifuct-js to decompress and rasterize only the first image frame, including for animated GIF files. The user verified browser decoding and conversion through the main application. Animation, frame timing, and later frames are not preserved.
 - An explicit capability registry that keeps detection, decoding, and encoding status separate.
 - A browser image decoder for PNG, JPEG, WebP, and BMP, with an ImageBitmap path and HTML image fallback. HEIC/HEIF decoding uses heic-to and has been user-verified in the decoder, main conversion pipeline, and Web Worker. TIFF decoding uses UTIF2 and has been user-verified with real fixtures in the browser, main conversion pipeline, and Web Worker.
@@ -55,7 +55,7 @@ Special cases:
 - HEIC/HEIF uses the integrated `heic-to` decoder adapter. The user verified real-file decoding, main conversion, and Worker processing.
 - TIFF uses the integrated UTIF2 decoder adapter. Real-file input verification passed; the current adapter reads only the first TIFF page.
 - TIFF output uses UTIF2's uncompressed encoder. Real-file output is user-verified. Compression, metadata preservation, and multi-page writing are not included.
-- SVG-to-raster uses a restricted sanitizer before rasterization. Raster wrapped in SVG is not true vector conversion.
+- SVG-to-raster uses a restricted sanitizer before rasterization. Raster-to-SVG output is an SVG wrapper containing embedded PNG data, not true vector conversion.
 - GIF input currently extracts only the first image frame. Animated GIF output and frame/timing preservation are not implemented.
 
 ## Technology
