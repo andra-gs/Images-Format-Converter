@@ -74,9 +74,9 @@ const FORMAT_CAPABILITIES = Object.freeze({
       note: "Real-browser decoding and main-application conversion were verified. Static and animated GIF inputs are rasterized from the first image frame only; playback, frame timing, and animation-preserving output are not implemented."
     },
     encoding: {
-      status: "not-planned",
-      strategy: null,
-      note: "Animated GIF encoding is reserved for advanced format work."
+      status: "implemented",
+      strategy: "modern-gif-animation",
+      note: "GIF output uses modern-gif for single-frame images and animated GIF re-encoding. GIF-to-GIF preserves frame order, timing, and looping metadata where present. Real-browser verification is pending."
     }
   },
   tiff: {
