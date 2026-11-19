@@ -54,7 +54,8 @@ fileInput.addEventListener("change", async () => {
       }
 
       const decoded = await decodeImage(file);
-      const detail = `Detected: ${decoded.format.toUpperCase()} · Dimensions: ${decoded.width} × ${decoded.height}${sanitizationDetail}`;
+      const formatDetail = decoded.format === "gif" ? " · First image frame only; animation is not preserved" : "";
+      const detail = `Detected: ${decoded.format.toUpperCase()} · Dimensions: ${decoded.width} × ${decoded.height}${sanitizationDetail}${formatDetail}`;
       decoded.close();
 
       addResult({
