@@ -47,7 +47,7 @@ fileInput.addEventListener("change", async () => {
 
       if (isSvg) {
         const sanitized = sanitizeSvgText(await file.text());
-        if (/<script\\b|<foreignObject\\b|<image\\b|\\bon[\\w:-]+\\s*=|(?:href|src)\\s*=/i.test(sanitized)) {
+        if (/<script\b|<foreignObject\b|<image\b|\bon[\w:-]+\s*=|(?:href|src)\s*=/i.test(sanitized)) {
           throw new Error("The SVG sanitizer left active or externally linked content in the document.");
         }
         sanitizationDetail = " · Active and external content removed";
