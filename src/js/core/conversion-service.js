@@ -246,7 +246,7 @@ export function convertImageToSvg(file) {
 
 /**
  * Convert a static image to a single-frame GIF or preserve all frames when the source is animated GIF.
- * Animated GIF decoding and encoding use modern-gif's dedicated worker when available.
+ * Animated GIF decoding and encoding run inside the application's existing conversion Worker when available.
  */
 export function convertImageToGif(file) {
   return convertImage(file, "gif");
