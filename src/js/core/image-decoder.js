@@ -1,8 +1,6 @@
 import { detectImageFormat } from "./format-detector.js";
 import { sanitizeSvgText } from "./svg-sanitizer.js";
-import gifuct from "gifuct-js";
-
-const { parseGIF, decompressFrame } = gifuct;
+import { parseGIF, decompressFrame } from "gifuct-js";
 
 const BROWSER_RASTER_FORMATS = new Set(["png", "jpeg", "webp", "bmp", "heic", "heif", "tiff", "svg", "gif"]);
 const MAX_IMAGE_DIMENSION = 16_384;
