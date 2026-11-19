@@ -18,7 +18,7 @@ import {
 } from "lucide";
 import "../styles/main.css";
 import { validateImageFile } from "./core/file-validator.js";
-import { convertImageToBmp, convertImageToJpeg, convertImageToPng, convertImageToWebp, disposeConversionWorker } from "./core/conversion-service.js";
+import { convertImageToBmp, convertImageToJpeg, convertImageToPng, convertImageToTiff, convertImageToWebp, disposeConversionWorker } from "./core/conversion-service.js";
 
 const iconSet = {
   Images,
@@ -90,7 +90,7 @@ const formatBytes = (bytes) => {
 };
 
 const updateConvertButton = () => {
-  convertButton.disabled = selectedFiles.size === 0 || !["image/png", "image/jpeg", "image/webp", "image/bmp"].includes(selectedFormat) || isConverting;
+  convertButton.disabled = selectedFiles.size === 0 || !["image/png", "image/jpeg", "image/webp", "image/bmp", "image/tiff"].includes(selectedFormat) || isConverting;
 };
 
 const updateQueueSummary = () => {
@@ -310,7 +310,7 @@ const updateBatchProgress = (total, finished) => {
 const renderConversionResult = (entry, result) => {
   removeConversionResult(entry.id);
 
-  const extension = result.format === "jpeg" ? "jpg" : result.format === "webp" ? "webp" : result.format === "bmp" ? "bmp" : "png";
+  const extension = result.format === "jpeg" ? "jpg" : result.format === "webp" ? "webp" : result.format === "bmp" ? "bmp" : result.format === "tiff" ? "tif" : "png";
   const formatLabel = result.format.toUpperCase();
   const outputName = `${entry.file.name.replace(/\.[^.]+$/, "") || "image"}.${extension}`;
   const url = URL.createObjectURL(result.blob);
@@ -478,7 +478,9 @@ const runConversion = async () => {
           ? await convertImageToWebp(entry.file, { quality })
           : selectedFormat === "image/bmp"
             ? await convertImageToBmp(entry.file)
-            : await convertImageToPng(entry.file);
+            : selectedFormat === "image/tiff"
+              ? await convertImageToTiff(entry.file)
+              : await convertImageToPng(entry.file);
 
       if (selectedFiles.has(entry.id)) {
         renderConversionResult(entry, result);
