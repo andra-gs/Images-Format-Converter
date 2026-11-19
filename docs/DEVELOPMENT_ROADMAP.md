@@ -83,7 +83,7 @@ Deliverable: batch conversion without freezing the UI under normal test loads. B
 
 ## Phase 4: Advanced format support
 
-Status: In progress. HEIC/HEIF and TIFF input decoding are user-verified. A baseline uncompressed TIFF encoder is integrated; real output verification remains pending.
+Status: In progress. HEIC/HEIF and TIFF input/output paths are user-verified. Safe SVG rasterization is the next implementation task.
 
 Tasks:
 - [x] Evaluate and integrate HEIC/HEIF decoder adapter using heic-to (real-file decoder, conversion, and Worker tests user-confirmed).
@@ -92,7 +92,7 @@ Tasks:
 - [x] Test real TIFF fixtures, including single-page/multi-page files and representative compression variants, in the browser and conversion pipeline (user-confirmed).
 - [x] Evaluate TIFF encoder separately and select the existing UTIF2 encoder for baseline uncompressed TIFF output.
 - [x] Integrate baseline uncompressed TIFF output in the main conversion pipeline and Web Worker.
-- [ ] Verify generated TIFF files with real files, independent viewers, dimensions, pixel data, and downloads.
+- [x] Verify generated TIFF files with real files, independent viewers, dimensions, pixel data, and downloads (user-confirmed).
 - [ ] Implement safe SVG rasterization.
 - [ ] Define and implement raster-to-SVG behavior with clear labeling.
 - [ ] Implement static GIF conversion.
