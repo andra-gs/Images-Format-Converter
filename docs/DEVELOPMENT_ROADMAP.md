@@ -95,7 +95,9 @@ Tasks:
 - [x] Verify generated TIFF files with real files, independent viewers, dimensions, pixel data, and downloads (user-confirmed).
 - [x] Implement a restricted SVG sanitizer and browser rasterization path without live-DOM insertion or external resource loading.
 - [x] Verify SVG sanitization, browser rasterization, dimensions, and conversion to PNG, JPEG, WebP, BMP, and TIFF in the main application (user-confirmed on 2026-11-19).
-- [ ] Define and implement raster-to-SVG behavior with clear labeling.
+- [x] Define raster-to-SVG behavior as an SVG wrapper containing an embedded PNG, clearly distinguished from true vectorization.
+- [x] Implement the PNG-embedding SVG encoder, strict sanitizer support for embedded PNG data, main-thread conversion pipeline, and UI labeling.
+- [ ] Verify raster-to-SVG output in real browsers, including re-decoding, dimensions, transparency, downloads, and ZIP export.
 - [x] Implement and verify GIF first-frame decoding for raster conversion in the browser decoder and main application (user-confirmed).
 - [ ] Evaluate animated GIF decoder and encoder.
 - [ ] Implement animated GIF frame/timing handling if feasible.
