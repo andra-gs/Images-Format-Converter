@@ -138,9 +138,9 @@ const FORMAT_CAPABILITIES = Object.freeze({
       note: "Real-browser verification passed for safe SVG parsing and rasterization, including removal of scripts, event handlers, foreignObject, and external images, plus conversion to PNG, JPEG, WebP, BMP, and TIFF."
     },
     encoding: {
-      status: "not-planned",
-      strategy: null,
-      note: "Raster-to-SVG wrapping is not true vector conversion and is not offered."
+      status: "implemented",
+      strategy: "embedded-png-wrapper",
+      note: "SVG output embeds a PNG data resource in an SVG image element. This preserves raster appearance and dimensions but does not create editable vector paths."
     }
   }
 });
