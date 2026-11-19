@@ -18,7 +18,7 @@ import {
 } from "lucide";
 import "../styles/main.css";
 import { validateImageFile } from "./core/file-validator.js";
-import { convertImageToBmp, convertImageToJpeg, convertImageToPng, convertImageToSvg, convertImageToTiff, convertImageToWebp, disposeConversionWorker } from "./core/conversion-service.js";
+import { convertImageToBmp, convertImageToGif, convertImageToJpeg, convertImageToPng, convertImageToSvg, convertImageToTiff, convertImageToWebp, disposeConversionWorker } from "./core/conversion-service.js";
 
 const iconSet = {
   Images,
@@ -90,7 +90,7 @@ const formatBytes = (bytes) => {
 };
 
 const updateConvertButton = () => {
-  convertButton.disabled = selectedFiles.size === 0 || !["image/png", "image/jpeg", "image/webp", "image/bmp", "image/tiff", "image/svg+xml"].includes(selectedFormat) || isConverting;
+  convertButton.disabled = selectedFiles.size === 0 || !["image/png", "image/jpeg", "image/webp", "image/bmp", "image/tiff", "image/svg+xml", "image/gif"].includes(selectedFormat) || isConverting;
 };
 
 const updateQueueSummary = () => {
@@ -310,7 +310,7 @@ const updateBatchProgress = (total, finished) => {
 const renderConversionResult = (entry, result) => {
   removeConversionResult(entry.id);
 
-  const extension = result.format === "jpeg" ? "jpg" : result.format === "webp" ? "webp" : result.format === "bmp" ? "bmp" : result.format === "tiff" ? "tif" : result.format === "svg" ? "svg" : "png";
+  const extension = result.format === "jpeg" ? "jpg" : result.format === "webp" ? "webp" : result.format === "bmp" ? "bmp" : result.format === "tiff" ? "tif" : result.format === "svg" ? "svg" : result.format === "gif" ? "gif" : "png";
   const formatLabel = result.format.toUpperCase();
   const outputName = `${entry.file.name.replace(/\.[^.]+$/, "") || "image"}.${extension}`;
   const url = URL.createObjectURL(result.blob);
@@ -482,7 +482,9 @@ const runConversion = async () => {
               ? await convertImageToTiff(entry.file)
               : selectedFormat === "image/svg+xml"
                 ? await convertImageToSvg(entry.file)
-                : await convertImageToPng(entry.file);
+                : selectedFormat === "image/gif"
+                  ? await convertImageToGif(entry.file)
+                  : await convertImageToPng(entry.file);
 
       if (selectedFiles.has(entry.id)) {
         renderConversionResult(entry, result);
