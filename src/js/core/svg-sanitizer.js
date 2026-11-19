@@ -83,7 +83,7 @@ function normalizeSvgDimensions(root) {
   const viewBoxValue = root.getAttribute("viewBox");
   const viewBox = (viewBoxValue || "")
     .trim()
-    .split(/[\\s,]+/)
+    .split(/[\s,]+/)
     .map(Number);
 
   const hasValidViewBox = viewBox.length === 4 &&
