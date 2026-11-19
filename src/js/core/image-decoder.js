@@ -1,7 +1,12 @@
 import { detectImageFormat } from "./format-detector.js";
 import { sanitizeSvgText } from "./svg-sanitizer.js";
+import gifuct from "gifuct-js";
 
-const BROWSER_RASTER_FORMATS = new Set(["png", "jpeg", "webp", "bmp", "heic", "heif", "tiff", "svg"]);
+const { parseGIF, decompressFrame } = gifuct;
+
+const BROWSER_RASTER_FORMATS = new Set(["png", "jpeg", "webp", "bmp", "heic", "heif", "tiff", "svg", "gif"]);
+const MAX_IMAGE_DIMENSION = 16_384;
+const MAX_IMAGE_PIXELS = 40_000_000;
 
 function getImageDimensions(source) {
   const width = source.width || source.naturalWidth;
@@ -81,6 +86,103 @@ async function decodeWithSvg(file) {
       decodeError.cause = imageError || bitmapError;
       throw decodeError;
     }
+  }
+}
+
+async function decodeWithGifLibrary(file, format) {
+  const buffer = await file.arrayBuffer();
+  const parsedGif = parseGIF(buffer);
+
+  if (parsedGif?.header?.signature !== "GIF") {
+    throw new Error("The GIF header is invalid.");
+  }
+
+  const width = Number(parsedGif.lsd?.width);
+  const height = Number(parsedGif.lsd?.height);
+
+  if (
+    !Number.isInteger(width) ||
+    !Number.isInteger(height) ||
+    width <= 0 ||
+    height <= 0 ||
+    width > MAX_IMAGE_DIMENSION ||
+    height > MAX_IMAGE_DIMENSION ||
+    width * height > MAX_IMAGE_PIXELS
+  ) {
+    throw new Error("The GIF has invalid or excessive image dimensions.");
+  }
+
+  const firstImageFrame = parsedGif.frames?.find((frame) => frame.image);
+  if (!firstImageFrame) {
+    throw new Error("The GIF does not contain a decodable image frame.");
+  }
+
+  // Decompress only the first image frame. Animated frame timing and playback
+  // are intentionally not part of this static conversion path.
+  const frame = decompressFrame(firstImageFrame, parsedGif.gct, true);
+  const frameWidth = Number(frame?.dims?.width);
+  const frameHeight = Number(frame?.dims?.height);
+  const left = Number(frame?.dims?.left);
+  const top = Number(frame?.dims?.top);
+
+  if (
+    !Number.isInteger(frameWidth) ||
+    !Number.isInteger(frameHeight) ||
+    !Number.isInteger(left) ||
+    !Number.isInteger(top) ||
+    frameWidth <= 0 ||
+    frameHeight <= 0 ||
+    left < 0 ||
+    top < 0 ||
+    left + frameWidth > width ||
+    top + frameHeight > height ||
+    !frame.patch ||
+    frame.patch.length !== frameWidth * frameHeight * 4
+  ) {
+    throw new Error("The GIF first frame contains invalid pixel data.");
+  }
+
+  let canvas;
+  if (typeof globalThis.OffscreenCanvas === "function") {
+    canvas = new globalThis.OffscreenCanvas(width, height);
+  } else if (typeof document !== "undefined" && document.createElement) {
+    canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+  } else {
+    throw new Error("Canvas is not available to render the GIF first frame.");
+  }
+
+  try {
+    const context = canvas.getContext("2d");
+    if (!context) {
+      throw new Error("A 2D canvas context is not available for GIF decoding.");
+    }
+
+    context.clearRect(0, 0, width, height);
+
+    // A transparent first frame keeps the untouched logical-screen area
+    // transparent. Otherwise, use the GIF global background color if present.
+    if (frame.transparentIndex == null) {
+      const background = parsedGif.gct?.[parsedGif.lsd.backgroundColorIndex];
+      if (background) {
+        context.fillStyle = `rgb(${background[0]}, ${background[1]}, ${background[2]})`;
+        context.fillRect(0, 0, width, height);
+      }
+    }
+
+    const imageData = context.createImageData(frameWidth, frameHeight);
+    imageData.data.set(frame.patch);
+    context.putImageData(imageData, left, top);
+
+    return createDecodedResult(canvas, format, () => {
+      canvas.width = 0;
+      canvas.height = 0;
+    });
+  } catch (error) {
+    canvas.width = 0;
+    canvas.height = 0;
+    throw error;
   }
 }
 
@@ -178,7 +280,7 @@ async function decodeWithImageElement(file, format) {
  *
  * The caller owns the returned resource and must call close() when finished.
  * SVG is sanitized to a restricted vector subset before browser rasterization.
- * GIF is intentionally excluded. TIFF uses UTIF2 to render its first page to Canvas.
+ * GIF uses gifuct-js to rasterize only its first image frame. TIFF uses UTIF2 to render its first page to Canvas.
  */
 export async function decodeImage(file, { format } = {}) {
   if (!(file instanceof Blob)) {
@@ -207,6 +309,16 @@ export async function decodeImage(file, { format } = {}) {
       return await decodeWithSvg(file);
     } catch (error) {
       const decodeError = new Error("This SVG file could not be safely parsed or rasterized.");
+      decodeError.cause = error;
+      throw decodeError;
+    }
+  }
+
+  if (detectedFormat === "gif") {
+    try {
+      return await decodeWithGifLibrary(file, detectedFormat);
+    } catch (error) {
+      const decodeError = new Error("This GIF file could not be decoded. It may be malformed or use unsupported image data.");
       decodeError.cause = error;
       throw decodeError;
     }
