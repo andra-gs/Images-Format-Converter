@@ -94,14 +94,19 @@ test("falls back to an HTML image when createImageBitmap fails", async (t) => {
   assert.equal(revokedUrl, "blob:test-image");
 });
 
-test("rejects formats outside the initial browser decoder scope", async (t) => {
-  mockGlobal(t, "createImageBitmap", async () => {
-    throw new Error("This should not run.");
-  });
+test("rejects SVG when a safe XML parser is unavailable", async (t) => {
+  mockGlobal(t, "DOMParser", undefined);
 
   await assert.rejects(
-    decodeImage(new Blob(["image"]), { format: "svg" }),
-    /Decoding is not available for the svg format/
+    decodeImage(new Blob(["<svg xmlns='http://www.w3.org/2000/svg'/>"]), { format: "svg" }),
+    /could not be safely parsed or rasterized/
+  );
+});
+
+test("continues to reject formats outside the browser decoder scope", async () => {
+  await assert.rejects(
+    decodeImage(new Blob(["image"]), { format: "gif" }),
+    /Decoding is not available for the gif format/
   );
 });
 
