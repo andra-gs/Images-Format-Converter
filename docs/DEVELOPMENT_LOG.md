@@ -965,3 +965,25 @@ Only record work that actually happened in the repository. Do not mark a feature
   - SVG decoding runs on the main thread because it uses DOMParser and XMLSerializer.
 - Next steps:
   - Continue Phase 4 with static GIF first-frame decoding. Animated GIF preservation remains a separate task.
+
+
+### 2026-11-19 - Fix GIF decoder module import
+- Status: Fixed; local verification pending
+- Issue reported:
+  - The application remained on the startup skeleton.
+  - The browser decoder page did not respond after selecting a GIF.
+  - Console error: Cannot destructure property 'parseGIF' of 'gifuct' as it is undefined.
+- Root cause:
+  - gifuct-js 2.1.2 exposes `parseGIF` and `decompressFrame` as named exports.
+  - The initial integration incorrectly imported a default export and destructured the named functions from it.
+  - This caused the image decoder module to fail during module initialization, preventing the application entry point and browser decoder test module from loading.
+- Fix:
+  - Replaced the default import and destructuring with direct named imports:
+    `import { parseGIF, decompressFrame } from "gifuct-js";`
+- Files changed:
+  - `src/js/core/image-decoder.js`
+- Tests performed:
+  - Confirmed the package's published entry point and source exports expose the functions as named exports.
+  - No local npm test, production build, or browser test was run in this environment.
+- Next steps:
+  - Run `npm test`, `npm run build`, and verify the main app and browser decoder page.
