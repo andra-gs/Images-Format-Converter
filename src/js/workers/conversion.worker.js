@@ -2,6 +2,7 @@ import {
   convertImageToBmp,
   convertImageToJpeg,
   convertImageToPng,
+  convertImageToTiff,
   convertImageToWebp
 } from "../core/conversion-service.js";
 
@@ -9,7 +10,8 @@ const converters = {
   png: (file) => convertImageToPng(file),
   jpeg: (file, options) => convertImageToJpeg(file, options),
   webp: (file, options) => convertImageToWebp(file, options),
-  bmp: (file) => convertImageToBmp(file)
+  bmp: (file) => convertImageToBmp(file),
+  tiff: (file) => convertImageToTiff(file)
 };
 
 self.addEventListener("message", async (event) => {
