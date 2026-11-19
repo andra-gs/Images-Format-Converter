@@ -21,7 +21,7 @@
         <p class="eyebrow">Development test</p>
         <h1>Browser Image Encoder</h1>
         <p class="description">
-          Test JPEG and WebP output with real PNG, JPEG, WebP, and BMP source files.
+          Test JPEG and WebP output with real PNG, JPEG, WebP, BMP, and sanitized SVG source files.
           The page checks MIME type, signature, dimensions, preview, and download. Files are not uploaded.
         </p>
       </header>
@@ -40,7 +40,7 @@
             <output id="quality-value">85%</output>
           </label>
           <label for="encoder-file-input">Choose source images</label>
-          <input id="encoder-file-input" type="file" accept="image/png,image/jpeg,image/webp,image/bmp,.bmp" multiple />
+          <input id="encoder-file-input" type="file" accept="image/png,image/jpeg,image/webp,image/bmp,image/svg+xml,.bmp,.svg" multiple />
         </div>
         <p class="hint">For JPEG, include a transparent PNG to verify white compositing. WebP testing depends on browser encoder support.</p>
       </section>
