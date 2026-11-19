@@ -1,7 +1,7 @@
 import { decodeImage } from "./image-decoder.js";
 import { encodeImage } from "./image-encoder.js";
 import { detectImageFormat } from "./format-detector.js";
-import { convertImageToGif as convertToGif } from "./animated-gif.js";
+import { convertImageToGif as convertGifDirect } from "./animated-gif.js";
 
 /**
  * Convert a supported source image and verify the generated output.
@@ -111,7 +111,7 @@ function supportsWorkerConversion(format) {
   try {
     const canvas = new globalThis.OffscreenCanvas(1, 1);
     if (typeof canvas.getContext !== "function" || !canvas.getContext("2d")) return false;
-    return ["bmp", "tiff"].includes(format) || typeof canvas.convertToBlob === "function";
+    return ["bmp", "tiff", "gif"].includes(format) || typeof canvas.convertToBlob === "function";
   } catch {
     return false;
   }
@@ -143,6 +143,19 @@ function convertInWorker(file, format, options) {
 }
 
 async function convertImage(file, format, options = {}) {
+  if (format === "gif") {
+    if (typeof document === "undefined" || !supportsWorkerConversion(format)) {
+      return convertGifDirect(file);
+    }
+
+    try {
+      return await convertInWorker(file, format, options);
+    } catch (error) {
+      if (!error.workerUnavailable && error.name !== "WorkerConversionError") throw error;
+      return convertGifDirect(file);
+    }
+  }
+
   if (format === "svg" || typeof document === "undefined" || !supportsWorkerConversion(format)) {
     return convertImageDirect(file, format, options);
   }
@@ -231,5 +244,5 @@ export function convertImageToSvg(file) {
  * Animated GIF decoding and encoding use modern-gif's dedicated worker when available.
  */
 export function convertImageToGif(file) {
-  return convertToGif(file);
+  return convertImage(file, "gif");
 }
