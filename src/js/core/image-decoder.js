@@ -1,4 +1,5 @@
 import { detectImageFormat } from "./format-detector.js";
+import { sanitizeSvgText } from "./svg-sanitizer.js";
 
 const BROWSER_RASTER_FORMATS = new Set(["png", "jpeg", "webp", "bmp", "heic", "heif", "tiff"]);
 
@@ -62,6 +63,24 @@ async function decodeWithHeicLibrary(file, format) {
   } catch (error) {
     bitmap.close?.();
     throw error;
+  }
+}
+
+async function decodeWithSvg(file) {
+  const sourceText = await file.text();
+  const sanitizedText = sanitizeSvgText(sourceText);
+  const sanitizedBlob = new Blob([sanitizedText], { type: "image/svg+xml" });
+
+  try {
+    return await decodeWithImageBitmap(sanitizedBlob, "svg");
+  } catch (bitmapError) {
+    try {
+      return await decodeWithImageElement(sanitizedBlob, "svg");
+    } catch (imageError) {
+      const decodeError = new Error("The sanitized SVG could not be rasterized by this browser.");
+      decodeError.cause = imageError || bitmapError;
+      throw decodeError;
+    }
   }
 }
 
@@ -155,10 +174,11 @@ async function decodeWithImageElement(file, format) {
 }
 
 /**
- * Decode a validated raster image into a browser-processable source.
+ * Decode a validated image into a browser-processable source.
  *
  * The caller owns the returned resource and must call close() when finished.
- * SVG and GIF are intentionally excluded from this module. TIFF uses UTIF2 to render its first page to Canvas.
+ * SVG is sanitized to a restricted vector subset before browser rasterization.
+ * GIF is intentionally excluded. TIFF uses UTIF2 to render its first page to Canvas.
  */
 export async function decodeImage(file, { format } = {}) {
   if (!(file instanceof Blob)) {
@@ -180,6 +200,16 @@ export async function decodeImage(file, { format } = {}) {
 
   if (!BROWSER_RASTER_FORMATS.has(detectedFormat)) {
     throw new Error(`Decoding is not available for the ${detectedFormat || "unknown"} format.`);
+  }
+
+  if (detectedFormat === "svg") {
+    try {
+      return await decodeWithSvg(file);
+    } catch (error) {
+      const decodeError = new Error("This SVG file could not be safely parsed or rasterized.");
+      decodeError.cause = error;
+      throw decodeError;
+    }
   }
 
   if (detectedFormat === "tiff") {
