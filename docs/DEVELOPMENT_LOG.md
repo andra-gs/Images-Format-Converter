@@ -7,7 +7,7 @@ This file records actual repository progress. Update it after meaningful impleme
 - Current stage: Phase 4 - Advanced format support
 - Current phase status: HEIC/HEIF and TIFF input decoding are user-verified. Baseline uncompressed TIFF output is integrated and awaits real-file verification.
 - Latest release: None
-- Last updated: 2026-11-18
+- Last updated: 2026-11-19
 
 ## Status legend
 
