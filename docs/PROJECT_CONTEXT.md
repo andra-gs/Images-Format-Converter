@@ -99,10 +99,10 @@ The application should maintain an explicit capability registry. The UI should o
 **GIF**
 - The initial GIF input adapter uses gifuct-js 2.1.2 to parse GIF data and decompress only the first image frame.
 - The first frame is drawn onto a canvas using the GIF logical-screen dimensions. Transparent first-frame pixels remain transparent; the global background color is used when the first frame does not declare transparency.
-- Animated GIF files are accepted as input for still-image conversion, but the output contains only the first image frame. Frame timing, playback, and animation preservation are not implemented.
+- GIF-to-static conversion continues to use only the first image frame. GIF-to-GIF conversion uses modern-gif 2.1.0 to decode all composited frames and re-encode them. Frame order, delays, and looping metadata are passed through to the encoder. Static image inputs produce a single-frame GIF.
 - GIF decoding runs in the existing Web Worker when supported and falls back to the main thread.
-- The user verified GIF decoding in the browser decoder and conversion through the main application. GIF input is available for still-image conversion.
-- Animated playback, frame timing, and later frames are not preserved. Animation-preserving GIF decoding and encoding remain a separate future milestone.
+- The user verified first-frame GIF decoding and conversion to static formats. Animated GIF output has now been implemented, but its dependency installation, build, and real-browser behavior still require verification.
+- The animated conversion path limits input to 200 frames and 25 million total logical-screen pixels to reduce memory risk. GIF animation is not converted to animated WebP or APNG.
 
 ## 5. Planned user features
 
