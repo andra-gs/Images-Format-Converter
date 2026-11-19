@@ -1,6 +1,7 @@
 import { decodeImage } from "./image-decoder.js";
 import { encodeImage } from "./image-encoder.js";
 import { detectImageFormat } from "./format-detector.js";
+import { convertImageToGif as convertToGif } from "./animated-gif.js";
 
 /**
  * Convert a supported source image and verify the generated output.
@@ -222,4 +223,13 @@ export function convertImageToTiff(file) {
  */
 export function convertImageToSvg(file) {
   return convertImage(file, "svg");
+}
+
+
+/**
+ * Convert a static image to a single-frame GIF or preserve all frames when the source is animated GIF.
+ * Animated GIF decoding and encoding use modern-gif's dedicated worker when available.
+ */
+export function convertImageToGif(file) {
+  return convertToGif(file);
 }
