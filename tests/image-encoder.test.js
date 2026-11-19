@@ -498,3 +498,75 @@ test("encodes BMP through HTML Canvas when OffscreenCanvas is unavailable", asyn
   const bytes = new Uint8Array(await result.arrayBuffer());
   assert.deepEqual([...bytes.slice(54, 58)], [56, 34, 12, 0]);
 });
+
+
+test("encodes baseline uncompressed TIFF and can decode the generated output", async (t) => {
+  const imageData = {
+    data: new Uint8ClampedArray([
+      255, 0, 0, 255,
+      0, 255, 0, 255,
+      0, 0, 255, 255,
+      255, 255, 255, 255
+    ])
+  };
+
+  class FakeOffscreenCanvas {
+    constructor(width, height) {
+      this.width = width;
+      this.height = height;
+    }
+
+    getContext(type) {
+      assert.equal(type, "2d");
+      return {
+        drawImage() {},
+        getImageData(x, y, width, height) {
+          assert.deepEqual([x, y, width, height], [0, 0, 2, 2]);
+          return imageData;
+        }
+      };
+    }
+  }
+
+  mockGlobal(t, "OffscreenCanvas", FakeOffscreenCanvas);
+
+  const result = await encodeImage(
+    { source: {}, width: 2, height: 2 },
+    { format: "tiff" }
+  );
+
+  assert.equal(result.type, "image/tiff");
+  assert.ok(result.size > 0);
+
+  const tiffModule = await import("utif2");
+  const decoder = tiffModule.default || tiffModule;
+  const buffer = await result.arrayBuffer();
+  const directories = decoder.decode(buffer);
+  assert.equal(directories.length, 1);
+
+  decoder.decodeImage(buffer, directories[0]);
+  assert.equal(directories[0].width, 2);
+  assert.equal(directories[0].height, 2);
+  assert.equal(decoder.toRGBA8(directories[0]).length, 2 * 2 * 4);
+});
+
+test("rejects TIFF encoding when the browser cannot read canvas pixels", async (t) => {
+  class FakeOffscreenCanvas {
+    constructor(width, height) {
+      this.width = width;
+      this.height = height;
+    }
+
+    getContext() {
+      return { drawImage() {} };
+    }
+  }
+
+  mockGlobal(t, "OffscreenCanvas", FakeOffscreenCanvas);
+  mockGlobal(t, "document", undefined);
+
+  await assert.rejects(
+    encodeImage({ source: {}, width: 2, height: 2 }, { format: "tiff" }),
+    /TIFF encoding failed/
+  );
+});
