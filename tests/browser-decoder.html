@@ -14,7 +14,7 @@
         <p class="eyebrow">Development test</p>
         <h1>Browser Image Decoder</h1>
         <p class="description">
-          Select real PNG, JPEG, WebP, BMP, HEIC, HEIF, TIFF, or SVG files. SVG files are sanitized before rasterization. This page tests browser decoding only.
+          Select real PNG, JPEG, WebP, BMP, HEIC, HEIF, TIFF, SVG, or GIF files. SVG files are sanitized before rasterization. GIF decoding extracts only the first image frame; animation is not preserved. This page tests browser decoding only.
           Files stay in your browser and are not uploaded.
         </p>
       </header>
@@ -24,10 +24,10 @@
         <input
           id="decoder-file-input"
           type="file"
-          accept="image/png,image/jpeg,image/webp,image/bmp,image/heic,image/heif,image/tiff,image/svg+xml,.bmp,.heic,.heif,.tif,.tiff,.svg"
+          accept="image/png,image/jpeg,image/webp,image/bmp,image/heic,image/heif,image/tiff,image/svg+xml,image/gif,.bmp,.heic,.heif,.tif,.tiff,.svg,.gif"
           multiple
         />
-        <p class="hint">Use valid image files. Test HEIC and HEIF separately. For TIFF, include single-page and multi-page files and different compression types when available. The current TIFF adapter reads the first page. SVG scripts, styles, external references, embedded images, and unsupported elements are removed before rasterization.</p>
+        <p class="hint">Use valid image files. Test HEIC and HEIF separately. For TIFF, include single-page and multi-page files and different compression types when available. The current TIFF adapter reads the first page. GIF decoding extracts the first image frame only, even for animated files. SVG scripts, styles, external references, embedded images, and unsupported elements are removed before rasterization.</p>
       </section>
 
       <section class="results-panel" aria-labelledby="results-title">
