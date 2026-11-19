@@ -85,14 +85,14 @@ const FORMAT_CAPABILITIES = Object.freeze({
     mime: "image/tiff",
     detection: { status: "implemented" },
     decoding: {
-      status: "planned",
+      status: "implemented",
       strategy: "utif2",
-      note: "The UTIF2 adapter is implemented and renders the first TIFF page to Canvas. Keep planned until representative real TIFF files pass browser and worker tests."
+      note: "Real TIFF fixtures passed browser decoding, main conversion, and Web Worker tests. The adapter reads the first page only."
     },
     encoding: {
-      status: "not-planned",
-      strategy: null,
-      note: "TIFF encoding has not been selected or implemented."
+      status: "implemented",
+      strategy: "utif2-uncompressed",
+      note: "Baseline TIFF output uses UTIF2 encodeImage with uncompressed RGBA pixels. Real-file output verification is pending."
     }
   },
   heic: {
