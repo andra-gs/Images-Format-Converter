@@ -1,7 +1,11 @@
 import { decodeImage } from "./image-decoder.js";
 import { encodeImage } from "./image-encoder.js";
 import { detectImageFormat } from "./format-detector.js";
-import { convertImageToGif as convertGifDirect } from "./animated-gif.js";
+
+async function convertGifDirect(file) {
+  const { convertImageToGif: convertGif } = await import("./animated-gif.js");
+  return convertGif(file);
+}
 
 /**
  * Convert a supported source image and verify the generated output.
