@@ -103,10 +103,66 @@ test("rejects SVG when a safe XML parser is unavailable", async (t) => {
   );
 });
 
+test("decodes the first frame of a GIF into a bounded canvas", async (t) => {
+  const gifBase64 = "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+  const gifBytes = Uint8Array.from(atob(gifBase64), (character) => character.charCodeAt(0));
+  let canvasCreated;
+  let putImageDataCall;
+  let closeCalls = 0;
+
+  class FakeOffscreenCanvas {
+    constructor(width, height) {
+      this.width = width;
+      this.height = height;
+      canvasCreated = this;
+    }
+
+    getContext(type) {
+      assert.equal(type, "2d");
+      return {
+        clearRect() {},
+        fillRect() {},
+        createImageData(width, height) {
+          return { data: new Uint8ClampedArray(width * height * 4) };
+        },
+        putImageData(imageData, x, y) {
+          putImageDataCall = { imageData, x, y };
+        }
+      };
+    }
+  }
+
+  mockGlobal(t, "OffscreenCanvas", FakeOffscreenCanvas);
+  mockGlobal(t, "document", undefined);
+
+  const result = await decodeImage(new Blob([gifBytes]), { format: "gif" });
+
+  assert.equal(result.format, "gif");
+  assert.equal(result.width, 1);
+  assert.equal(result.height, 1);
+  assert.equal(canvasCreated.width, 1);
+  assert.equal(canvasCreated.height, 1);
+  assert.equal(putImageDataCall.x, 0);
+  assert.equal(putImageDataCall.y, 0);
+  assert.equal(putImageDataCall.imageData.data.length, 4);
+
+  result.close();
+  result.close();
+  assert.equal(canvasCreated.width, 0);
+  assert.equal(canvasCreated.height, 0);
+});
+
+test("rejects malformed GIF input with a format-specific error", async () => {
+  await assert.rejects(
+    decodeImage(new Blob(["GIF89a"]), { format: "gif" }),
+    /This GIF file could not be decoded/
+  );
+});
+
 test("continues to reject formats outside the browser decoder scope", async () => {
   await assert.rejects(
-    decodeImage(new Blob(["image"]), { format: "gif" }),
-    /Decoding is not available for the gif format/
+    decodeImage(new Blob(["image"]), { format: "avif" }),
+    /Decoding is not available for the avif format/
   );
 });
 
