@@ -1,11 +1,12 @@
 const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
+const MAX_EMBEDDED_PNG_BASE64_LENGTH = 64 * 1024 * 1024;
 
 const ALLOWED_ELEMENTS = new Set([
   "svg", "g", "defs", "title", "desc",
   "rect", "circle", "ellipse", "line", "polyline", "polygon", "path",
   "text", "tspan",
   "linearGradient", "radialGradient", "stop",
-  "clipPath", "mask"
+  "clipPath", "mask", "image"
 ]);
 
 const ALLOWED_ATTRIBUTES = new Set([
@@ -20,7 +21,7 @@ const ALLOWED_ATTRIBUTES = new Set([
   "gradientUnits", "gradientTransform", "spreadMethod",
   "text-anchor", "dominant-baseline", "font-family", "font-size",
   "font-weight", "font-style", "letter-spacing", "word-spacing",
-  "xml:space"
+  "xml:space", "href"
 ]);
 
 const TEXT_ELEMENTS = new Set(["title", "desc", "text", "tspan"]);
@@ -42,6 +43,15 @@ function sanitizeElement(element, inheritedNamespace) {
 
     if (name === "xmlns") {
       if (value !== SVG_NAMESPACE) element.removeAttributeNode(attribute);
+      continue;
+    }
+
+    if (name === "href") {
+      const isEmbeddedPng = element.localName === "image" &&
+        value.length <= MAX_EMBEDDED_PNG_BASE64_LENGTH &&
+        value.length % 4 === 0 &&
+        /^data:image\\/png;base64,[A-Za-z0-9+/]+={0,2}$/i.test(value);
+      if (!isEmbeddedPng) element.removeAttributeNode(attribute);
       continue;
     }
 
@@ -123,8 +133,8 @@ function normalizeSvgDimensions(root) {
 
 /**
  * Sanitize an SVG document without inserting its untrusted markup into the live DOM.
- * Only basic vector shapes, text, gradients, and local clipping/mask references remain.
- * External resources, CSS, scripts, embedded HTML, images, and animation are removed.
+ * Only basic vector shapes, text, gradients, local clipping/mask references, and embedded PNG image data remain.
+ * External resources, CSS, scripts, embedded HTML, and animation are removed.
  */
 export function sanitizeSvgText(source) {
   if (typeof source !== "string" || source.trim() === "") {
