@@ -49,8 +49,8 @@ function sanitizeElement(element, inheritedNamespace) {
     if (name === "href") {
       const payload = value.slice(value.indexOf(",") + 1);
       const isEmbeddedPng = element.localName === "image" &&
-        value.length <= MAX_EMBEDDED_PNG_BASE64_LENGTH &&
         payload.length > 0 &&
+        payload.length <= MAX_EMBEDDED_PNG_BASE64_LENGTH &&
         payload.length % 4 === 0 &&
         /^data:image\/png;base64,[A-Za-z0-9+/]+={0,2}$/i.test(value);
       if (!isEmbeddedPng) element.removeAttributeNode(attribute);
