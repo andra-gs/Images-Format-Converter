@@ -5,13 +5,15 @@ import {
   convertImageToTiff,
   convertImageToWebp
 } from "../core/conversion-service.js";
+import { convertImageToGif } from "../core/animated-gif.js";
 
 const converters = {
   png: (file) => convertImageToPng(file),
   jpeg: (file, options) => convertImageToJpeg(file, options),
   webp: (file, options) => convertImageToWebp(file, options),
   bmp: (file) => convertImageToBmp(file),
-  tiff: (file) => convertImageToTiff(file)
+  tiff: (file) => convertImageToTiff(file),
+  gif: (file) => convertImageToGif(file)
 };
 
 self.addEventListener("message", async (event) => {
