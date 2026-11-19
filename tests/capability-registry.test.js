@@ -30,7 +30,7 @@ test("unknown formats return null and are not marked as supported", () => {
 });
 
 test("only verified input decoders and output encoders are available", () => {
-  assert.deepEqual(getAvailableInputFormats(), ["png", "jpeg", "webp", "bmp", "tiff", "heic", "heif", "svg"]);
+  assert.deepEqual(getAvailableInputFormats(), ["png", "jpeg", "webp", "bmp", "gif", "tiff", "heic", "heif", "svg"]);
   assert.deepEqual(getAvailableOutputFormats(), ["png", "jpeg", "webp", "bmp", "tiff"]);
   assert.deepEqual(getPlannedOutputFormats(), []);
 });
@@ -69,8 +69,9 @@ test("capability data keeps decoding and encoding separate", () => {
 
   const gif = getFormatCapabilities("gif");
   assert.equal(gif.detection.status, "implemented");
-  assert.equal(gif.decoding.status, "planned");
-  assert.equal(canDecodeFormat("gif"), false);
+  assert.equal(gif.decoding.status, "implemented");
+  assert.equal(gif.decoding.strategy, "gifuct-js-first-frame");
+  assert.equal(canDecodeFormat("gif"), true);
 
   const svg = getFormatCapabilities("svg");
   assert.equal(svg.detection.status, "implemented");
