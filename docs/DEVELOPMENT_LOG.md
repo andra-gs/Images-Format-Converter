@@ -55,6 +55,7 @@ Add newest entries first.
   - Integrated GIF conversion into the conversion service and main output selector.
   - Added GIF filename handling and user-facing compatibility notes.
   - Updated the capability registry and its automated expectations.
+  - Added a Node test for animated GIF round-tripping, frame count, timing, transparency, and looping metadata.
   - Updated README, Project Context, Technical Specification, and Roadmap.
 - Files changed:
   - `package.json`, `package-lock.json` (root dependency declaration only; full npm lock resolution is still required)
