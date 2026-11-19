@@ -83,7 +83,7 @@ The application should maintain an explicit capability registry. The UI should o
 - UTIF2 4.1.0 is integrated for TIFF decoding and baseline uncompressed TIFF encoding.
 - The decoder and main/Worker conversion paths for TIFF input were verified by the user with real files, including single-page/multi-page behavior, grayscale/RGB, and available LZW, Deflate, and PackBits variants.
 - The decoder renders the first IFD only. Multi-page selection and output are not implemented.
-- TIFF output uses UTIF2 encodeImage with RGBA pixels and no compression. Real-file output verification remains pending.
+- TIFF output uses UTIF2 encodeImage with RGBA pixels and no compression. The user verified real-file conversions, independent opening, dimensions, visual output, Worker conversion, individual downloads, and ZIP export.
 - Compression selection, metadata preservation, and multi-page TIFF writing are not supported by the current encoder path.
 
 **SVG**
