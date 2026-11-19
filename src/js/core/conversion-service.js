@@ -148,6 +148,11 @@ async function convertImage(file, format, options = {}) {
       return convertGifDirect(file);
     }
 
+    const sourceFormat = await detectImageFormat(file);
+    if (sourceFormat?.format === "svg") {
+      return convertGifDirect(file);
+    }
+
     try {
       return await convertInWorker(file, format, options);
     } catch (error) {
