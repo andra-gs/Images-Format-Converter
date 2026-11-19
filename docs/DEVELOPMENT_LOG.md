@@ -7,7 +7,7 @@ This file records actual repository progress. Update it after meaningful impleme
 - Current stage: Phase 4 - Advanced format support
 - Current phase status: HEIC/HEIF and TIFF input/output paths are user-verified. SVG input rasterization and raster-to-SVG wrapper output are user-verified. GIF first-frame decoding is user-verified; animated GIF handling and format-specific compatibility/error notes remain open.
 - Latest release: None
-- Last updated: 2026-11-19
+- Last updated: 2026-11-20
 
 ## Status legend
 
@@ -32,6 +32,26 @@ This file records actual repository progress. Update it after meaningful impleme
 ## Change log
 
 Add newest entries first.
+
+### 2026-11-20 - Raster-to-SVG output verification and documentation sync
+
+- Status: Tested; user-confirmed.
+- Tests performed by the user:
+  - Verified conversion of transparent and opaque raster images to SVG.
+  - Confirmed SVG dimensions match the source.
+  - Re-uploaded generated SVG and converted it back to PNG successfully.
+  - Confirmed individual SVG downloads and ZIP export work.
+  - Confirmed light and dark themes remain functional.
+  - Ran `npm test` and `npm run build`; both completed successfully.
+- Test results:
+  - Raster-to-SVG wrapper output is now user-verified. SVG output embeds PNG data and is not true vectorization.
+  - Phase 4 remains in progress because animated GIF evaluation/handling and format-specific error/compatibility notes remain open.
+- Documentation synchronized:
+  - Updated README, Development Roadmap, Development Log, Project Context, and Technical Specification to reflect verified SVG output behavior.
+- Next steps:
+  - Evaluate animated GIF decoding and encoding options before selecting an implementation.
+  - Add format-specific error messages and compatibility notes.
+
 
 
 ### 2026-11-19 - Initial safe SVG rasterization
