@@ -20,6 +20,7 @@ The current interface includes:
 - Conversion settings for PNG, JPEG, WebP, BMP, and baseline uncompressed TIFF, with quality control for JPEG and WebP. The dedicated 24-bit BMP encoder is implemented and user-verified with real PNG, JPEG, WebP, and BMP files.
 - Startup skeleton that follows the selected theme and prevents an unstyled-content flash.
 - Initial file validation and image-format signature detection.
+- An initial safe SVG rasterization path is integrated. SVG input is parsed and sanitized to a restricted vector subset before rasterization; scripts, CSS, external references, embedded images, and unsupported elements are removed. Real browser verification is pending, so SVG is not yet listed as a supported input format.
 - An explicit capability registry that keeps detection, decoding, and encoding status separate.
 - A browser image decoder for PNG, JPEG, WebP, and BMP, with an ImageBitmap path and HTML image fallback. HEIC/HEIF decoding uses heic-to and has been user-verified in the decoder, main conversion pipeline, and Web Worker. TIFF decoding uses UTIF2 and has been user-verified with real fixtures in the browser, main conversion pipeline, and Web Worker.
 - A PNG encoder and conversion service using OffscreenCanvas with an HTML Canvas fallback. The service checks the PNG signature and reopens the output to verify its dimensions.
