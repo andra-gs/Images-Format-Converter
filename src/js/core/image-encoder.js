@@ -157,6 +157,9 @@ async function createSvgBlob(decodedImage) {
   });
   const pngBytes = new Uint8Array(await pngBlob.arrayBuffer());
   const pngBase64 = bytesToBase64(pngBytes);
+  if (pngBase64.length > 64 * 1024 * 1024) {
+    throw new RangeError("The embedded PNG is too large for the supported SVG wrapper size.");
+  }
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><image x="0" y="0" width="${width}" height="${height}" href="data:image/png;base64,${pngBase64}" /></svg>`;
   return new Blob([svg], { type: "image/svg+xml" });
 }
