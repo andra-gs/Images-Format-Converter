@@ -433,7 +433,7 @@ const renderConversionError = (entry, error) => {
 };
 
 const runConversion = async () => {
-  if (!["image/png", "image/jpeg", "image/webp", "image/bmp"].includes(selectedFormat) || isConverting) return;
+  if (!["image/png", "image/jpeg", "image/webp", "image/bmp", "image/tiff"].includes(selectedFormat) || isConverting) return;
 
   isConverting = true;
   cancelRequested = false;
