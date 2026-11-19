@@ -987,3 +987,18 @@ Only record work that actually happened in the repository. Do not mark a feature
   - No local npm test, production build, or browser test was run in this environment.
 - Next steps:
   - Run `npm test`, `npm run build`, and verify the main app and browser decoder page.
+
+
+### 2026-11-19 - GIF first-frame decoding verified
+- Status: Tested; user-confirmed
+- Tests performed:
+  - The user confirmed that GIF decoding produced the expected image dimensions in the browser decoder test.
+  - The user confirmed that GIF conversion through the main application produced the expected result.
+- Test results:
+  - GIF first-frame decoding is now marked implemented in the capability registry and available as an input format.
+  - Static and animated GIF inputs are converted as still images using the first image frame only.
+- Known limitations:
+  - Animation playback, frame timing, and later frames are not preserved.
+  - Animated GIF output is not implemented.
+- Next steps:
+  - Define and implement raster-to-SVG output with explicit labeling that the raster image is embedded and is not vectorized.
