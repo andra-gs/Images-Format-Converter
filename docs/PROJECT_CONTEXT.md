@@ -88,10 +88,13 @@ The application should maintain an explicit capability registry. The UI should o
 
 **SVG**
 - SVG is a vector document format, unlike ordinary raster formats.
-- SVG-to-PNG/JPEG/WebP can be implemented by safely loading and rasterizing the SVG.
-- Raster-to-SVG can wrap the raster image in an SVG document, but this does not vectorize the image.
-- Never inject untrusted SVG markup into the live DOM using unsafe `innerHTML`.
-- Consider SVG sanitization and external-resource restrictions.
+- An initial browser-side sanitizer and rasterization path is integrated. It parses XML without inserting untrusted markup into the live document.
+- The sanitizer allows basic vector shapes, text, gradients, and local clipping/mask references. It removes scripts, event handlers, CSS, external links, embedded images, foreignObject, animation, and unsupported elements.
+- DOCTYPE and entity declarations are rejected. Raster dimensions are bounded.
+- SVG conversion currently runs on the main thread because sanitization uses DOMParser and XMLSerializer.
+- The browser decoder test page includes a fixture containing script, event-handler, foreignObject, and external-image content.
+- Keep SVG decoding marked planned until real browser tests pass.
+- Raster-to-SVG wrapping is not true vectorization and is not offered.
 
 **GIF**
 - Static GIF can use a raster pipeline.
