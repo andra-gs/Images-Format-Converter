@@ -71,7 +71,7 @@ const FORMAT_CAPABILITIES = Object.freeze({
     decoding: {
       status: "implemented",
       strategy: "gifuct-js-first-frame",
-      note: "Real-browser decoding and main-application conversion were verified. Static and animated GIF inputs are rasterized from the first image frame only; playback, frame timing, and animation-preserving output are not implemented."
+      note: "Real-browser first-frame decoding and conversion to static formats were verified. This decoder path intentionally extracts only the first frame; animated GIF-to-GIF uses the separate modern-gif codec path."
     },
     encoding: {
       status: "implemented",
