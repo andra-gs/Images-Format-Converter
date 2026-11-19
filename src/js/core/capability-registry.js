@@ -71,7 +71,7 @@ const FORMAT_CAPABILITIES = Object.freeze({
     decoding: {
       status: "planned",
       strategy: "browser-native-static-frame",
-      note: "Native image decoding may expose only a rendered frame. Animation preservation requires a separate frame-aware pipeline."
+      note: "An initial gifuct-js decoder rasterizes only the first image frame. Animated playback, frame timing, and animation-preserving output are not implemented; browser verification is pending."
     },
     encoding: {
       status: "not-planned",
