@@ -227,3 +227,10 @@ SVG source conversion runs on the main thread because the sanitizer depends on D
 The initial GIF adapter uses gifuct-js 2.1.2. It parses the GIF logical screen and frame descriptors, then decompresses only the first image frame rather than decompressing every frame. The frame patch is drawn at its descriptor offset onto a canvas sized to the logical screen. The adapter preserves first-frame transparency and applies the global background color when the frame does not declare transparency. Logical dimensions are limited to 16,384 pixels per side and 40 million total pixels.
 
 This path supports converting GIF input into the currently implemented raster output formats. For animated GIF input, the output is a still image from the first image frame. It does not preserve animation, frame timing, looping, or later frames. The decoder can run in the existing Web Worker when supported and falls back to the main thread. GIF decoding remains planned in the capability registry until real-browser decoding and main-interface conversion tests pass.
+
+
+## 23. Raster-to-SVG wrapper output
+
+The SVG encoder does not trace raster pixels into vector paths. It first encodes the decoded source to PNG with the browser Canvas API, then embeds that PNG as a base64 data resource in an SVG `<image>` element. The SVG root and image element use the decoded source pixel dimensions and matching viewBox. The result retains the visible raster image but does not provide editable vector shapes or resolution-independent detail.
+
+The SVG sanitizer permits an `image` element only when its `href` is a bounded, base64-encoded `data:image/png` resource. External URLs, other data MIME types, scripts, CSS, and active content remain disallowed. The output is reopened through the safe SVG decoder and checked for matching dimensions by the conversion service. SVG output runs on the main thread because safe SVG verification depends on DOMParser and XMLSerializer.
