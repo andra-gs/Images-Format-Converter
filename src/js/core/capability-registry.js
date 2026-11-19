@@ -70,7 +70,7 @@ const FORMAT_CAPABILITIES = Object.freeze({
     detection: { status: "implemented" },
     decoding: {
       status: "planned",
-      strategy: "browser-native-static-frame",
+      strategy: "gifuct-js-first-frame",
       note: "An initial gifuct-js decoder rasterizes only the first image frame. Animated playback, frame timing, and animation-preserving output are not implemented; browser verification is pending."
     },
     encoding: {
@@ -133,9 +133,9 @@ const FORMAT_CAPABILITIES = Object.freeze({
     mime: "image/svg+xml",
     detection: { status: "implemented" },
     decoding: {
-      status: "planned",
+      status: "implemented",
       strategy: "safe-svg-rasterization",
-      note: "SVG input must be rasterized safely without injecting untrusted markup into the live DOM."
+      note: "Real-browser verification passed for safe SVG parsing and rasterization, including removal of scripts, event handlers, foreignObject, and external images, plus conversion to PNG, JPEG, WebP, BMP, and TIFF."
     },
     encoding: {
       status: "not-planned",
