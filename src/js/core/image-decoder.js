@@ -117,13 +117,13 @@ async function decodeWithGifLibrary(file, format) {
     throw new Error("The GIF does not contain a decodable image frame.");
   }
 
-  // Decompress only the first image frame. Animated frame timing and playback
-  // are intentionally not part of this static conversion path.
-  const frame = decompressFrame(firstImageFrame, parsedGif.gct, true);
-  const frameWidth = Number(frame?.dims?.width);
-  const frameHeight = Number(frame?.dims?.height);
-  const left = Number(frame?.dims?.left);
-  const top = Number(frame?.dims?.top);
+  // Validate the first frame descriptor before decompression so malformed
+  // dimensions cannot trigger an oversized pixel allocation.
+  const descriptor = firstImageFrame.image.descriptor;
+  const frameWidth = Number(descriptor?.width);
+  const frameHeight = Number(descriptor?.height);
+  const left = Number(descriptor?.left);
+  const top = Number(descriptor?.top);
 
   if (
     !Number.isInteger(frameWidth) ||
@@ -136,9 +136,16 @@ async function decodeWithGifLibrary(file, format) {
     top < 0 ||
     left + frameWidth > width ||
     top + frameHeight > height ||
-    !frame.patch ||
-    frame.patch.length !== frameWidth * frameHeight * 4
+    frameWidth * frameHeight > MAX_IMAGE_PIXELS
   ) {
+    throw new Error("The GIF first frame has invalid or excessive dimensions.");
+  }
+
+  // Decompress only the first image frame. Animated frame timing and playback
+  // are intentionally not part of this static conversion path.
+  const frame = decompressFrame(firstImageFrame, parsedGif.gct, true);
+
+  if (!frame?.patch || frame.patch.length !== frameWidth * frameHeight * 4) {
     throw new Error("The GIF first frame contains invalid pixel data.");
   }
 
