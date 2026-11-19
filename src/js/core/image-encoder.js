@@ -2,7 +2,8 @@ const FORMAT_MIME_TYPES = Object.freeze({
   png: "image/png",
   jpeg: "image/jpeg",
   webp: "image/webp",
-  bmp: "image/bmp"
+  bmp: "image/bmp",
+  tiff: "image/tiff"
 });
 
 function createHtmlCanvas(width, height, mimeType, quality) {
@@ -137,6 +138,54 @@ function encodeBmpPixels(imageData, width, height) {
   return new Blob([output], { type: "image/bmp" });
 }
 
+async function createTiffBlob(decodedImage) {
+  const { source, width, height } = decodedImage;
+  let imageData;
+
+  if (typeof globalThis.OffscreenCanvas === "function") {
+    try {
+      const canvas = new globalThis.OffscreenCanvas(width, height);
+      const context = canvas.getContext("2d");
+
+      if (context?.getImageData) {
+        context.drawImage(source, 0, 0, width, height);
+        imageData = context.getImageData(0, 0, width, height);
+      }
+    } catch {
+      // Fall through to the HTML canvas implementation.
+    }
+  }
+
+  if (!imageData) {
+    const { canvas, context } = createHtmlCanvas(width, height, "image/tiff");
+    if (!context || typeof context.getImageData !== "function") {
+      throw new Error("A readable 2D canvas context is not available for TIFF encoding.");
+    }
+
+    context.drawImage(source, 0, 0, width, height);
+    imageData = context.getImageData(0, 0, width, height);
+  }
+
+  if (!imageData?.data || imageData.data.length !== width * height * 4) {
+    throw new Error("The browser returned invalid pixel data for TIFF encoding.");
+  }
+
+  const tiffModule = await import("utif2");
+  const tiffEncoder = tiffModule.default || tiffModule;
+  const rgba = new Uint8Array(
+    imageData.data.buffer,
+    imageData.data.byteOffset,
+    imageData.data.byteLength
+  );
+  const encoded = tiffEncoder.encodeImage(rgba, width, height);
+
+  if (!(encoded instanceof ArrayBuffer) || encoded.byteLength === 0) {
+    throw new Error("The TIFF encoder returned an invalid output buffer.");
+  }
+
+  return new Blob([encoded], { type: "image/tiff" });
+}
+
 async function createBmpBlob(decodedImage) {
   const { source, width, height } = decodedImage;
   let imageData;
@@ -173,9 +222,9 @@ async function createBmpBlob(decodedImage) {
 }
 
 /**
- * Encode a decoded browser image as PNG, JPEG, WebP, or 24-bit BMP.
- * JPEG and WebP quality values are numbers from 0 to 1. JPEG and BMP
- * transparent pixels are composited onto the supplied background (white by default).
+ * Encode a decoded browser image as PNG, JPEG, WebP, 24-bit BMP, or baseline TIFF.
+ * TIFF output uses UTIF2's uncompressed encoder. JPEG and WebP quality values
+ * are numbers from 0 to 1. JPEG and BMP transparent pixels are composited onto white.
  */
 export async function encodeImage(
   decodedImage,
@@ -194,7 +243,7 @@ export async function encodeImage(
   const mimeType = FORMAT_MIME_TYPES[normalizedFormat];
 
   if (!mimeType) {
-    throw new Error("Only PNG, JPEG, WebP, and BMP encoding are currently implemented.");
+    throw new Error("Only PNG, JPEG, WebP, BMP, and TIFF encoding are currently implemented.");
   }
 
   if (["jpeg", "webp"].includes(normalizedFormat)) {
@@ -212,6 +261,14 @@ export async function encodeImage(
       return await createBmpBlob(decodedImage);
     } catch (error) {
       throw new Error("BMP encoding failed in this browser.", { cause: error });
+    }
+  }
+
+  if (normalizedFormat === "tiff") {
+    try {
+      return await createTiffBlob(decodedImage);
+    } catch (error) {
+      throw new Error("TIFF encoding failed in this browser.", { cause: error });
     }
   }
 
