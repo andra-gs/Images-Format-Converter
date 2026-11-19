@@ -17,7 +17,7 @@ The current interface includes:
 - Web Worker conversion when supported, with a main-thread fallback and a sequential concurrency limit.
 - Cancellation of remaining queued files after the active conversion finishes. Successful outputs can be downloaded individually or together in a ZIP archive using JSZip. The user has verified ZIP export, including archive extraction and image integrity.
 - Light and dark themes with saved preference.
-- Conversion settings for PNG, JPEG, WebP, and BMP, with quality control for JPEG and WebP. The dedicated 24-bit BMP encoder is implemented and user-verified with real PNG, JPEG, WebP, and BMP files.
+- Conversion settings for PNG, JPEG, WebP, BMP, and baseline uncompressed TIFF, with quality control for JPEG and WebP. The dedicated 24-bit BMP encoder is implemented and user-verified with real PNG, JPEG, WebP, and BMP files.
 - Startup skeleton that follows the selected theme and prevents an unstyled-content flash.
 - Initial file validation and image-format signature detection.
 - An explicit capability registry that keeps detection, decoding, and encoding status separate.
