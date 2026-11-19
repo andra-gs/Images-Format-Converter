@@ -56,10 +56,6 @@ function validateGifMetadata(gif) {
   return { width, height, frames };
 }
 
-function hasWorkerSupport() {
-  return typeof globalThis.Worker === "function";
-}
-
 function decodeAllFrames(buffer, metadata) {
   // The application conversion worker owns this CPU-heavy operation. Avoid creating
   // nested library workers, which do not expose a public termination API.
