@@ -142,6 +142,13 @@ function convertInWorker(file, format, options) {
 }
 
 async function convertImage(file, format, options = {}) {
+  if (typeof document !== "undefined") {
+    const sourceFormat = await detectImageFormat(file);
+    if (sourceFormat?.format === "svg") {
+      return convertImageDirect(file, format, options);
+    }
+  }
+
   if (typeof document === "undefined" || !supportsWorkerConversion(format)) {
     return convertImageDirect(file, format, options);
   }
