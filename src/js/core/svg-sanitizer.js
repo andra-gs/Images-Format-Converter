@@ -30,7 +30,7 @@ function removeNode(node) {
   node.parentNode?.removeChild(node);
 }
 
-function sanitizeElement(element) {
+function sanitizeElement(element, inheritedNamespace) {
   for (const attribute of [...element.attributes]) {
     const name = attribute.name;
     const value = attribute.value.trim();
@@ -59,10 +59,10 @@ function sanitizeElement(element) {
 
   for (const child of [...element.childNodes]) {
     if (child.nodeType === 1) {
-      if (!ALLOWED_ELEMENTS.has(child.localName) || child.namespaceURI !== SVG_NAMESPACE) {
+      if (!ALLOWED_ELEMENTS.has(child.localName) || (child.namespaceURI && child.namespaceURI !== SVG_NAMESPACE) || (child.namespaceURI !== inheritedNamespace && child.namespaceURI !== SVG_NAMESPACE)) {
         removeNode(child);
       } else {
-        sanitizeElement(child);
+        sanitizeElement(child, inheritedNamespace);
       }
     } else if (child.nodeType === 8 || (child.nodeType === 3 && !TEXT_ELEMENTS.has(element.localName))) {
       removeNode(child);
@@ -144,7 +144,7 @@ export function sanitizeSvgText(source) {
     }
   }
 
-  sanitizeElement(root);
+  sanitizeElement(root, root.namespaceURI || null);
   normalizeSvgDimensions(root);
 
   return new globalThis.XMLSerializer().serializeToString(root);
