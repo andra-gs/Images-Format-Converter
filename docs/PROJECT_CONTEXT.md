@@ -94,7 +94,7 @@ The application should maintain an explicit capability registry. The UI should o
 - SVG conversion currently runs on the main thread because sanitization uses DOMParser and XMLSerializer.
 - The browser decoder test page includes a fixture containing script, event-handler, foreignObject, and external-image content.
 - SVG decoding and conversion were verified by the user in a real browser, including safe-fixture sanitization and conversion to PNG, JPEG, WebP, BMP, and TIFF.
-- Raster-to-SVG wrapping is not true vectorization and is not offered.
+- Raster-to-SVG output is implemented as an SVG wrapper containing an embedded PNG data resource. It preserves the raster image appearance and dimensions but does not create editable vector paths. The UI labels this behavior explicitly.
 
 **GIF**
 - The initial GIF input adapter uses gifuct-js 2.1.2 to parse GIF data and decompress only the first image frame.
