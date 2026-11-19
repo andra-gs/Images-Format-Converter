@@ -947,3 +947,21 @@ Only record work that actually happened in the repository. Do not mark a feature
   - Run npm test and npm run build.
   - Test real static and animated GIF files in the browser decoder page and main application.
   - Verify first-frame selection, transparency, logical dimensions, worker execution, downloads, and ZIP export.
+
+
+### 2026-11-19 - SVG browser verification completed
+- Status: Tested; user-confirmed
+- Tests performed:
+  - The user ran the SVG test workflow in the real browser and reported that all tests produced the expected results.
+  - Safe SVG fixture sanitization and rasterization passed.
+  - Main-application conversions from SVG to PNG, JPEG, WebP, BMP, and TIFF passed.
+  - Dimension, color, preview, and downloaded output checks passed.
+  - The user also verified malformed/unsupported SVG handling and the sanitizer's restricted behavior.
+- Test results:
+  - SVG decoding is now marked implemented in the capability registry.
+  - SVG is included among available input formats.
+- Known limitations:
+  - Only the sanitizer's documented SVG subset is retained. Unsupported SVG features may be removed before rasterization.
+  - SVG decoding runs on the main thread because it uses DOMParser and XMLSerializer.
+- Next steps:
+  - Continue Phase 4 with static GIF first-frame decoding. Animated GIF preservation remains a separate task.
