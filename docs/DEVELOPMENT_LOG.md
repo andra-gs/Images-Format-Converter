@@ -1002,3 +1002,24 @@ Only record work that actually happened in the repository. Do not mark a feature
   - Animated GIF output is not implemented.
 - Next steps:
   - Define and implement raster-to-SVG output with explicit labeling that the raster image is embedded and is not vectorized.
+
+
+### 2026-11-19 - Implement raster-to-SVG wrapper output
+- Status: Implemented; real-browser verification pending
+- Implementation:
+  - Added an SVG encoder that converts the decoded source to PNG and embeds it as a base64 data resource inside an SVG image element.
+  - Preserved the source pixel dimensions in the SVG width, height, and viewBox.
+  - Extended the SVG sanitizer to allow image elements only with bounded base64-encoded PNG data URIs. External image URLs and other data MIME types remain disallowed.
+  - Routed SVG output through the main thread because output verification uses DOMParser and XMLSerializer.
+  - Added SVG to the output format dropdown, conversion service, capability registry, filename extension handling, and ZIP-compatible result flow.
+  - Added automated encoder and capability-registry tests.
+  - Labeled the format as an embedded PNG wrapper, not vectorization.
+- Known limitations:
+  - The SVG contains a raster PNG. It does not create editable vector paths or resolution-independent image detail.
+  - Embedded PNG data is limited by the sanitizer to a 64 MiB base64 payload.
+  - SVG output is main-thread only.
+- Tests performed:
+  - Automated tests and production build have not been run in this environment.
+  - Real-browser conversion and sanitizer verification are pending user testing.
+- Next steps:
+  - Run npm test and npm run build, then verify SVG output in the browser with transparent and opaque images, re-decoding, dimensions, individual download, and ZIP export.
