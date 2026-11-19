@@ -3,7 +3,8 @@ const FORMAT_MIME_TYPES = Object.freeze({
   jpeg: "image/jpeg",
   webp: "image/webp",
   bmp: "image/bmp",
-  tiff: "image/tiff"
+  tiff: "image/tiff",
+  svg: "image/svg+xml"
 });
 
 function createHtmlCanvas(width, height, mimeType, quality) {
@@ -138,6 +139,28 @@ function encodeBmpPixels(imageData, width, height) {
   return new Blob([output], { type: "image/bmp" });
 }
 
+function bytesToBase64(bytes) {
+  let binary = "";
+  const chunkSize = 0x8000;
+  for (let offset = 0; offset < bytes.length; offset += chunkSize) {
+    binary += String.fromCharCode(...bytes.subarray(offset, offset + chunkSize));
+  }
+  return globalThis.btoa(binary);
+}
+
+async function createSvgBlob(decodedImage) {
+  const { width, height } = decodedImage;
+  const pngBlob = await createCanvasBlob(decodedImage, {
+    mimeType: "image/png",
+    quality: 1,
+    backgroundColor: "#ffffff"
+  });
+  const pngBytes = new Uint8Array(await pngBlob.arrayBuffer());
+  const pngBase64 = bytesToBase64(pngBytes);
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><image x="0" y="0" width="${width}" height="${height}" href="data:image/png;base64,${pngBase64}" /></svg>`;
+  return new Blob([svg], { type: "image/svg+xml" });
+}
+
 async function createTiffBlob(decodedImage) {
   const { source, width, height } = decodedImage;
   let imageData;
@@ -222,7 +245,7 @@ async function createBmpBlob(decodedImage) {
 }
 
 /**
- * Encode a decoded browser image as PNG, JPEG, WebP, 24-bit BMP, or baseline TIFF.
+ * Encode a decoded browser image as PNG, JPEG, WebP, 24-bit BMP, baseline TIFF, or an SVG wrapper containing embedded PNG data.
  * TIFF output uses UTIF2's uncompressed encoder. JPEG and WebP quality values
  * are numbers from 0 to 1. JPEG and BMP transparent pixels are composited onto white.
  */
@@ -269,6 +292,14 @@ export async function encodeImage(
       return await createTiffBlob(decodedImage);
     } catch (error) {
       throw new Error("TIFF encoding failed in this browser.", { cause: error });
+    }
+  }
+
+  if (normalizedFormat === "svg") {
+    try {
+      return await createSvgBlob(decodedImage);
+    } catch (error) {
+      throw new Error("SVG wrapper encoding failed in this browser.", { cause: error });
     }
   }
 
