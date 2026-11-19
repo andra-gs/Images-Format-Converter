@@ -69,9 +69,9 @@ const FORMAT_CAPABILITIES = Object.freeze({
     mime: "image/gif",
     detection: { status: "implemented" },
     decoding: {
-      status: "planned",
+      status: "implemented",
       strategy: "gifuct-js-first-frame",
-      note: "An initial gifuct-js decoder rasterizes only the first image frame. Animated playback, frame timing, and animation-preserving output are not implemented; browser verification is pending."
+      note: "Real-browser decoding and main-application conversion were verified. Static and animated GIF inputs are rasterized from the first image frame only; playback, frame timing, and animation-preserving output are not implemented."
     },
     encoding: {
       status: "not-planned",
