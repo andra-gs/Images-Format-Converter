@@ -5,7 +5,7 @@ This file records actual repository progress. Update it after meaningful impleme
 ## Project status
 
 - Current stage: Phase 4 - Advanced format support
-- Current phase status: HEIC/HEIF and TIFF input/output paths are user-verified. SVG sanitization and rasterization are integrated but await browser verification.
+- Current phase status: HEIC/HEIF and TIFF input/output paths are user-verified. SVG input rasterization and raster-to-SVG wrapper output are user-verified. GIF first-frame decoding is user-verified; animated GIF handling and format-specific compatibility/error notes remain open.
 - Latest release: None
 - Last updated: 2026-11-19
 
@@ -25,7 +25,7 @@ This file records actual repository progress. Update it after meaningful impleme
 | Phase 1: UI development | Tested | User confirmed the skeleton follows light/dark themes, theme persists after refresh, no unstyled flash appears, and `npm run build` succeeds |
 | Phase 2: Core conversion engine | Tested | PNG, JPEG, WebP, and BMP conversion paths are user-verified; user reports the requested automated tests and build checks passed |
 | Phase 3: Batch processing | Tested | User verified batch queue, worker execution, progress, cancellation, failure isolation, large-image responsiveness, cleanup, individual downloads, ZIP extraction, and image integrity |
-| Phase 4: Advanced formats | In progress | HEIC/HEIF and TIFF input/output paths user-verified. SVG rasterization integrated, browser verification pending; GIF remains |
+| Phase 4: Advanced formats | In progress | HEIC/HEIF and TIFF input/output paths user-verified. SVG input and raster-to-SVG wrapper output user-verified. GIF first-frame input user-verified; animation and format-specific notes remain |
 | Phase 5: Image manipulation | Not started | Resize, compression, metadata |
 | Phase 6: Testing and release | Not started | QA and v1.0.0 |
 
