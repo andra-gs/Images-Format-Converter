@@ -128,20 +128,43 @@ async function createGifFromGif(file) {
 
 async function createGifFromStaticImage(file) {
   const source = await decodeImage(file);
+  let canvas;
 
   try {
     if (source.width * source.height > MAX_GIF_FRAME_PIXELS) {
       throw new Error("The source image exceeds the supported GIF dimensions.");
     }
 
+    if (typeof globalThis.OffscreenCanvas === "function") {
+      canvas = new globalThis.OffscreenCanvas(source.width, source.height);
+    } else if (typeof document !== "undefined") {
+      canvas = document.createElement("canvas");
+      canvas.width = source.width;
+      canvas.height = source.height;
+    } else {
+      throw new Error("Canvas is not available to prepare GIF pixels.");
+    }
+
+    const context = canvas.getContext("2d");
+    if (!context?.getImageData) {
+      throw new Error("A readable 2D canvas context is not available for GIF encoding.");
+    }
+
+    context.drawImage(source.source, 0, 0, source.width, source.height);
+    const pixels = context.getImageData(0, 0, source.width, source.height).data.slice();
+
     return {
       width: source.width,
       height: source.height,
-      frames: [{ data: source.source, delay: 100 }],
+      frames: [{ data: pixels, delay: 100 }],
       looped: false
     };
   } finally {
     source.close();
+    if (canvas) {
+      canvas.width = 0;
+      canvas.height = 0;
+    }
   }
 }
 
