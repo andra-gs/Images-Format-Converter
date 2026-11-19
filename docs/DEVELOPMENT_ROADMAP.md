@@ -83,7 +83,7 @@ Deliverable: batch conversion without freezing the UI under normal test loads. B
 
 ## Phase 4: Advanced format support
 
-Status: In progress. HEIC/HEIF and TIFF input/output paths are user-verified. SVG input rasterization and raster-to-SVG wrapper output are user-verified. GIF first-frame decoding and main-application conversion are user-verified. Remaining work covers animated GIF evaluation/handling and format-specific errors and compatibility notes.
+Status: In progress. HEIC/HEIF, TIFF, SVG, raster-to-SVG, and GIF first-frame input paths are user-verified. Animated GIF output has been implemented with modern-gif; dependency lockfile synchronization, automated tests, production build, and real-browser verification remain.
 
 Tasks:
 - [x] Evaluate and integrate HEIC/HEIF decoder adapter using heic-to (real-file decoder, conversion, and Worker tests user-confirmed).
@@ -99,9 +99,10 @@ Tasks:
 - [x] Implement the PNG-embedding SVG encoder, strict sanitizer support for embedded PNG data, main-thread conversion pipeline, and UI labeling.
 - [x] Verify raster-to-SVG output in the real browser, including transparent and opaque sources, re-decoding, dimensions, individual downloads, and ZIP export (user-confirmed; `npm test` and `npm run build` also passed).
 - [x] Implement and verify GIF first-frame decoding for raster conversion in the browser decoder and main application (user-confirmed).
-- [ ] Evaluate animated GIF decoder and encoder.
-- [ ] Implement animated GIF frame/timing handling if feasible.
-- [ ] Add format-specific error messages and compatibility notes.
+- [x] Evaluate animated GIF decoder and encoder candidates; select modern-gif 2.1.0 (MIT) alongside the existing gifuct-js first-frame path.
+- [x] Implement animated GIF-to-GIF frame decoding/re-encoding, frame delay and looping metadata handling, and single-frame GIF output from static images.
+- [x] Add GIF-specific frame, dimension, and total-pixel limits plus user-facing compatibility notes.
+- [ ] Synchronize the npm lockfile, run automated tests and production build, and verify real animated GIFs in the browser, including timing, looping, transparency, disposal, Worker execution, downloads, and ZIP export.
 
 Deliverable: tested advanced-format pipelines. Do not claim untested variants are supported.
 
