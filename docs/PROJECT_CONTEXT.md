@@ -97,10 +97,12 @@ The application should maintain an explicit capability registry. The UI should o
 - Raster-to-SVG wrapping is not true vectorization and is not offered.
 
 **GIF**
-- Static GIF can use a raster pipeline.
-- Animated GIF needs frame decoding and encoding to preserve animation, frame timing, and transparency.
-- Converting an animated GIF to a still format should have a clear frame-selection policy.
-- Animated GIF support is a later milestone, not a requirement for the first MVP.
+- The initial GIF input adapter uses gifuct-js 2.1.2 to parse GIF data and decompress only the first image frame.
+- The first frame is drawn onto a canvas using the GIF logical-screen dimensions. Transparent first-frame pixels remain transparent; the global background color is used when the first frame does not declare transparency.
+- Animated GIF files are accepted as input for still-image conversion, but the output contains only the first image frame. Frame timing, playback, and animation preservation are not implemented.
+- GIF decoding runs in the existing Web Worker when supported and falls back to the main thread.
+- Real-browser verification is pending. Keep GIF decoding marked planned until the browser and main-application tests pass.
+- Animated GIF decoding and encoding remain a separate future milestone.
 
 ## 5. Planned user features
 
