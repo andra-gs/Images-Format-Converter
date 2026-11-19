@@ -5,7 +5,7 @@ This file records actual repository progress. Update it after meaningful impleme
 ## Project status
 
 - Current stage: Phase 4 - Advanced format support
-- Current phase status: HEIC/HEIF and TIFF input decoding are user-verified. Baseline uncompressed TIFF output is integrated and awaits real-file verification.
+- Current phase status: HEIC/HEIF and TIFF input/output paths are user-verified. Safe SVG rasterization is the next implementation task.
 - Latest release: None
 - Last updated: 2026-11-19
 
@@ -25,13 +25,24 @@ This file records actual repository progress. Update it after meaningful impleme
 | Phase 1: UI development | Tested | User confirmed the skeleton follows light/dark themes, theme persists after refresh, no unstyled flash appears, and `npm run build` succeeds |
 | Phase 2: Core conversion engine | Tested | PNG, JPEG, WebP, and BMP conversion paths are user-verified; user reports the requested automated tests and build checks passed |
 | Phase 3: Batch processing | Tested | User verified batch queue, worker execution, progress, cancellation, failure isolation, large-image responsiveness, cleanup, individual downloads, ZIP extraction, and image integrity |
-| Phase 4: Advanced formats | In progress | HEIC/HEIF and TIFF input paths user-verified. Baseline uncompressed TIFF output integrated, output tests pending. SVG and GIF remain |
+| Phase 4: Advanced formats | In progress | HEIC/HEIF and TIFF input/output paths user-verified. SVG rasterization and GIF remain |
 | Phase 5: Image manipulation | Not started | Resize, compression, metadata |
 | Phase 6: Testing and release | Not started | QA and v1.0.0 |
 
 ## Change log
 
 Add newest entries first.
+
+
+### 2026-11-19 - TIFF output real-file verification
+
+- User confirmed that all TIFF output checks passed.
+- Confirmed source-to-TIFF conversions: PNG, JPEG, WebP, BMP, HEIC/HEIF, and TIFF.
+- User confirmed generated TIFF files open correctly and produce the expected dimensions and visual output.
+- Worker conversion, individual downloads, and ZIP export were included in the successful checks.
+- Baseline TIFF output is therefore user-verified. The encoder remains uncompressed and does not preserve source metadata or write multiple pages.
+- Next task: implement safe SVG rasterization. SVG input must be sanitized, must not load external resources, and must not inject untrusted markup into the live document.
+
 
 
 ### 2026-11-19 - TIFF input verification and baseline TIFF encoder
