@@ -246,6 +246,9 @@ The current GIF policy separates static and animated conversions:
 - GIF to GIF decodes all composited logical-screen frames with modern-gif 2.1.0 and re-encodes them in their original order.
 - Frame delays are normalized to GIF's 10 ms timing units before encoding.
 - The source looping flag and loop count are passed to the encoder when present.
+- The encoder uses up to 255 palette colors to reserve a transparent index. Palette quantization can change colors slightly.
+- GIF transparency is binary. Partial alpha cannot be represented exactly and may be simplified during encoding.
+- The encoder rebuilds frames from fully composited images, so it preserves the displayed animation rather than the original disposal-method codes.
 - Static image input is converted to a single-frame GIF with a 100 ms frame delay.
 - Animated GIF conversion to animated WebP or APNG is not supported.
 
