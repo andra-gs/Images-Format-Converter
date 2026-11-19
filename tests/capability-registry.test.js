@@ -72,6 +72,11 @@ test("capability data keeps decoding and encoding separate", () => {
   assert.equal(gif.decoding.status, "planned");
   assert.equal(canDecodeFormat("gif"), false);
 
+  const gif = getFormatCapabilities("gif");
+  assert.equal(gif.detection.status, "implemented");
+  assert.equal(gif.decoding.status, "planned");
+  assert.equal(canDecodeFormat("gif"), false);
+
   const svg = getFormatCapabilities("svg");
   assert.equal(svg.detection.status, "implemented");
   assert.equal(svg.decoding.status, "planned");
