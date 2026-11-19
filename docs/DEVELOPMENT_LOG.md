@@ -5,7 +5,7 @@ This file records actual repository progress. Update it after meaningful impleme
 ## Project status
 
 - Current stage: Phase 4 - Advanced format support
-- Current phase status: HEIC/HEIF and TIFF input/output paths are user-verified. SVG input rasterization and raster-to-SVG wrapper output are user-verified. GIF first-frame decoding is user-verified; animated GIF handling and format-specific compatibility/error notes remain open.
+- Current phase status: HEIC/HEIF, TIFF, SVG input/output, and GIF first-frame conversion are user-verified. Animated GIF-to-GIF and static-to-GIF code is implemented; lockfile synchronization, automated tests, production build, and real-browser verification remain open.
 - Latest release: None
 - Last updated: 2026-11-20
 
@@ -25,13 +25,54 @@ This file records actual repository progress. Update it after meaningful impleme
 | Phase 1: UI development | Tested | User confirmed the skeleton follows light/dark themes, theme persists after refresh, no unstyled flash appears, and `npm run build` succeeds |
 | Phase 2: Core conversion engine | Tested | PNG, JPEG, WebP, and BMP conversion paths are user-verified; user reports the requested automated tests and build checks passed |
 | Phase 3: Batch processing | Tested | User verified batch queue, worker execution, progress, cancellation, failure isolation, large-image responsiveness, cleanup, individual downloads, ZIP extraction, and image integrity |
-| Phase 4: Advanced formats | In progress | HEIC/HEIF and TIFF input/output paths user-verified. SVG input and raster-to-SVG wrapper output user-verified. GIF first-frame input user-verified; animation and format-specific notes remain |
+| Phase 4: Advanced formats | In progress | Advanced format paths are user-verified. Animated GIF output is implemented but awaiting dependency lockfile synchronization, tests/build, and real-browser verification |
 | Phase 5: Image manipulation | Not started | Resize, compression, metadata |
 | Phase 6: Testing and release | Not started | QA and v1.0.0 |
 
 ## Change log
 
 Add newest entries first.
+
+### 2026-11-20 - Animated GIF conversion implementation
+
+- Status: Implemented; dependency and real-browser verification pending.
+- Evaluation:
+  - Selected modern-gif 2.1.0, an MIT-licensed JavaScript GIF decoder/encoder with a documented Worker entry point and one runtime dependency, modern-palette 2.0.0.
+  - Kept gifuct-js 2.1.2 for the existing first-frame-only GIF-to-static conversion path.
+- Agreed behavior implemented:
+  - GIF-to-GIF decodes all composited frames and re-encodes them in order.
+  - Frame delays and looping metadata are passed through to the encoder.
+  - Static image inputs produce a single-frame GIF.
+  - GIF-to-static formats continue to use only the first image frame.
+  - Animated GIF to animated WebP/APNG remains out of scope.
+- Safety and resource limits:
+  - Maximum 200 frames.
+  - Maximum 16,384 pixels per dimension and 40 million pixels per individual frame.
+  - Maximum 25 million logical-screen pixels across the complete animation.
+  - Static source pixels are copied to an owned buffer before the decoded source and temporary canvas are released.
+- Implementation:
+  - Added `src/js/core/animated-gif.js`.
+  - Integrated GIF conversion into the conversion service and main output selector.
+  - Added GIF filename handling and user-facing compatibility notes.
+  - Updated the capability registry and its automated expectations.
+  - Updated README, Project Context, Technical Specification, and Roadmap.
+- Files changed:
+  - `package.json`, `package-lock.json` (root dependency declaration only; full npm lock resolution is still required)
+  - `src/js/core/animated-gif.js`, `src/js/core/conversion-service.js`, `src/js/main.js`, `src/js/core/capability-registry.js`, `index.html`
+  - `tests/capability-registry.test.js`
+  - `README.md`, `docs/PROJECT_CONTEXT.md`, `docs/TECHNICAL_SPECIFICATION.md`, `docs/DEVELOPMENT_ROADMAP.md`, `docs/DEVELOPMENT_LOG.md`
+- Tests performed:
+  - Reviewed the modern-gif API and its decoder/encoder source implementation.
+  - No npm install, automated test run, production build, or real-browser animated GIF test has been run in this environment.
+- Known issues:
+  - The package lock needs a full npm-generated resolution for modern-gif and modern-palette. Run `npm install` after pulling before using the app.
+  - Transparency, disposal, looping, frame delays, Worker fallback, and large-animation memory behavior still require real-file verification.
+- Next steps:
+  - Run `npm install`, `npm test`, and `npm run build`.
+  - Test animated GIF-to-GIF with multiple frames, partial-frame updates, transparency, disposal methods, finite/infinite looping, and varying frame delays.
+  - Test static PNG/JPEG/WebP/BMP/TIFF/HEIC/SVG inputs to GIF.
+  - Test GIF-to-PNG/JPEG/WebP/BMP/TIFF/SVG to confirm first-frame behavior remains unchanged.
+  - Verify individual downloads, ZIP export, Worker execution, and fallback behavior.
 
 ### 2026-11-20 - Raster-to-SVG output verification and documentation sync
 
