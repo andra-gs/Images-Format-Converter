@@ -5,7 +5,7 @@ This file records actual repository progress. Update it after meaningful impleme
 ## Project status
 
 - Current stage: Phase 4 - Advanced format support
-- Current phase status: HEIC/HEIF, TIFF, SVG input/output, and GIF first-frame conversion are user-verified. Animated GIF-to-GIF and static-to-GIF code is implemented; lockfile synchronization, automated tests, production build, and real-browser verification remain open.
+- Current phase status: HEIC/HEIF, TIFF, SVG input/output, and GIF first-frame conversion are user-verified. Animated GIF-to-GIF and static-to-GIF code is implemented and routed through the existing conversion Worker; lockfile synchronization, automated tests, production build, and real-browser verification remain open.
 - Latest release: None
 - Last updated: 2026-11-20
 
