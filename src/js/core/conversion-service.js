@@ -142,15 +142,15 @@ function convertInWorker(file, format, options) {
 }
 
 async function convertImage(file, format, options = {}) {
+  if (format === "svg" || typeof document === "undefined" || !supportsWorkerConversion(format)) {
+    return convertImageDirect(file, format, options);
+  }
+
   if (typeof document !== "undefined") {
     const sourceFormat = await detectImageFormat(file);
     if (sourceFormat?.format === "svg") {
       return convertImageDirect(file, format, options);
     }
-  }
-
-  if (typeof document === "undefined" || !supportsWorkerConversion(format)) {
-    return convertImageDirect(file, format, options);
   }
 
   try {
@@ -213,4 +213,13 @@ export function convertImageToBmp(file) {
  */
 export function convertImageToTiff(file) {
   return convertImage(file, "tiff");
+}
+
+
+/**
+ * Convert a supported raster image to an SVG wrapper containing embedded PNG data.
+ * This preserves the image appearance but does not vectorize its pixels.
+ */
+export function convertImageToSvg(file) {
+  return convertImage(file, "svg");
 }
