@@ -108,8 +108,6 @@ test("decodes the first frame of a GIF into a bounded canvas", async (t) => {
   const gifBytes = Uint8Array.from(atob(gifBase64), (character) => character.charCodeAt(0));
   let canvasCreated;
   let putImageDataCall;
-  let closeCalls = 0;
-
   class FakeOffscreenCanvas {
     constructor(width, height) {
       this.width = width;
