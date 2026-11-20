@@ -1091,8 +1091,9 @@ Only record work that actually happened in the repository. Do not mark a feature
 - Changes:
   - Added the Phase 4 GitHub Actions validation workflow.
   - Upgraded checkout and setup-node actions to v5 to use the Node.js 24 action runtime; the project itself continues to use Node.js 22.
-  - Synchronized package-lock.json for gifuct-js and modern-gif dependencies.
+  - Synchronized package-lock.json for gifuct-js and modern-gif dependencies in the phase-4 branch.
   - Corrected pull-request workflow branch filters so PRs targeting main or phase-4 are included.
+  - Limited workflow token permissions to contents: read and removed automatic lockfile mutation/push steps; the committed lockfile is validated with npm ci.
   - Updated README, project context, technical specification, and roadmap to reflect completed GIF support and Phase 4 status.
 - Tests performed:
   - GitHub Actions completed npm ci, npm test, and npm run build successfully on commit c34d26b.
