@@ -4,8 +4,8 @@ This file records actual repository progress. Update it after meaningful impleme
 
 ## Project status
 
-- Current stage: Phase 4 - Advanced format support
-- Current phase status: HEIC/HEIF, TIFF, SVG input/output, and GIF first-frame conversion are user-verified. Animated GIF-to-GIF and static-to-GIF code is implemented and routed through the existing conversion Worker; lockfile synchronization, automated tests, production build, and real-browser verification remain open.
+- Current stage: Phase 5 - Image manipulation (next planned phase)
+- Current phase status: Phase 4 is complete. HEIC/HEIF, TIFF, SVG, GIF first-frame conversion, animated GIF-to-GIF, and static-image-to-GIF have passed the documented CI and user-run browser verification. Phase 5 implementation has not started; Phase 6 begins only after Phase 5 is integrated and verified.
 - Latest release: None
 - Last updated: 2026-11-20
 
@@ -25,9 +25,10 @@ This file records actual repository progress. Update it after meaningful impleme
 | Phase 1: UI development | Tested | User confirmed the skeleton follows light/dark themes, theme persists after refresh, no unstyled flash appears, and `npm run build` succeeds |
 | Phase 2: Core conversion engine | Tested | PNG, JPEG, WebP, and BMP conversion paths are user-verified; user reports the requested automated tests and build checks passed |
 | Phase 3: Batch processing | Tested | User verified batch queue, worker execution, progress, cancellation, failure isolation, large-image responsiveness, cleanup, individual downloads, ZIP extraction, and image integrity |
-| Phase 4: Advanced formats | In progress | Advanced format paths are user-verified. Animated GIF output is implemented but awaiting dependency lockfile synchronization, tests/build, and real-browser verification |
-| Phase 5: Image manipulation | Not started | Resize, compression, metadata |
-| Phase 6: Testing and release | Not started | QA and v1.0.0 |
+| Phase 4: Advanced formats | Tested | Completed; CI validation and user-run real-browser verification passed. Known format limitations remain documented |
+| Phase 5: Image manipulation | Not started | Image Transformation, Image Adjustment, and Editor UI/Integration |
+| Phase 6: Advanced export and image optimization | Not started | Image Optimization, Metadata Management, and Export Presets/UI. Starts after Phase 5 integration |
+| Phase 7: Testing, documentation, and release | Not started | Cross-browser QA, security review, documentation, production validation, and v1.0.0 readiness |
 
 ## Change log
 
@@ -1136,3 +1137,29 @@ Only record work that actually happened in the repository. Do not mark a feature
   - All three members review the ownership table and detailed tasks.
   - Agree on shared processing APIs, editing state, resource ownership, and error contracts before parallel implementation.
   - Start Phase 5 branches from the latest `main`.
+
+
+### 2026-11-20 - Documentation synchronization after AGENTS.md rename
+
+- Status: Documentation synchronized; feature implementation unchanged.
+- Changes:
+  - Established the root-level `AGENTS.md` as the canonical persistent instruction file for ChatGPT coding sessions.
+  - Updated README documentation links and team guidance to point to `AGENTS.md` instead of the removed `docs/CHATGPT_PROJECT_INSTRUCTIONS.md` path.
+  - Updated the starter prompt so it starts from the current project state and asks each contributor to identify their GitHub username and assigned phase task, rather than incorrectly starting at Phase 0.
+  - Synchronized current phase summaries and phase tracking with the completed Phase 4 and planned Phases 5, 6, and 7.
+  - Corrected the GIF verification status in the technical specification to match the user's real-browser confirmation on 2026-11-20.
+  - Clarified current unsupported GIF and TIFF capabilities in the project context.
+- Files changed:
+  - `README.md`
+  - `AGENTS.md`
+  - `docs/PROJECT_CONTEXT.md`
+  - `docs/TECHNICAL_SPECIFICATION.md`
+  - `docs/DEVELOPMENT_ROADMAP.md`
+  - `docs/DEVELOPMENT_LOG.md`
+  - `docs/STARTER_PROMPT.md`
+- Tests performed:
+  - Reviewed the current documentation on GitHub and checked cross-file references, phase ownership, branch names, and current status wording.
+  - No application tests or production build were run because this update changes documentation only.
+- Test results:
+  - Documentation references and phase summaries are synchronized.
+  - Phase 5 and Phase 6 feature implementation status remains unchanged; no feature branches were created by this documentation update.
