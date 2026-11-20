@@ -1109,3 +1109,30 @@ Only record work that actually happened in the repository. Do not mark a feature
   - Raster-to-SVG embeds PNG data and is not true vectorization.
 - Next steps:
   - Begin Phase 5 Image Manipulation on a separate phase-5 branch after Phase 4 PR review/merge.
+
+### 2026-11-20 - Phase 5 and Phase 6 team task allocation
+- Status: Planning agreed; implementation not started
+- Decisions:
+  - The project owner approved a three-person division of work for Phase 5 and Phase 6.
+  - `andra-gs` owns Phase 5 Image Transformation and Phase 6 Image Optimization.
+  - `Adit1945-web` owns Phase 5 Image Adjustment and Phase 6 Metadata Management.
+  - `FarrelPtrv` owns Phase 5 Editor UI and Integration and Phase 6 Export Presets and UI.
+  - Phase 6 is defined as Advanced Export and Image Optimization.
+  - The former Testing and Release checklist has been moved to Phase 7.
+  - Separate feature branches, Pull Requests, code review, ordered integration, and post-merge regression testing are required.
+- Documentation updated:
+  - `docs/DEVELOPMENT_ROADMAP.md`
+  - `docs/PROJECT_CONTEXT.md`
+  - `docs/TECHNICAL_SPECIFICATION.md`
+  - `docs/CHATGPT_PROJECT_INSTRUCTIONS.md`
+  - `README.md`
+- Implementation status:
+  - No Phase 5 or Phase 6 feature code has been implemented as part of this planning update.
+  - No feature branches have been created as part of this planning update.
+- Tests performed:
+  - Documentation content and GitHub commits were checked after each update.
+  - No application tests or production build were run because this change updates planning documentation only.
+- Next steps:
+  - All three members review the ownership table and detailed tasks.
+  - Agree on shared processing APIs, editing state, resource ownership, and error contracts before parallel implementation.
+  - Start Phase 5 branches from the latest `main`.
