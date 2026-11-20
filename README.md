@@ -117,3 +117,17 @@ npm run preview
 6. Use Web Workers for suitable heavy work, with a fallback where practical.
 7. Report unsupported conversions honestly.
 8. Reopen generated outputs to validate them.
+
+## Team development: Phase 5 and Phase 6
+
+The project is developed by three contributors. Task ownership is tied to GitHub usernames so that contributors and their ChatGPT sessions can identify the correct scope.
+
+| GitHub username | Phase 5 | Phase 6 |
+|---|---|---|
+| `andra-gs` | Image Transformation: resize, aspect ratio, crop, rotate, flip | Image Optimization: quality presets, feasible target-size attempts, file-size measurement |
+| `Adit1945-web` | Image Adjustment: brightness, contrast, saturation, grayscale, sepia, blur | Metadata Management: inspect supported EXIF fields and remove metadata where supported |
+| `FarrelPtrv` | Editor UI and Integration: editing workspace, preview, controls, and conversion handoff | Export Presets and UI: optimization and metadata controls, size reporting, individual and ZIP export |
+
+Each contributor must use their assigned feature branch, create it from the latest `main`, add tests, and submit a Pull Request to `main`. Processing-module Pull Requests are merged before the UI/integration Pull Request. After all three are merged, the team runs the full test suite, production build, and end-to-end browser checks.
+
+See [Development Roadmap](docs/DEVELOPMENT_ROADMAP.md), [Project Context](docs/PROJECT_CONTEXT.md), [Technical Specification](docs/TECHNICAL_SPECIFICATION.md), and [ChatGPT Project instructions](docs/CHATGPT_PROJECT_INSTRUCTIONS.md) for the detailed task lists, module boundaries, branch names, integration order, and rules for ChatGPT sessions assisting each contributor.
