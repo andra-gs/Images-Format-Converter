@@ -1085,3 +1085,26 @@ Only record work that actually happened in the repository. Do not mark a feature
   - Real-browser conversion and sanitizer verification are pending user testing.
 - Next steps:
   - Run npm test and npm run build, then verify SVG output in the browser with transparent and opaque images, re-decoding, dimensions, individual download, and ZIP export.
+
+### 2026-11-20 - Phase 4 validation and completion
+- Status: Complete; CI-validated and user-verified
+- Changes:
+  - Added the Phase 4 GitHub Actions validation workflow.
+  - Upgraded checkout and setup-node actions to v5 to use the Node.js 24 action runtime; the project itself continues to use Node.js 22.
+  - Synchronized package-lock.json for gifuct-js and modern-gif dependencies.
+  - Corrected pull-request workflow branch filters so PRs targeting main or phase-4 are included.
+  - Updated README, project context, technical specification, and roadmap to reflect completed GIF support and Phase 4 status.
+- Tests performed:
+  - GitHub Actions completed npm ci, npm test, and npm run build successfully on commit c34d26b.
+  - The user confirmed real-browser tests for animated GIF conversion, including timing, looping, transparency, frame order, batch processing, individual downloads, and ZIP export.
+- Test results:
+  - CI check "validate" completed with success.
+  - The user confirmed that the GIF browser checks behaved as expected.
+- Known limitations:
+  - GIF-to-static conversion uses only the first frame.
+  - Animated GIF re-encoding can quantize colors and simplify partial transparency.
+  - Animated GIF-to-WebP/APNG is not supported.
+  - TIFF decoding uses the first page; baseline TIFF output is uncompressed.
+  - Raster-to-SVG embeds PNG data and is not true vectorization.
+- Next steps:
+  - Begin Phase 5 Image Manipulation on a separate phase-5 branch after Phase 4 PR review/merge.
