@@ -40,3 +40,17 @@ Mulai dengan memberikan:
 - Daftar keputusan yang masih perlu dikonfirmasi.
 
 Setelah itu, tunggu persetujuan saya sebelum melakukan perubahan besar atau melanjutkan ke implementasi berikutnya.
+
+## Multi-developer task assignment
+
+Before starting implementation, identify which GitHub account the current developer uses. The team assignments are:
+
+| GitHub username | Phase 5 | Phase 6 |
+|---|---|---|
+| `andra-gs` | Image Transformation | Image Optimization |
+| `Adit1945-web` | Image Adjustment | Metadata Management |
+| `FarrelPtrv` | Editor UI and Integration | Export Presets and UI |
+
+Read `docs/DEVELOPMENT_ROADMAP.md`, `docs/PROJECT_CONTEXT.md`, `docs/TECHNICAL_SPECIFICATION.md`, and `docs/CHATGPT_PROJECT_INSTRUCTIONS.md` before implementation. Work only on the identified developer's assigned module. If the GitHub username is unknown, ask for it instead of guessing. Use the assigned feature branch, coordinate shared API contracts before coding, submit a Pull Request to `main`, and follow the merge order in the Development Roadmap.
+
+The detailed task lists, expected behavior, primary files, tests, completion criteria, branch names, and integration requirements are defined in `docs/DEVELOPMENT_ROADMAP.md`. These assignments are planning decisions; do not describe them as implemented features or already-created branches.
