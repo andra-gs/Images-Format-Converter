@@ -464,8 +464,9 @@ This repository is developed by a three-person team. The GitHub account names be
 
 ### Mandatory instructions for ChatGPT sessions
 
-1. Identify the current developer by their GitHub username. If it is not known, ask the user to provide it before selecting an assigned task.
-2. Read `docs/DEVELOPMENT_ROADMAP.md`, this file, and `docs/TECHNICAL_SPECIFICATION.md` before making implementation decisions.
+1. Read the root-level `AGENTS.md` before taking action.
+2. Identify the current developer by their GitHub username. If it is not known, ask the user to provide it before selecting an assigned task.
+3. Read `docs/DEVELOPMENT_ROADMAP.md`, this file, `docs/PROJECT_CONTEXT.md`, and `docs/TECHNICAL_SPECIFICATION.md` before making implementation decisions.
 3. Work only on the responsibility assigned to the identified GitHub account for the active phase. Do not silently take over another member's module.
 4. Do not change the ownership table or reassign tasks unless the project owner explicitly agrees.
 5. Preserve the existing architecture: Vanilla JavaScript ES modules, Vite, plain CSS, browser-local image processing, and the existing conversion pipeline.
