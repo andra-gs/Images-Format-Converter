@@ -2,7 +2,7 @@
 
 A local-first image format conversion web application. Image files are processed in the user's browser and are not uploaded to a remote server.
 
-> Project status: Phase 4 - Advanced format support (in progress)
+> Project status: Phase 4 - Advanced format support (completed; user-verified)
 > Stack: Vanilla JavaScript + Vite + plain CSS
 > Icons: Lucide via NPM
 > Architecture: Client-side, modular, hybrid processing
@@ -21,7 +21,7 @@ The current interface includes:
 - Startup skeleton that follows the selected theme and prevents an unstyled-content flash.
 - Initial file validation and image-format signature detection.
 - SVG input is parsed and sanitized to a restricted vector subset before rasterization. SVG output embeds a PNG data resource in an SVG image element. This preserves the raster image but does not vectorize it. The sanitizer allows only bounded embedded PNG data for image elements and continues to reject external resources and active content. The user has verified SVG rasterization and conversion to PNG, JPEG, WebP, BMP, and TIFF in the real browser. Raster-to-SVG output has also been verified with transparent and opaque sources, matching dimensions, SVG re-decoding, individual downloads, and ZIP export.
-- GIF input uses gifuct-js to decode the first frame for conversion to static formats. GIF output uses modern-gif to create single-frame GIFs from static images and re-encode animated GIFs with frame order, timing, and looping metadata. The implementation is committed but real-browser verification is pending. GIF animation-to-other-animated-formats is outside the current scope.
+- GIF input uses gifuct-js to decode the first frame for conversion to static formats. GIF output uses modern-gif to create single-frame GIFs from static images and re-encode animated GIFs with frame order, timing, and looping metadata. The user has verified animated GIF-to-GIF and static-image-to-GIF conversion in the real browser, including timing, looping, transparency, frame order, batch processing, individual downloads, and ZIP export. GIF animation-to-other-animated-formats is outside the current scope.
 - An explicit capability registry that keeps detection, decoding, and encoding status separate.
 - A browser image decoder for PNG, JPEG, WebP, and BMP, with an ImageBitmap path and HTML image fallback. HEIC/HEIF decoding uses heic-to and has been user-verified in the decoder, main conversion pipeline, and Web Worker. TIFF decoding uses UTIF2 and has been user-verified with real fixtures in the browser, main conversion pipeline, and Web Worker.
 - A PNG encoder and conversion service using OffscreenCanvas with an HTML Canvas fallback. The service checks the PNG signature and reopens the output to verify its dimensions.
@@ -32,7 +32,7 @@ The current interface includes:
 - The user verified that all four input formats convert successfully, output files open as PNG, dimensions match the originals, PNG transparency is preserved, filenames use the .png extension, downloads work, and multiple files convert independently.
 - The user has verified Phase 3 batch processing, worker execution, progress states, cancellation, failure isolation, responsiveness, cleanup, individual downloads, and ZIP archive integrity.
 
-PNG, JPEG, WebP, and BMP conversion paths are user-verified with real files. Phase 3, including ZIP export, is user-verified. HEIC/HEIF decoding is user-verified. TIFF input decoding and conversion are user-verified with real fixtures. The decoder reads the first page only. TIFF output is implemented as uncompressed baseline TIFF and has been user-verified with real files. SVG decoding, raster-to-SVG output, re-decoding, downloads, and ZIP export are user-verified. The user also reports `npm test` and `npm run build` pass after the SVG output implementation. GIF first-frame conversion to static formats is user-verified. Animated GIF-to-GIF and static-image-to-GIF output have been implemented with modern-gif, but require dependency installation, automated tests, production build, and real-browser verification.
+PNG, JPEG, WebP, and BMP conversion paths are user-verified with real files. Phase 3, including ZIP export, is user-verified. HEIC/HEIF decoding is user-verified. TIFF input decoding and conversion are user-verified with real fixtures. The decoder reads the first page only. TIFF output is implemented as uncompressed baseline TIFF and has been user-verified with real files. SVG decoding, raster-to-SVG output, re-decoding, downloads, and ZIP export are user-verified. The user also reports `npm test` and `npm run build` pass after the SVG output implementation. GIF first-frame conversion to static formats is user-verified. Animated GIF-to-GIF and static-image-to-GIF output have been implemented with modern-gif, and have passed dependency installation, automated tests, production build, and user-run real-browser verification.
 
 ## Project goals
 
