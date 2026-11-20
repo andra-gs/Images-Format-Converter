@@ -1,56 +1,65 @@
 # Starter Prompt: Images Format Converter
 
-Saya ingin memulai pengembangan proyek **Images Format Converter** berdasarkan dokumentasi proyek yang tersedia di Project ini.
+Saya ingin melanjutkan pengembangan proyek **Images Format Converter**.
 
-Tolong jadikan file berikut sebagai sumber acuan utama:
-- `README.md`
-- `docs/PROJECT_CONTEXT.md`
-- `docs/TECHNICAL_SPECIFICATION.md`
-- `docs/DEVELOPMENT_ROADMAP.md`
-- `docs/DEVELOPMENT_LOG.md`
-- `docs/CHATGPT_PROJECT_INSTRUCTIONS.md`
+Repository:
+https://github.com/andra-gs/Images-Format-Converter
+
+## Sumber acuan wajib
+
+Baca dan ikuti dokumen berikut sebelum memberi rekomendasi atau mengubah kode:
+
+1. `AGENTS.md` di root repository. Ini adalah instruksi utama untuk ChatGPT coding agent.
+2. `README.md`
+3. `docs/PROJECT_CONTEXT.md`
+4. `docs/TECHNICAL_SPECIFICATION.md`
+5. `docs/DEVELOPMENT_ROADMAP.md`
+6. `docs/DEVELOPMENT_LOG.md`
+
+Gunakan dokumentasi terbaru dari branch `main`. Jangan mengandalkan salinan lama jika repository sudah terhubung.
 
 ## Tugas awal
 
-1. Pahami tujuan, batasan, arsitektur, teknologi, daftar format, dan roadmap proyek.
-2. Jika repository GitHub sudah terhubung, periksa kondisi repository dan file yang sudah ada sebelum mengusulkan perubahan. Jika belum terhubung, jangan menganggap repository sudah tersedia.
-3. Bandingkan kondisi repository dengan Phase 0 pada roadmap.
-4. Buat daftar langkah implementasi Phase 0 yang konkret dan berurutan.
-5. Identifikasi keputusan teknis yang masih perlu diuji, terutama pemilihan library HEIC/HEIF, TIFF, GIF, BMP, serta dukungan browser.
-6. Jangan langsung membuat seluruh aplikasi atau melompat ke conversion engine.
-7. Jangan mengubah kesepakatan arsitektur tanpa menjelaskan alasan dan meminta persetujuan saya jika perubahan tersebut berdampak besar.
+1. Identifikasi GitHub username developer yang sedang menggunakan sesi ini. Jangan menebak dari pemilik repository atau akun ChatGPT.
+2. Periksa branch aktif dan kondisi repository terbaru.
+3. Baca status fase dan riwayat perubahan pada Development Roadmap serta Development Log.
+4. Tentukan tugas yang sesuai dengan username berdasarkan tabel kepemilikan di `AGENTS.md`.
+5. Pastikan tugas tersebut memang belum selesai atau belum dikerjakan. Jangan menganggap tugas yang direncanakan sudah diimplementasikan.
+6. Pelajari file kode yang relevan sebelum mengusulkan perubahan.
+7. Identifikasi kontrak API dan file bersama yang perlu dikoordinasikan dengan anggota lain.
 
-## Batasan penting
+## Status pengembangan
 
-- Gunakan Vanilla JavaScript, HTML5, CSS3, dan Vite.
-- Semua pemrosesan gambar harus berlangsung lokal di browser.
-- Tidak menggunakan backend, database, cloud storage, atau remote image-conversion API.
-- Gunakan pendekatan modular.
-- Gunakan Web Workers untuk pekerjaan berat yang sesuai, dengan fallback.
-- Sediakan light mode dan dark mode.
-- Kembangkan secara bertahap sesuai roadmap.
-- Jangan mengklaim fitur sudah berfungsi sebelum diuji dengan file gambar nyata.
+- Phase 0 sampai Phase 4: selesai.
+- Phase 5: Image Manipulation, fase berikutnya dan belum dimulai.
+- Phase 6: Advanced Export and Image Optimization, dimulai setelah Phase 5 terintegrasi dan diverifikasi.
+- Phase 7: Testing, Documentation, and Release.
 
-Mulai dengan memberikan:
-- Ringkasan pemahaman proyek.
-- Pemeriksaan kondisi repository (jika akses tersedia).
-- Checklist Phase 0.
-- Struktur folder final yang disarankan untuk tahap awal.
-- Perintah terminal untuk menginisialisasi proyek.
-- Daftar keputusan yang masih perlu dikonfirmasi.
+Rincian tugas, file target, kriteria selesai, branch, dan urutan merge tersedia di `docs/DEVELOPMENT_ROADMAP.md`.
 
-Setelah itu, tunggu persetujuan saya sebelum melakukan perubahan besar atau melanjutkan ke implementasi berikutnya.
+## Aturan kerja
 
-## Multi-developer task assignment
+- Kerjakan hanya tanggung jawab GitHub username yang sudah teridentifikasi.
+- Jangan mengubah pembagian tugas tanpa persetujuan pemilik proyek.
+- Jangan bekerja langsung pada branch `main`.
+- Gunakan feature branch yang ditentukan untuk fase terkait, dibuat dari `main` terbaru.
+- Sepakati kontrak API, format data, error handling, dan resource ownership sebelum integrasi lintas modul.
+- Jangan mengubah modul milik anggota lain tanpa koordinasi.
+- Pertahankan pemrosesan gambar sepenuhnya lokal di browser.
+- Pertahankan arsitektur Vanilla JavaScript, HTML5, CSS3, Vite, Web Workers, dan conversion pipeline yang sudah ada.
+- Tambahkan automated tests untuk perubahan.
+- Jalankan `npm test`, `npm run build`, dan pemeriksaan browser yang relevan sebelum Pull Request.
+- Jangan mengklaim perubahan, commit, push, build, atau tes berhasil jika belum diverifikasi.
+- Perbarui dokumentasi hanya berdasarkan perubahan dan pengujian yang benar-benar dilakukan.
 
-Before starting implementation, identify which GitHub account the current developer uses. The team assignments are:
+## Format respons pertama
 
-| GitHub username | Phase 5 | Phase 6 |
-|---|---|---|
-| `andra-gs` | Image Transformation | Image Optimization |
-| `Adit1945-web` | Image Adjustment | Metadata Management |
-| `FarrelPtrv` | Editor UI and Integration | Export Presets and UI |
+Berikan:
+- GitHub username yang teridentifikasi.
+- Ringkasan kondisi repository dan branch.
+- Fase aktif dan tugas yang menjadi tanggung jawab developer.
+- File kode dan dokumentasi yang perlu dibaca.
+- Ketergantungan atau kontrak API yang harus disepakati.
+- Rencana implementasi bertahap.
 
-Read `docs/DEVELOPMENT_ROADMAP.md`, `docs/PROJECT_CONTEXT.md`, `docs/TECHNICAL_SPECIFICATION.md`, and `docs/CHATGPT_PROJECT_INSTRUCTIONS.md` before implementation. Work only on the identified developer's assigned module. If the GitHub username is unknown, ask for it instead of guessing. Use the assigned feature branch, coordinate shared API contracts before coding, submit a Pull Request to `main`, and follow the merge order in the Development Roadmap.
-
-The detailed task lists, expected behavior, primary files, tests, completion criteria, branch names, and integration requirements are defined in `docs/DEVELOPMENT_ROADMAP.md`. These assignments are planning decisions; do not describe them as implemented features or already-created branches.
+Jangan langsung mengubah kode sebelum pemeriksaan awal dan rencana kerja selesai. Jika ada keputusan penting yang belum disepakati dan dapat menyebabkan konflik integrasi, tanyakan terlebih dahulu.
