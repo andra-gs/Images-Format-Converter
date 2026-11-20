@@ -125,3 +125,70 @@ Use these branch names:
 Create each branch from the latest `main` when its phase starts. Submit Pull Requests to `main`. Merge processing modules before the UI/integration module. The UI/integration owner must update their branch from the latest `main` before final integration. Merge one Pull Request at a time and rerun the complete test suite, production build, and end-to-end browser checks after all three have merged.
 
 Do not create a branch, commit, merge, or claim repository changes unless the operation actually succeeded.
+
+## Continuous documentation maintenance
+
+Documentation is part of the development workflow. Keep it synchronized with the actual repository state throughout every phase, not only at release time.
+
+### When documentation must be reviewed and updated
+
+Review the relevant documentation and update it whenever a meaningful change occurs, including:
+
+1. A feature, task, or milestone is implemented and verified.
+2. A public module API, shared contract, data model, architecture decision, or dependency changes.
+3. A bug fix changes documented behavior, supported formats, limitations, or error handling.
+4. A test strategy, verification result, browser compatibility finding, or known limitation changes.
+5. A Pull Request is prepared, updated with significant changes, or merged.
+6. A phase starts, changes scope, reaches a milestone, or is completed.
+
+Before ending a development session, check whether the work performed requires documentation updates. Do not postpone a required update merely because the phase is not complete.
+
+### Which documents to update
+
+Update only the documents affected by the change:
+
+- `docs/DEVELOPMENT_LOG.md`: record meaningful completed work, decisions, fixes, verification results, and relevant commit or PR references. Keep entries factual and dated when possible.
+- `docs/DEVELOPMENT_ROADMAP.md`: update task and phase status only when supported by implementation and verification evidence. Keep ownership and dependencies accurate.
+- `docs/TECHNICAL_SPECIFICATION.md`: update architecture, module contracts, APIs, dependencies, format capabilities, browser requirements, and technical limitations when they change.
+- `docs/PROJECT_CONTEXT.md`: update product scope, user-facing behavior, supported capabilities, and project-wide decisions when they change.
+- `README.md`: update user-facing features, supported formats, installation, usage, and known limitations when relevant.
+- `AGENTS.md`: update only when persistent project instructions, collaboration rules, or development workflow rules change.
+
+Do not edit every document mechanically for every commit. Keep each document focused on its purpose and avoid duplicating the same detailed information across multiple files.
+
+### Cross-branch awareness at session start
+
+At the beginning of each development session, and again before integration or a major decision:
+
+1. Fetch the latest `main` and read this file plus the relevant project documentation.
+2. Inspect repository branches, open Pull Requests, and recent commits to identify active development work.
+3. For each active feature branch or open PR relevant to the current task, inspect its latest commit and relevant documentation. At minimum, check whether it contains updated copies of `AGENTS.md`, `README.md`, `docs/PROJECT_CONTEXT.md`, `docs/TECHNICAL_SPECIFICATION.md`, `docs/DEVELOPMENT_ROADMAP.md`, or `docs/DEVELOPMENT_LOG.md`. Inspect implementation files or PR descriptions when needed to understand changes that affect shared contracts or integration.
+4. Record the branch name and latest commit SHA when reporting findings. Distinguish clearly between changes on `main`, changes pending on feature branches, and changes included in open PRs.
+5. Compare relevant branch documentation and implementation notes with `main`. Identify new decisions, API changes, dependencies, limitations, conflicting assumptions, and work that may affect other developers.
+6. Use the latest relevant information from active branches to stay informed, but do not treat unmerged branch changes as approved or integrated project facts.
+7. If two branches document conflicting contracts or decisions, report the conflict and ask the responsible developers to agree. Do not silently choose one.
+8. Never modify another developer's branch or owned files without explicit coordination.
+
+The `main` branch is the source of truth for officially integrated project state. Active branches and open PRs are sources of pending development context only. A newer commit on a feature branch does not automatically override an established project decision.
+
+### Session wrap-up
+
+Before finishing a substantial development session:
+
+1. Review the changes made and identify which documentation files are affected.
+2. Update the relevant documentation in the same branch as the implementation whenever possible.
+3. Ensure roadmap status reflects verified progress, not plans or untested code.
+4. Ensure the development log describes only work that actually happened and tests that actually ran.
+5. Report which documents were updated and which were reviewed but left unchanged, with a brief reason.
+6. Mention any relevant updates discovered on other active branches or open PRs, including their branch/PR status. Do not claim those changes are integrated unless they have been merged into `main`.
+
+If GitHub access, a branch, or a PR is unavailable, state that limitation explicitly. Do not claim to have reviewed all active branches or synchronized project-wide documentation when you could not inspect them.
+
+### Accuracy and history
+
+- Never document planned work as completed.
+- Never claim tests, builds, browser checks, commits, pushes, or merges without evidence that they succeeded.
+- Preserve historical development-log entries. Add corrections or clarifications as new entries instead of rewriting history, unless an existing entry is objectively incorrect and the correction is clearly explained.
+- Do not copy branch-specific progress into `main` documentation until the corresponding work is merged or the project owner explicitly asks for a consolidated pending-work summary.
+- Keep documentation concise, specific, and consistent with the code and test results.
+
