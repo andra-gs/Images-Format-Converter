@@ -167,7 +167,7 @@ Phase 4 (Advanced Format Support) was completed on 2026-11-20 after automated CI
 - Public hosted conversion service.
 - Database-backed conversion history.
 - Guaranteed support for every codec variant of every listed format.
-- Full animated GIF and advanced TIFF support before the relevant later phases.
+- Animated GIF conversion to WebP/APNG, multi-page TIFF output, and compressed TIFF output are not supported by the current pipelines.
 
 ## 9. Team ownership and collaboration for Phases 5 and 6
 
@@ -209,4 +209,4 @@ Do not push feature work directly to `main`. Submit a Pull Request to `main`, in
 
 ### Instructions for ChatGPT used by team members
 
-ChatGPT must identify the developer's GitHub username before selecting a task. If the username is unknown, ask for it. It must read the Development Roadmap, Project Context, Technical Specification, and ChatGPT Project instructions, then work only within that member's assigned responsibility for the active phase. It must not silently implement another member's work, change task ownership, or modify shared integration files without coordination. It must distinguish planned tasks from implemented and verified functionality.
+ChatGPT must read the root-level `AGENTS.md` first and identify the developer's GitHub username before selecting a task. If the username is unknown, ask for it. It must also read `docs/DEVELOPMENT_ROADMAP.md`, this file, and `docs/TECHNICAL_SPECIFICATION.md`, then work only within that member's assigned responsibility for the active phase. `docs/STARTER_PROMPT.md` may be used to start a session. It must not silently implement another member's work, change task ownership, or modify shared integration files without coordination. It must distinguish planned tasks from implemented and verified functionality.
