@@ -110,33 +110,313 @@ Deliverable: tested advanced-format pipelines. Complete. Limitations remain docu
 
 ## Phase 5: Image manipulation
 
+Status: Planned. Phase 5 has not started. The work is divided among three members. Each member must implement and test the assigned module, then submit a Pull Request to `main`.
+
+### Team ownership
+
+| GitHub account | Responsibility | Branch |
+|---|---|---|
+| `andra-gs` | Image Transformation | `phase-5-transformation` |
+| `Adit1945-web` | Image Adjustment | `phase-5-adjustment` |
+| `FarrelPtrv` | Editor UI and Integration | `phase-5-editor-ui` |
+
+### 5.1 `andra-gs`: Image Transformation
+
+Objective: implement image geometry and orientation operations. These operations change the image's dimensions, visible area, or orientation before the edited image is passed to the existing conversion service.
+
 Tasks:
-- [ ] Resize dimensions.
-- [ ] Maintain or unlock aspect ratio.
-- [ ] Compression controls.
-- [ ] Rotation.
-- [ ] JPEG background selection.
-- [ ] Before/after comparison.
-- [ ] Metadata viewer.
-- [ ] Define metadata stripping/preservation behavior.
 
-Deliverable: additional image manipulation features.
+- [ ] Implement image resizing with explicit output width and height.
+- [ ] Support keeping the original aspect ratio while resizing.
+- [ ] Support unlocking the aspect ratio when the user wants independent width and height values.
+- [ ] Validate width and height values. Reject zero, negative, non-finite, or excessive dimensions using project limits.
+- [ ] Implement cropping by a defined selection rectangle.
+- [ ] Validate crop coordinates and crop dimensions against the source image boundaries.
+- [ ] Implement rotation by 90, 180, and 270 degrees.
+- [ ] Implement horizontal flipping.
+- [ ] Implement vertical flipping.
+- [ ] Ensure output dimensions are correct after resizing, cropping, and rotation.
+- [ ] Handle transparent pixels without introducing an unintended background during transformations.
+- [ ] Release temporary canvases, ImageBitmap objects, and other image resources when processing finishes or fails.
+- [ ] Add automated tests for resize, aspect-ratio behavior, crop bounds, rotation, flipping, output dimensions, invalid input, and resource/error paths.
+- [ ] Document the module's public interface and the agreed input/output contract for the editor integration.
 
-## Phase 6: Testing and release
+Primary implementation file:
+
+```text
+src/js/core/image-transformer.js
+tests/image-transformer.test.js
+```
+
+The exact exported function names and argument shapes must be agreed with `FarrelPtrv` before implementation. Do not independently invent a second editing data model.
+
+Completion criteria:
+
+- All listed transformations work with representative real images.
+- Aspect ratio and output dimensions match the selected operation.
+- Crop selections outside the source bounds are rejected or safely constrained according to the agreed contract.
+- Transparency behaves as documented.
+- Automated tests pass.
+- The module can be called by the editor integration without changing the existing conversion service's established behavior.
+
+### 5.2 `Adit1945-web`: Image Adjustment
+
+Objective: implement pixel appearance and color adjustments. These operations modify the visual appearance of the image without changing its geometric dimensions.
 
 Tasks:
+
+- [ ] Implement brightness adjustment.
+- [ ] Implement contrast adjustment.
+- [ ] Implement saturation adjustment.
+- [ ] Implement grayscale conversion.
+- [ ] Implement sepia adjustment.
+- [ ] Implement blur adjustment.
+- [ ] Define and enforce valid minimum, maximum, and default values for each numeric adjustment.
+- [ ] Ensure adjustment values outside the accepted range are rejected or clamped consistently with the agreed API contract.
+- [ ] Ensure image dimensions remain unchanged by color and appearance adjustments.
+- [ ] Define how alpha transparency is handled by each adjustment, and preserve transparency where the operation allows it.
+- [ ] Ensure adjustments can be combined in a deterministic order.
+- [ ] Avoid mutating the original uploaded File or the original source image data.
+- [ ] Release temporary pixel buffers and canvases after processing.
+- [ ] Add automated tests for default values, boundary values, brightness, contrast, saturation, grayscale, sepia, blur, transparency, dimensions, combined adjustments, and invalid input.
+- [ ] Document the module's public interface and the agreed input/output contract for the editor integration.
+
+Primary implementation file:
+
+```text
+src/js/core/image-adjuster.js
+tests/image-adjuster.test.js
+```
+
+The exact exported function names, adjustment ranges, and argument shapes must be agreed with `FarrelPtrv` before implementation. Do not create a UI-specific state model inside this processing module.
+
+Completion criteria:
+
+- Every listed adjustment produces the expected visual change.
+- Adjustment values stay within documented ranges.
+- Dimensions remain unchanged.
+- Transparency behaves as documented.
+- Multiple adjustments produce deterministic results.
+- Automated tests pass.
+- The module can be called by the editor integration using the shared contract.
+
+### 5.3 `FarrelPtrv`: Editor UI and Integration
+
+Objective: build the image-editing workspace and connect the transformation and adjustment modules to the application. This member owns the editor-facing UI and the integration flow, not the internal implementation of the transformation or adjustment algorithms.
+
+Tasks:
+
+- [ ] Design and implement an editing workspace that fits the existing application layout and design system.
+- [ ] Add an image preview area for the currently selected image.
+- [ ] Add width and height controls for resizing.
+- [ ] Add an aspect-ratio lock/unlock control.
+- [ ] Add crop selection controls and a clear way to apply or cancel a crop.
+- [ ] Add rotation controls for 90, 180, and 270 degrees.
+- [ ] Add horizontal and vertical flip controls.
+- [ ] Add brightness, contrast, saturation, and blur controls.
+- [ ] Add grayscale and sepia controls.
+- [ ] Show the current values of numeric adjustment controls.
+- [ ] Update the preview when the user changes editing controls, while avoiding unnecessary repeated processing that would make the interface unresponsive.
+- [ ] Add a Reset action that restores the editing settings to their initial state.
+- [ ] Add an Apply action that confirms the edited result for subsequent conversion.
+- [ ] Define and coordinate the shared editing state and module contracts with `andra-gs` and `Adit1945-web` before connecting their modules.
+- [ ] Connect the editor to the transformation and adjustment modules after their interfaces are agreed.
+- [ ] Pass the resulting edited image into the existing conversion service without duplicating or replacing the established decoders and encoders.
+- [ ] Ensure the original uploaded file remains available for reset or re-editing according to the agreed editing-state design.
+- [ ] Handle processing, invalid input, and error states visibly.
+- [ ] Ensure the editor works in light and dark themes.
+- [ ] Ensure the editor is responsive on desktop and mobile.
+- [ ] Preserve keyboard accessibility, focus behavior, and clear control labels.
+- [ ] Add UI and integration tests for the editing workflow, reset, apply, preview updates, errors, themes, and conversion handoff.
+
+Primary implementation files:
+
+```text
+src/js/ui/image-editor.js
+src/styles/editor.css
+tests/image-editor.test.js
+```
+
+The file list is a starting ownership boundary. If the current repository structure requires a different location, document the change and coordinate it before editing files owned by another module.
+
+Completion criteria:
+
+- A user can select an image, edit it, preview the changes, reset them, and apply the edited result.
+- Transformation and adjustment controls call the corresponding processing modules.
+- The edited result can be converted using the existing conversion formats and download flow.
+- Existing upload, batch conversion, Worker behavior, ZIP export, and theme behavior continue to work.
+- Automated tests, browser checks, and production build pass.
+
+### Phase 5 integration order
+
+1. All three members agree on the editing data model, module contracts, error handling, and resource ownership before implementation.
+2. `andra-gs` and `Adit1945-web` implement their independent processing modules and tests.
+3. Their Pull Requests are reviewed and merged into `main` one at a time.
+4. `FarrelPtrv` updates `phase-5-editor-ui` from the latest `main`, connects the merged modules, and completes the editor integration.
+5. The editor Pull Request is reviewed and merged.
+6. The team runs all automated tests and the production build, then tests the complete editing-to-conversion workflow in the browser.
+
+Deliverable: an image editor that supports geometric transformation and visual adjustment before conversion, integrated with the existing conversion engine.
+
+## Phase 6: Advanced export and image optimization
+
+Status: Planned and agreed by the project team on 2026-11-20. Phase 6 begins only after Phase 5 has been integrated and verified. The work is divided among the same three members.
+
+### Team ownership
+
+| GitHub account | Responsibility | Branch |
+|---|---|---|
+| `andra-gs` | Image Optimization | `phase-6-optimization` |
+| `Adit1945-web` | Metadata Management | `phase-6-metadata` |
+| `FarrelPtrv` | Export Presets and UI | `phase-6-export-ui` |
+
+### 6.1 `andra-gs`: Image Optimization
+
+Objective: implement optimization options that reduce output file size while keeping visual quality within the user's selected preference.
+
+Tasks:
+
+- [ ] Evaluate the existing encoders and determine which output formats support meaningful optimization controls.
+- [ ] Implement optimization presets for low, medium, and high quality where the target encoder supports the relevant controls.
+- [ ] Map each preset to documented encoder settings. Do not assume that the same quality number produces equivalent results across different formats.
+- [ ] Implement an optional target-file-size mode where it is technically feasible for the selected output format and encoder.
+- [ ] If exact target-size output cannot be guaranteed, report the achieved size and make the limitation clear rather than promising an exact result.
+- [ ] Measure and report the source file size and generated output file size.
+- [ ] Calculate the size difference and percentage reduction or increase accurately.
+- [ ] Ensure optimization does not silently change the selected output format.
+- [ ] Validate the output MIME type and file signature using the existing conversion validation approach.
+- [ ] Reopen or decode generated output where the current pipeline supports that verification.
+- [ ] Test visual quality at each preset using representative images, including photographs, graphics, and images with transparency where supported.
+- [ ] Document format-specific limitations, including formats that do not expose a lossy quality control.
+- [ ] Add automated tests for preset mapping, target-size behavior, size calculations, unsupported formats, invalid values, and output validation.
+
+Primary implementation file:
+
+```text
+src/js/core/image-optimizer.js
+tests/image-optimizer.test.js
+```
+
+The exact optimizer API must be agreed with `FarrelPtrv` before UI integration. The optimizer must use the existing encoder/conversion pipeline rather than creating a parallel conversion system.
+
+Completion criteria:
+
+- Optimization presets produce valid output for every format explicitly declared as supported.
+- Source and output sizes are measured from actual files, not estimated values presented as exact results.
+- Target-size mode is offered only where feasible and communicates when the requested size cannot be reached.
+- Visual quality and transparency behavior are tested and documented.
+- Automated tests pass.
+
+### 6.2 `Adit1945-web`: Metadata Management
+
+Objective: inspect supported image metadata and give the user a clear option to remove metadata from exported images.
+
+Tasks:
+
+- [ ] Evaluate a browser-compatible metadata reader and document its license, bundle impact, and supported metadata formats.
+- [ ] Detect metadata availability without assuming every image contains EXIF data.
+- [ ] Read supported EXIF fields from image files.
+- [ ] Expose camera make and model when those fields exist.
+- [ ] Expose orientation information when that field exists.
+- [ ] Identify other metadata fields that are safe and useful to show in the interface. Document the exact supported field list.
+- [ ] Handle missing, malformed, unsupported, and partially readable metadata without breaking image conversion.
+- [ ] Implement metadata removal for exported files where the output pipeline can reliably omit the relevant metadata.
+- [ ] Distinguish between metadata that can be read, metadata that can be removed, and metadata that can be preserved. These are separate capabilities.
+- [ ] Verify the behavior separately for each supported output format. Do not claim metadata preservation when the encoder discards metadata.
+- [ ] Ensure metadata removal does not modify the original uploaded file.
+- [ ] Add automated tests for metadata detection, supported field extraction, missing fields, malformed metadata, removal behavior, and format-specific limitations.
+- [ ] Document privacy implications and exactly which metadata fields the application reads or removes.
+
+Primary implementation file:
+
+```text
+src/js/core/metadata-manager.js
+tests/metadata-manager.test.js
+```
+
+The exact metadata result shape and API must be agreed with `FarrelPtrv` before UI integration.
+
+Completion criteria:
+
+- Supported metadata is read accurately from representative real image files.
+- Missing or malformed metadata does not break the conversion workflow.
+- Metadata removal is verified against actual exported files for each format declared as supported.
+- Read, remove, and preserve capabilities are reported separately.
+- Automated tests pass and format limitations are documented.
+
+### 6.3 `FarrelPtrv`: Export Presets and UI
+
+Objective: build the export settings interface and connect it to the optimization and metadata modules.
+
+Tasks:
+
+- [ ] Design and implement an export settings panel that follows the existing application design system.
+- [ ] Add low-, medium-, and high-quality optimization preset controls.
+- [ ] Add a target-file-size control only for formats and encoders that support the agreed target-size workflow.
+- [ ] Add metadata inspection controls and a clear presentation of available metadata fields.
+- [ ] Add an option to remove metadata from exported files when the selected output path supports it.
+- [ ] Clearly distinguish metadata removal from metadata preservation. Do not display a preservation option for a format that cannot support it.
+- [ ] Display the actual source file size and final output file size.
+- [ ] Display the actual size difference and percentage change.
+- [ ] Display an estimated size only if it is explicitly labeled as an estimate and the estimate has a documented basis.
+- [ ] Connect export controls to `image-optimizer.js` and `metadata-manager.js` after their APIs are agreed.
+- [ ] Integrate the export settings with individual downloads.
+- [ ] Integrate the export settings with ZIP export so each successful file uses its selected export settings.
+- [ ] Ensure failed optimization or metadata operations are reported per file and do not unnecessarily cancel unrelated batch items.
+- [ ] Ensure the export panel works in light and dark themes.
+- [ ] Ensure responsive layout and keyboard accessibility.
+- [ ] Add UI and integration tests for presets, metadata controls, size reporting, individual downloads, ZIP export, error handling, and theme behavior.
+
+Primary implementation files:
+
+```text
+src/js/ui/export-panel.js
+src/styles/export-panel.css
+tests/export-panel.test.js
+```
+
+The file list is a starting ownership boundary. Coordinate any required changes to shared files before editing them.
+
+Completion criteria:
+
+- The user can select a supported optimization preset and metadata option before export.
+- The selected settings reach the correct processing modules.
+- Actual source/output size information is displayed accurately.
+- Individual downloads and ZIP export use the selected settings.
+- Unsupported options are hidden or clearly disabled with an explanation.
+- Automated tests, browser checks, and production build pass.
+
+### Phase 6 integration order
+
+1. Confirm Phase 5 is merged and stable.
+2. Agree on the optimizer and metadata APIs, supported format matrix, error behavior, and resource ownership.
+3. `andra-gs` and `Adit1945-web` implement their processing modules and automated tests.
+4. Review and merge their Pull Requests into `main` one at a time.
+5. `FarrelPtrv` updates `phase-6-export-ui` from the latest `main`, connects both modules, and completes individual-download and ZIP integration.
+6. Review and merge the export UI Pull Request.
+7. Run the full automated test suite and production build, then test export behavior with representative real files and formats.
+
+Deliverable: an export workflow with tested optimization presets, accurate file-size reporting, supported metadata inspection/removal, and integration with individual and ZIP downloads.
+
+## Phase 7: Testing, documentation, and release
+
+This phase contains the release-readiness work that was previously listed as Phase 6. It is intentionally separate from the newly agreed Phase 6 feature work.
+
+Tasks:
+
 - [ ] Cross-browser testing.
 - [ ] Mobile layout testing.
 - [ ] Large-image and memory testing.
-- [ ] Security review, especially SVG handling.
+- [ ] Security review, especially SVG handling and image metadata parsing.
 - [ ] Validate all advertised conversion paths.
-- [ ] Verify no image upload/network transfer occurs.
+- [ ] Verify no image upload/network transfer occurs during normal image processing.
 - [ ] Check production build.
 - [ ] Complete README installation and usage instructions.
-- [ ] Add screenshots and supported-format matrix.
+- [ ] Add screenshots and a supported-format matrix.
+- [ ] Document known limitations and browser compatibility.
 - [ ] Tag release `v1.0.0` when release criteria are met.
 
-Deliverable: documented and tested GitHub release.
+Deliverable: documented, tested, release-ready GitHub version.
 
 ## Priority guide
 
@@ -169,4 +449,49 @@ Deliverable: documented and tested GitHub release.
 
 ## Completion policy
 
-Do not mark a phase complete based on appearance alone. A feature must work with real files and pass relevant tests. Update `DEVELOPMENT_LOG.md` as work progresses.
+Do not mark a phase complete based on appearance alone. A feature must work with real files and pass relevant tests. Update `DEVELOPMENT_LOG.md` as work progresses. Follow the team ownership, branch, review, and integration rules in the collaboration section below.
+
+
+## Team collaboration and task ownership
+
+This repository is developed by a three-person team. The GitHub account names below are the authoritative task owners. ChatGPT sessions used by any team member must read this section and the Development Roadmap before proposing or changing project files.
+
+| GitHub account | Phase 5 responsibility | Phase 6 responsibility |
+|---|---|---|
+| `andra-gs` | Image Transformation | Image Optimization |
+| `Adit1945-web` | Image Adjustment | Metadata Management |
+| `FarrelPtrv` | Editor UI and Integration | Export Presets and UI |
+
+### Mandatory instructions for ChatGPT sessions
+
+1. Identify the current developer by their GitHub username. If it is not known, ask the user to provide it before selecting an assigned task.
+2. Read `docs/DEVELOPMENT_ROADMAP.md`, this file, and `docs/TECHNICAL_SPECIFICATION.md` before making implementation decisions.
+3. Work only on the responsibility assigned to the identified GitHub account for the active phase. Do not silently take over another member's module.
+4. Do not change the ownership table or reassign tasks unless the project owner explicitly agrees.
+5. Preserve the existing architecture: Vanilla JavaScript ES modules, Vite, plain CSS, browser-local image processing, and the existing conversion pipeline.
+6. Do not claim a feature is complete until its implementation, automated tests, relevant browser checks, and production build have been verified. Record who performed manual tests and what was tested.
+7. Do not push directly to `main`. Work on the assigned feature branch and submit a Pull Request.
+8. Keep documentation synchronized with actual implementation. Planned work must remain marked as planned until it exists and passes verification.
+
+### Shared collaboration rules
+
+- Each member owns one feature branch per phase. Create the branch from the latest `main` when the phase begins.
+- Do not create or use a shared working branch as a substitute for the member's assigned branch.
+- Avoid editing another member's owned module or the same integration files without prior coordination.
+- Before implementation, agree on module input/output contracts, error behavior, resource ownership, and how the module connects to the existing application.
+- If a task requires a change outside the assigned module, explain the dependency and coordinate it in the team before changing the other member's files.
+- Keep commits focused and descriptive. Include tests with the feature implementation.
+- Before opening a Pull Request, run `npm test` and `npm run build`, and perform the relevant browser checks.
+- Pull Requests target `main`. Review the diff, resolve conflicts, and merge one Pull Request at a time.
+- For each phase, merge the processing modules before the UI/integration module. The UI/integration owner must update their branch from the newly merged `main` before final integration.
+- After all three Pull Requests are merged, run the full test suite and production build again, then perform end-to-end browser testing.
+- Do not force-push over another member's work or overwrite a teammate's commit.
+
+### Branch naming
+
+| Phase | `andra-gs` | `Adit1945-web` | `FarrelPtrv` |
+|---|---|---|---|
+| Phase 5 | `phase-5-transformation` | `phase-5-adjustment` | `phase-5-editor-ui` |
+| Phase 6 | `phase-6-optimization` | `phase-6-metadata` | `phase-6-export-ui` |
+
+Branch names are the agreed convention. The branches are created when the relevant phase begins; documenting a branch name does not mean that the branch already exists.
