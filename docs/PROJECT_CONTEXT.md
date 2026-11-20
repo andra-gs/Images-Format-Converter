@@ -101,7 +101,7 @@ The application should maintain an explicit capability registry. The UI should o
 - The first frame is drawn onto a canvas using the GIF logical-screen dimensions. Transparent first-frame pixels remain transparent; the global background color is used when the first frame does not declare transparency.
 - GIF-to-static conversion continues to use only the first image frame. GIF-to-GIF conversion uses modern-gif 2.1.0 to decode all composited frames and re-encode them. Frame order, delays, and looping metadata are passed through to the encoder. Static image inputs produce a single-frame GIF.
 - GIF first-frame decoding and animated GIF-to-GIF re-encoding run inside the existing application Web Worker when supported and fall back to the main thread. The modern-gif codec is invoked synchronously inside that worker to avoid nested worker lifetime leaks.
-- The user verified first-frame GIF decoding and conversion to static formats. Animated GIF output has now been implemented, but its dependency installation, build, and real-browser behavior still require verification.
+- The user verified first-frame GIF decoding and conversion to static formats. Animated GIF-to-GIF and static-image-to-GIF output have also been verified in the real browser, including frame timing, looping, transparency, frame order, batch processing, individual downloads, and ZIP export. GitHub Actions passed lockfile synchronization, npm ci, npm test, and npm run build. Animated GIF conversion to WebP/APNG remains unsupported.
 - The animated conversion path limits input to 200 frames and 25 million total logical-screen pixels to reduce memory risk. GIF animation is not converted to animated WebP or APNG.
 
 ## 5. Planned user features
@@ -157,7 +157,9 @@ A conversion is successful only when:
 - Relevant properties (dimensions, transparency, animation, and quality) behave according to the selected conversion mode.
 - Errors are isolated to the affected file and do not unnecessarily stop other queue items.
 
-## 8. Out of scope for the initial MVP
+## 8. Current phase and out of scope for the initial MVP
+
+Phase 4 (Advanced Format Support) was completed on 2026-11-20 after automated CI validation and user-run real-browser verification. Phase 5 (Image Manipulation) is the next planned phase.
 
 - User accounts and authentication.
 - Cloud storage.
