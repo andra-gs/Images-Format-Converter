@@ -83,7 +83,7 @@ Deliverable: batch conversion without freezing the UI under normal test loads. B
 
 ## Phase 4: Advanced format support
 
-Status: In progress. HEIC/HEIF, TIFF, SVG, raster-to-SVG, and GIF first-frame input paths are user-verified. Animated GIF output has been implemented with modern-gif; dependency lockfile synchronization, automated tests, production build, and real-browser verification remain.
+Status: Complete (2026-11-20). HEIC/HEIF, TIFF, SVG, raster-to-SVG, GIF first-frame input, animated GIF-to-GIF, and static-image-to-GIF paths are implemented and user-verified. Lockfile synchronization, automated tests, production build, and real-browser checks have passed.
 
 Tasks:
 - [x] Evaluate and integrate HEIC/HEIF decoder adapter using heic-to (real-file decoder, conversion, and Worker tests user-confirmed).
@@ -102,9 +102,11 @@ Tasks:
 - [x] Evaluate animated GIF decoder and encoder candidates; select modern-gif 2.1.0 (MIT) alongside the existing gifuct-js first-frame path.
 - [x] Implement animated GIF-to-GIF frame decoding/re-encoding, frame delay and looping metadata handling, and single-frame GIF output from static images.
 - [x] Add GIF-specific frame, dimension, and total-pixel limits plus user-facing compatibility notes.
-- [ ] Synchronize the npm lockfile, run automated tests and production build, and verify real animated GIFs in the browser, including timing, looping, transparency, disposal, Worker execution, downloads, and ZIP export.
+- [x] Synchronize the npm lockfile and pass automated tests and production build in GitHub Actions.
+- [x] Verify animated GIF behavior in the real browser: timing, looping, transparency, frame order, batch processing, individual downloads, and ZIP export (user-confirmed).
+- [x] Update the GitHub Actions workflow to use current Node 24-compatible action versions while running the project on Node.js 22.
 
-Deliverable: tested advanced-format pipelines. Do not claim untested variants are supported.
+Deliverable: tested advanced-format pipelines. Complete. Limitations remain documented; do not imply animated GIF-to-WebP/APNG, multi-page TIFF output, or true raster vectorization is supported.
 
 ## Phase 5: Image manipulation
 
