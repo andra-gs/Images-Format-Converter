@@ -254,9 +254,11 @@ The current GIF policy separates static and animated conversions:
 
 The animated path runs inside the application's existing conversion Worker. The codec itself runs synchronously inside that worker to avoid spawning nested workers that do not expose a public termination API. If the application Worker is unavailable, the existing conversion service falls back to the main thread. Input is limited to 200 frames, 16,384 pixels per dimension, 40 million pixels per individual frame, and 25 million logical-screen pixels across the animation. These limits reduce, but do not eliminate, memory pressure. All frame data is held in memory during re-encoding.
 
-The encoder output is reopened with modern-gif to verify logical dimensions and frame count, then checked with the existing signature detector. Browser compatibility, transparency fidelity, disposal behavior, loop behavior, memory use, and actual downloads still require real-file verification. Do not treat the GIF encoder as user-verified until those checks pass.
+The encoder output is reopened with modern-gif to verify logical dimensions and frame count, then checked with the existing signature detector. On 2026-11-20, the user confirmed real-browser verification of animated GIF-to-GIF and static-image-to-GIF behavior, including timing, looping, transparency, frame order, batch processing, individual downloads, and ZIP export. The current limitations remain: palette quantization can alter colors, partial alpha may be simplified, original disposal-method codes are not preserved, and animated GIF-to-WebP/APNG is unsupported.
 
 ## 18. Multi-developer module boundaries for Phases 5 and 6
+
+Before using this specification for implementation, read the root-level `AGENTS.md` for persistent ChatGPT instructions and collaboration rules.
 
 The team consists of three developers. GitHub usernames are the canonical identifiers for task ownership:
 
