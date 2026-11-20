@@ -100,11 +100,14 @@ npm run preview
 
 ## Documentation
 
+- [Agent instructions](AGENTS.md)
+
 - [Project context](docs/PROJECT_CONTEXT.md)
 - [Technical specification](docs/TECHNICAL_SPECIFICATION.md)
 - [Development roadmap](docs/DEVELOPMENT_ROADMAP.md)
 - [Development log](docs/DEVELOPMENT_LOG.md)
-- [ChatGPT Project instructions](docs/CHATGPT_PROJECT_INSTRUCTIONS.md)
+- [Agent instructions](AGENTS.md)
+- [Starter prompt](docs/STARTER_PROMPT.md)
 - [Starter prompt](docs/STARTER_PROMPT.md)
 
 ## Development principles
@@ -130,4 +133,4 @@ The project is developed by three contributors. Task ownership is tied to GitHub
 
 Each contributor must use their assigned feature branch, create it from the latest `main`, add tests, and submit a Pull Request to `main`. Processing-module Pull Requests are merged before the UI/integration Pull Request. After all three are merged, the team runs the full test suite, production build, and end-to-end browser checks.
 
-See [Development Roadmap](docs/DEVELOPMENT_ROADMAP.md), [Project Context](docs/PROJECT_CONTEXT.md), [Technical Specification](docs/TECHNICAL_SPECIFICATION.md), and [ChatGPT Project instructions](docs/CHATGPT_PROJECT_INSTRUCTIONS.md) for the detailed task lists, module boundaries, branch names, integration order, and rules for ChatGPT sessions assisting each contributor.
+See [Development Roadmap](docs/DEVELOPMENT_ROADMAP.md), [Project Context](docs/PROJECT_CONTEXT.md), [Technical Specification](docs/TECHNICAL_SPECIFICATION.md), and [AGENTS.md](AGENTS.md) for the task ownership, branch rules, integration order, and instructions for ChatGPT sessions assisting each contributor. Use [Starter Prompt](docs/STARTER_PROMPT.md) to initialize a new development session.
