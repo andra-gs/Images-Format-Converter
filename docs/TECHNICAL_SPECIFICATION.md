@@ -255,3 +255,64 @@ The current GIF policy separates static and animated conversions:
 The animated path runs inside the application's existing conversion Worker. The codec itself runs synchronously inside that worker to avoid spawning nested workers that do not expose a public termination API. If the application Worker is unavailable, the existing conversion service falls back to the main thread. Input is limited to 200 frames, 16,384 pixels per dimension, 40 million pixels per individual frame, and 25 million logical-screen pixels across the animation. These limits reduce, but do not eliminate, memory pressure. All frame data is held in memory during re-encoding.
 
 The encoder output is reopened with modern-gif to verify logical dimensions and frame count, then checked with the existing signature detector. Browser compatibility, transparency fidelity, disposal behavior, loop behavior, memory use, and actual downloads still require real-file verification. Do not treat the GIF encoder as user-verified until those checks pass.
+
+## 18. Multi-developer module boundaries for Phases 5 and 6
+
+The team consists of three developers. GitHub usernames are the canonical identifiers for task ownership:
+
+- `andra-gs`: Phase 5 Image Transformation; Phase 6 Image Optimization.
+- `Adit1945-web`: Phase 5 Image Adjustment; Phase 6 Metadata Management.
+- `FarrelPtrv`: Phase 5 Editor UI and Integration; Phase 6 Export Presets and UI.
+
+### Phase 5 module boundaries
+
+| Owner | Module | Responsibilities | Suggested files |
+|---|---|---|---|
+| `andra-gs` | Image Transformer | Resize, aspect-ratio handling, crop, rotation, horizontal flip, vertical flip | `src/js/core/image-transformer.js`, `tests/image-transformer.test.js` |
+| `Adit1945-web` | Image Adjuster | Brightness, contrast, saturation, grayscale, sepia, blur | `src/js/core/image-adjuster.js`, `tests/image-adjuster.test.js` |
+| `FarrelPtrv` | Editor UI and integration | Editing workspace, preview, controls, reset/apply, integration with transformer, adjuster, and existing conversion service | `src/js/ui/image-editor.js`, `src/styles/editor.css`, `tests/image-editor.test.js` |
+
+Transformation and adjustment modules must not depend on DOM UI state. They should expose documented processing interfaces and predictable errors. The editor owns user interaction and coordinates calls to the processing modules. The existing conversion service remains the final output conversion path.
+
+### Phase 6 module boundaries
+
+| Owner | Module | Responsibilities | Suggested files |
+|---|---|---|---|
+| `andra-gs` | Image Optimizer | Low/medium/high quality presets where supported, feasible target-size attempts, actual file-size measurement and comparison | `src/js/core/image-optimizer.js`, `tests/image-optimizer.test.js` |
+| `Adit1945-web` | Metadata Manager | Metadata availability detection, supported EXIF field extraction, metadata removal where output format permits | `src/js/core/metadata-manager.js`, `tests/metadata-manager.test.js` |
+| `FarrelPtrv` | Export UI and integration | Export controls, preset selection, metadata options, size reporting, individual-download and ZIP integration | `src/js/ui/export-panel.js`, `src/styles/export-panel.css`, `tests/export-panel.test.js` |
+
+### Contracts that must be agreed before coding
+
+The following details are deliberately not hard-coded yet. The three developers must agree on them and record the decision before parallel implementation:
+
+1. The shared image representation passed between the editor UI and processing modules.
+2. Function signatures, parameter units, default values, valid ranges, and return types for each transformation and adjustment.
+3. Whether editing operations are applied immediately to a working image or represented as an ordered, reversible operation list.
+4. How original image data is retained for reset without unnecessary duplication of large binary buffers.
+5. Resource ownership and cleanup for Canvas, OffscreenCanvas, ImageBitmap, Blob, and Object URLs.
+6. How errors and unsupported operations are represented and surfaced to the UI.
+7. Optimizer preset mapping for each output encoder and the exact meaning of any target-size request.
+8. Metadata fields supported by the reader and the per-format behavior for reading, removing, or preserving metadata.
+
+Do not invent incompatible contracts independently in separate branches. The UI/integration developer must coordinate the contract with both processing-module owners before relying on it.
+
+### Execution and testing requirements
+
+- Keep processing modules independent from UI markup and DOM event handlers where practical.
+- Reuse the existing conversion pipeline and capability registry. Do not create a second conversion engine.
+- Preserve local-first processing. Selected image data and metadata must not be sent to remote services.
+- Keep resource cleanup and dimension/pixel limits consistent with existing project safety practices.
+- Add unit tests for processing logic and integration tests for user workflows.
+- Test representative real images and every format for which the UI exposes the new option.
+- Run `npm test` and `npm run build` before submitting each Pull Request.
+- Run the full test suite, production build, and end-to-end browser tests after the three branches are integrated.
+
+Suggested branch names:
+
+| Phase | `andra-gs` | `Adit1945-web` | `FarrelPtrv` |
+|---|---|---|---|
+| Phase 5 | `phase-5-transformation` | `phase-5-adjustment` | `phase-5-editor-ui` |
+| Phase 6 | `phase-6-optimization` | `phase-6-metadata` | `phase-6-export-ui` |
+
+These are naming conventions only. A branch is not considered created or implemented merely because it appears in this specification.
