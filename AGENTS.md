@@ -22,6 +22,10 @@ This is a local-first image conversion web application. Image files must be proc
 
 Planned formats: PNG, JPG/JPEG, WebP, BMP, HEIC/HEIF, TIFF, SVG, and GIF.
 
+## Source-of-truth documentation
+
+This root-level `AGENTS.md` is the persistent instruction file for ChatGPT coding agents. Read it before acting. Use `docs/DEVELOPMENT_ROADMAP.md` for phase scope and ownership, `docs/PROJECT_CONTEXT.md` for product context, and `docs/TECHNICAL_SPECIFICATION.md` for architecture and module contracts. `docs/STARTER_PROMPT.md` is an optional session kickoff prompt, not a replacement for these instructions.
+
 ## Responsibilities
 
 1. Help plan, implement, debug, review, test, and document the project.
