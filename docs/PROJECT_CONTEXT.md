@@ -168,3 +168,45 @@ Phase 4 (Advanced Format Support) was completed on 2026-11-20 after automated CI
 - Database-backed conversion history.
 - Guaranteed support for every codec variant of every listed format.
 - Full animated GIF and advanced TIFF support before the relevant later phases.
+
+## 9. Team ownership and collaboration for Phases 5 and 6
+
+The project has three assigned developers. Their GitHub usernames identify their task ownership and must be used consistently in project discussions, issues, Pull Requests, and ChatGPT sessions.
+
+| GitHub username | Phase 5 | Phase 6 |
+|---|---|---|
+| `andra-gs` | Image Transformation: resize, aspect ratio, crop, rotate, horizontal flip, vertical flip | Image Optimization: quality presets, feasible target-size mode, output-size measurement and comparison |
+| `Adit1945-web` | Image Adjustment: brightness, contrast, saturation, grayscale, sepia, blur | Metadata Management: inspect supported EXIF fields and remove metadata where supported |
+| `FarrelPtrv` | Editor UI and Integration: editing workspace, preview, controls, reset/apply, connection to processing modules and conversion service | Export Presets and UI: export settings, optimization and metadata controls, size reporting, individual download and ZIP integration |
+
+### Phase 5 work boundaries
+
+- `andra-gs` owns the transformation processing module in `src/js/core/image-transformer.js` and its tests in `tests/image-transformer.test.js`.
+- `Adit1945-web` owns the adjustment processing module in `src/js/core/image-adjuster.js` and its tests in `tests/image-adjuster.test.js`.
+- `FarrelPtrv` owns the editor interface in `src/js/ui/image-editor.js`, its stylesheet in `src/styles/editor.css`, and integration tests in `tests/image-editor.test.js`.
+- The exact function signatures and shared editing-state representation are not yet fixed. The three members must agree on them before implementation. Do not assume that the suggested filenames imply that files have already been created.
+- The editor must pass the final edited image to the existing conversion service. Do not replace or duplicate the established format decoders, encoders, batch queue, Worker orchestration, or ZIP exporter.
+
+### Phase 6 work boundaries
+
+- `andra-gs` owns `src/js/core/image-optimizer.js` and `tests/image-optimizer.test.js`. The module handles quality presets, feasible target-size attempts, and accurate source/output size measurements.
+- `Adit1945-web` owns `src/js/core/metadata-manager.js` and `tests/metadata-manager.test.js`. The module handles metadata detection, supported EXIF reading, and metadata removal where the selected output path supports it.
+- `FarrelPtrv` owns `src/js/ui/export-panel.js`, `src/styles/export-panel.css`, and `tests/export-panel.test.js`. The module connects export controls to the optimizer and metadata manager, then integrates the selected settings with individual and ZIP downloads.
+- Reading, removing, and preserving metadata are separate capabilities. Do not promise metadata preservation unless it has been verified for the selected output format and encoder.
+- Target output size is not guaranteed. If the encoder cannot reliably reach a requested size, show the actual achieved size and explain the limitation.
+- The exact optimizer and metadata API contracts must be agreed before UI integration.
+
+### Git and integration policy
+
+Each member works on a separate branch created from the latest `main`:
+
+| Phase | `andra-gs` | `Adit1945-web` | `FarrelPtrv` |
+|---|---|---|---|
+| Phase 5 | `phase-5-transformation` | `phase-5-adjustment` | `phase-5-editor-ui` |
+| Phase 6 | `phase-6-optimization` | `phase-6-metadata` | `phase-6-export-ui` |
+
+Do not push feature work directly to `main`. Submit a Pull Request to `main`, include automated tests, run `npm test` and `npm run build`, and perform relevant browser checks. Merge the two processing modules before the UI/integration branch. The UI owner must update their branch from the latest `main` before final integration. After all three Pull Requests are merged, run the full test suite, production build, and end-to-end browser checks again.
+
+### Instructions for ChatGPT used by team members
+
+ChatGPT must identify the developer's GitHub username before selecting a task. If the username is unknown, ask for it. It must read the Development Roadmap, Project Context, Technical Specification, and ChatGPT Project instructions, then work only within that member's assigned responsibility for the active phase. It must not silently implement another member's work, change task ownership, or modify shared integration files without coordination. It must distinguish planned tasks from implemented and verified functionality.
