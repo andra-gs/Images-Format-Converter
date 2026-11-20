@@ -6,6 +6,7 @@ on:
       - phase-4
   pull_request:
     branches:
+      - main
       - phase-4
   workflow_dispatch:
 
@@ -16,11 +17,8 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out phase-4
+      - name: Check out source
         uses: actions/checkout@v5
-        with:
-          ref: ${{ github.head_ref || github.ref_name }}
-          persist-credentials: true
 
       - name: Set up Node.js
         uses: actions/setup-node@v5
