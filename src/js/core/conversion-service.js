@@ -9,10 +9,6 @@ async function convertGifDirect(file) {
 }
 
 /**
- * Convert a supported source image and verify the generated output.
- * The returned Blob is owned by the caller.
- */
-/**
  * Encode an already-decoded image and run the same output verification used by
  * the File/Blob conversion path.
  */
