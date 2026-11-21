@@ -4,10 +4,10 @@ This file records actual repository progress. Update it after meaningful impleme
 
 ## Project status
 
-- Current stage: Phase 5 - Image manipulation (next planned phase)
-- Current phase status: Phase 4 is complete. HEIC/HEIF, TIFF, SVG, GIF first-frame conversion, animated GIF-to-GIF, and static-image-to-GIF have passed the documented CI and user-run browser verification. Phase 5 implementation has not started; Phase 6 begins only after Phase 5 is integrated and verified.
+- Current stage: Phase 5 - Image manipulation (in progress on feature branches)
+- Current phase status: Phase 4 is complete. Phase 5 editor scaffolding and the ImageData adapter preparation are in progress on `phase-5-editor-ui`; Transformer and Adjuster implementations remain with their assigned owners. Apply remains disabled until real modules and conversion handoff are integrated and verified. Phase 6 begins only after Phase 5 is integrated and verified.
 - Latest release: None
-- Last updated: 2026-11-20
+- Last updated: 2026-11-21
 
 ## Status legend
 
@@ -26,13 +26,27 @@ This file records actual repository progress. Update it after meaningful impleme
 | Phase 2: Core conversion engine | Tested | PNG, JPEG, WebP, and BMP conversion paths are user-verified; user reports the requested automated tests and build checks passed |
 | Phase 3: Batch processing | Tested | User verified batch queue, worker execution, progress, cancellation, failure isolation, large-image responsiveness, cleanup, individual downloads, ZIP extraction, and image integrity |
 | Phase 4: Advanced formats | Tested | Completed; CI validation and user-run real-browser verification passed. Known format limitations remain documented |
-| Phase 5: Image manipulation | Not started | Image Transformation, Image Adjustment, and Editor UI/Integration |
+| Phase 5: Image manipulation | In progress | Editor UI and ImageData adapter preparation on `phase-5-editor-ui`; processing modules and final integration remain pending |
 | Phase 6: Advanced export and image optimization | Not started | Image Optimization, Metadata Management, and Export Presets/UI. Starts after Phase 5 integration |
 | Phase 7: Testing, documentation, and release | Not started | Cross-browser QA, security review, documentation, production validation, and v1.0.0 readiness |
 
 ## Change log
 
 Add newest entries first.
+
+### 2026-11-21 - Phase 5 shared ImageData adapter preparation
+
+- Status: Adapter and documentation scaffold implemented; automated test execution, production build, and browser verification pending.
+- Recorded the team's final shared sRGB ImageData contract in the Technical Specification and Phase 5 editor notes.
+- Updated the editor draft state to use the agreed `transformations` and `adjustments` groups.
+- Reworked `image-processing-adapter.js` to validate ImageData and dimension limits, copy decoder pixels into an owned pixel buffer, release its temporary canvas, and create a caller-owned Canvas result from ImageData.
+- Added dependency injection for the Transformer and Adjuster functions. The adapter preserves Transform → Adjust ordering, validates each `{ imageData, width, height }` result, and checks cancellation between stages.
+- Kept all capabilities unavailable and Apply disabled until both real processing modules and the final conversion handoff are integrated.
+- Updated the Phase 5 roadmap wording to reference the agreed contracts without marking unimplemented processing features complete.
+- Automated tests were expanded for shared state, pixel validation, limits, decoder copying, canvas cleanup, processing order, output validation, placeholder behavior, and cancellation. Tests were not run in this environment.
+- Existing conversion service, decoder, encoder, Worker orchestration, queue, and ZIP exporter were not modified.
+- Next: inspect and integrate the two processing modules after their PRs are merged; coordinate a lossless edited-pixel handoff that retains the existing conversion service's output validation.
+
 
 ### 2026-11-21 - Phase 5 editor UI scaffold and placeholder adapter
 
