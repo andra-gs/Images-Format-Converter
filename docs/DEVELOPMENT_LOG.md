@@ -1190,3 +1190,14 @@ Only record work that actually happened in the repository. Do not mark a feature
   - Run the full repository tests and production build in a local checkout.
   - Review the implementation with representative real images and large-image performance.
   - Coordinate integration with Adit and Farrel after their modules and adapter are ready.
+
+
+### 2026-11-21 - Expanded Image Transformer rotation coverage
+- Status: Tested; focused module suite.
+- Changes:
+  - Added non-square source fixtures to verify 90-degree and 270-degree rotation output dimensions and pixel order.
+- Tests performed:
+  - Re-ran the focused Image Transformer Node test suite.
+- Test results:
+  - 16 tests passed, 0 failed.
+  - Full repository tests, production build, and browser checks remain pending.
