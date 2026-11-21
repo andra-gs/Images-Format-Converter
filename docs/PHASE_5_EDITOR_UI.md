@@ -6,31 +6,48 @@
 - Branch: `phase-5-editor-ui`
 - Main files: `src/js/ui/image-editor.js`, `src/styles/editor.css`, `src/js/core/image-processing-adapter.js`
 
-## Temporary integration strategy
+## Agreed shared processing contract
 
-The editor UI is being built against a placeholder adapter while the Image Transformation and Image Adjustment modules are developed on their own branches. The placeholder advertises every processing capability as unavailable and rejects processing requests with the stable error code `EDITOR_PROCESSING_UNAVAILABLE`.
+The team has agreed to use an sRGB ImageData-shaped value between the processing modules:
 
-This keeps UI work independent of unapproved function names, argument shapes, return types, and resource ownership. The Apply action must remain disabled until the real module contracts are agreed and the implementations are integrated.
+```javascript
+{
+  data: Uint8ClampedArray,
+  width: number,
+  height: number,
+  colorSpace: "srgb"
+}
+```
 
-## Current UI scope
+Both processing modules must leave their input unchanged and return a new result in the shape `{ imageData, width, height }`, with dimensions matching the returned pixel buffer.
 
-The initial editor scaffold provides:
+- Transformer API: `applyImageTransformations(imageData, transformations)`
+- Adjuster API: `applyImageAdjustments(imageData, adjustments)`
+- Pipeline: Decode → ImageData adapter → Transform → Adjust → Canvas/encoder adapter → existing conversion service.
+- Shared state: `{ transformations, adjustments }`.
+- Maximum dimensions: 16,384 pixels per side and 40,000,000 total pixels, including intermediate allocations.
+- Cancellation: AbortSignal; cancellation is reported as AbortError.
+- Resource ownership: the decoder result belongs to the caller; processing modules do not mutate input; each module cleans up its temporary resources; returned ImageData belongs to the caller.
 
-- Selection of an image already present in the existing file queue.
-- Original-image preview and source dimensions.
-- Draft controls for resize and aspect ratio, crop coordinates, rotation, horizontal/vertical flip, brightness, contrast, saturation, blur, grayscale, and sepia.
-- Reset to the selected source image's dimensions and neutral adjustment values.
-- Responsive layout and existing light/dark theme variables.
-- Explicit placeholder messaging; draft controls do not claim to modify the preview.
+The full parameter defaults, ranges, processing order, validation, and error contract are recorded in `docs/TECHNICAL_SPECIFICATION.md`.
 
-## Integration requirements still open
+## Current implementation prepared on this branch
 
-1. Agree the shared editing state and processing contracts with both module owners.
-2. Confirm input/output representation, processing order, error behavior, and resource ownership.
-3. Replace the placeholder adapter only after both processing modules are merged into `main`.
-4. Connect the edited Blob/File to the existing conversion service without changing decoder/encoder behavior.
-5. Enable Apply only after processing and handoff are implemented and tested.
+- Editor controls use the agreed nested shared state: `transformations` and `adjustments`.
+- `image-processing-adapter.js` validates dimensions and ImageData structure, copies decoder pixels into an owned sRGB buffer, releases its temporary canvas, and can create a caller-owned Canvas result from ImageData.
+- The adapter accepts the Transformer and Adjuster functions through dependency injection. This avoids importing modules that have not yet been merged.
+- The adapter executes Transform before Adjust, validates each module's `{ imageData, width, height }` result, and checks AbortSignal between stages.
+- Until both processing modules are supplied, all capabilities remain unavailable and processing rejects with `EDITOR_PROCESSING_UNAVAILABLE`.
+- Apply remains disabled. The original preview remains read-only; draft controls do not claim to change image pixels.
+
+## Remaining integration work
+
+1. Integrate the Transformer and Adjuster after their PRs are merged into `main`.
+2. Coordinate the edited-pixel handoff with the existing conversion service. It currently accepts File/Blob inputs and performs its own decoding and output validation; the final route must preserve the edits and retain output signature/dimension checks.
+3. Add preview updates and Apply handoff using the processed result.
+4. Add full UI/integration tests, then run `npm test`, `npm run build`, and browser checks with real images.
+5. Update this document and the development log with verified results.
 
 ## Verification status
 
-This document describes the implementation scope. It does not claim automated tests, production build, or browser verification have passed.
+The adapter and test source have been updated on this branch. Automated tests, production build, and browser verification have not yet been run in this environment. Do not treat the editor integration as complete until those checks pass and the real processing modules are integrated.
