@@ -101,6 +101,30 @@ test("rotates by 180 and 270 degrees with correct pixel order", () => {
   ]);
 });
 
+test("rotates a non-square image and swaps output dimensions", () => {
+  const source = createImageData(3, 2, [
+    1, 0, 0, 255, 2, 0, 0, 255, 3, 0, 0, 255,
+    4, 0, 0, 255, 5, 0, 0, 255, 6, 0, 0, 255
+  ]);
+  const clockwise = applyImageTransformations(source, { rotation: 90 });
+  const counterClockwise = applyImageTransformations(source, { rotation: 270 });
+
+  assert.equal(clockwise.width, 2);
+  assert.equal(clockwise.height, 3);
+  assert.deepEqual(pixelsOf(clockwise), [
+    4, 0, 0, 255, 1, 0, 0, 255,
+    5, 0, 0, 255, 2, 0, 0, 255,
+    6, 0, 0, 255, 3, 0, 0, 255
+  ]);
+  assert.equal(counterClockwise.width, 2);
+  assert.equal(counterClockwise.height, 3);
+  assert.deepEqual(pixelsOf(counterClockwise), [
+    3, 0, 0, 255, 6, 0, 0, 255,
+    2, 0, 0, 255, 5, 0, 0, 255,
+    1, 0, 0, 255, 4, 0, 0, 255
+  ]);
+});
+
 test("flips horizontally and vertically", () => {
   const source = twoByTwo();
   const horizontal = applyImageTransformations(source, { flipHorizontal: true });
