@@ -106,3 +106,13 @@ Supported edited-image formats are PNG, JPEG, WebP, BMP, TIFF, and SVG. Animated
 
 A new test file, `tests/edited-image-conversion.test.js`, covers the edited-pixel handoff, output dimension verification, invalid ImageData rejection, and the explicit GIF limitation. These tests have been added but have **not yet been run locally**. The earlier 47/47 result applies to the previous branch state and does not include these new tests.
 
+### Updated automated verification — 2026-11-21
+
+After adding the edited-ImageData conversion handoff, the user ran the checks locally on `phase-5-editor-ui` and reported:
+
+- `npm test`: 51 tests passed, 0 failed, 0 cancelled, 0 skipped.
+- `npm run build`: successful; Vite transformed 2,163 modules and completed in 4.22 seconds.
+- The existing Vite warning for oversized HEIC-related chunks remains (approximately 3.23 MB each before gzip); it does not fail the build.
+
+The 51-test run includes the four new edited-ImageData conversion tests. These results supersede the earlier 47-test count for the previous branch state. Browser verification of the new edited-pixel path has not yet been performed; the real Transformer and Adjuster modules are still pending.
+
