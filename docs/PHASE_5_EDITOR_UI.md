@@ -116,3 +116,13 @@ After adding the edited-ImageData conversion handoff, the user ran the checks lo
 
 The 51-test run includes the four new edited-ImageData conversion tests. These results supersede the earlier 47-test count for the previous branch state. Browser verification of the new edited-pixel path has not yet been performed; the real Transformer and Adjuster modules are still pending.
 
+### Browser regression check — 2026-11-21
+
+The user manually verified the application in the browser after the edited-ImageData service changes:
+
+- Application opens without errors.
+- Existing standard image conversion still works.
+- Editor panel remains visible.
+- Apply remains disabled as expected while the real Transformer/Adjuster integration is not yet available.
+
+This is a user-reported manual regression check. It does not constitute end-to-end verification of edited image processing.
