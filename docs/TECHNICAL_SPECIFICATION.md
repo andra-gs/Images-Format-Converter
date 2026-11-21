@@ -402,6 +402,10 @@ Invalid input types and malformed ImageData raise TypeError. Invalid values and 
 
 The existing conversion service currently accepts a File/Blob and performs its own decoding and output validation. The final integration must hand the edited pixels into that established service without bypassing output signature/dimension validation or creating a parallel conversion engine. A lossless intermediate or a coordinated service entry point must be selected during final integration; do not silently route the original file back through conversion because that would discard edits.
 
+## Queue → Editor event contract
+
+The Queue and Editor communicate through the browser Custom Event `ifc:queue-change`. The event detail contains an `entries` array of lightweight snapshots with `id`, `name`, `file`, `format`, and `url`. The Queue owns the original File and preview object URL; the Editor consumes references and must not revoke Queue-owned URLs. Queue mutations (add, remove, clear) publish a fresh snapshot. This event bridge does not change the existing File/Blob conversion or Worker path.
+
 ## 26. Edited ImageData conversion handoff
 
 The Editor integration uses the existing encoder and output-validation pipeline through this service entry point:
