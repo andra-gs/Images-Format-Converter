@@ -809,3 +809,23 @@ Add newest entries first.
 - Known issues:
   - Startup skeleton is removed when the application module initializes. A JavaScript loading failure will leave the skeleton visible rather than exposing an unstyled application.
 - Next steps:
+
+### 2026-11-21 - Edited ImageData conversion handoff
+
+- Status: Implemented; new automated tests pending local execution
+- Branch: `phase-5-editor-ui`
+- Changes:
+  - Refactored the direct conversion path to share `encodeAndValidateImage()` for encoding, output signature detection, output re-decoding, dimension verification, and verification-resource cleanup.
+  - Added `convertImageDataToFormat(imageData, format, options)` to accept the edited sRGB ImageData representation without decoding the original File again.
+  - The new entry point copies ImageData into a temporary Canvas-backed source, reuses the existing `encodeImage()`, and releases the temporary Canvas in a `finally` block.
+  - Preserved the existing File/Blob conversion API and Worker routing.
+  - Limited edited-ImageData output to PNG, JPEG, WebP, BMP, TIFF, and SVG, which are supported by the current image encoder. Animated GIF remains on its existing File-based path because it has separate animation-preservation behavior.
+  - Added `tests/edited-image-conversion.test.js` for the edited-pixel handoff, output dimension verification, invalid ImageData, and GIF limitation.
+  - Updated the technical specification and Phase 5 editor documentation.
+- Validation:
+  - The new tests have been added but have not yet been run locally.
+  - The previous user-reported 47/47 test result and production build apply to the branch state before these changes; they must be rerun.
+- Remaining work:
+  - Run `npm test` and `npm run build` on this branch and address any failures.
+  - After test results are confirmed, connect the editor's processed ImageData to the new service entry point when the Transformer and Adjuster modules are available.
+  - Keep Apply disabled until the real processing modules, UI handoff, and end-to-end behavior are integrated and verified.
