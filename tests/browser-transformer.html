@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Browser Image Transformer Test</title>
+    <link rel="stylesheet" href="./browser-transformer.css" />
+  </head>
+  <body>
+    <main class="test-page">
+      <a class="back-link" href="/">← Back to Images Format Converter</a>
+      <header>
+        <p class="eyebrow">Development test</p>
+        <h1>Browser Image Transformer</h1>
+        <p class="description">
+          Test the Image Transformer with real local image files. The page decodes the selected file,
+          converts it to sRGB ImageData, runs one transformation, and displays the result.
+          Files stay in your browser and are not uploaded.
+        </p>
+      </header>
+
+      <section class="test-panel" aria-labelledby="input-title">
+        <h2 id="input-title">Select an image</h2>
+        <input id="transformer-file-input" type="file"
+          accept="image/png,image/jpeg,image/webp,image/bmp,image/heic,image/heif,image/tiff,image/svg+xml,image/gif,.bmp,.heic,.heif,.tif,.tiff,.svg,.gif" />
+        <p id="file-info" class="hint">No image selected.</p>
+
+        <label for="operation-select">Transformation test</label>
+        <select id="operation-select">
+          <option value="identity">No changes (identity)</option>
+          <option value="crop">Center crop (80%)</option>
+          <option value="resize">Resize to 50% with aspect ratio</option>
+          <option value="rotate-90">Rotate 90° clockwise</option>
+          <option value="rotate-180">Rotate 180°</option>
+          <option value="rotate-270">Rotate 270° clockwise</option>
+          <option value="flip-horizontal">Flip horizontally</option>
+          <option value="flip-vertical">Flip vertically</option>
+          <option value="combined">Crop + resize + rotate + flip</option>
+        </select>
+        <button id="run-test" type="button" disabled>Run transformation</button>
+        <p id="test-status" class="status" role="status" aria-live="polite">Select an image to begin.</p>
+      </section>
+
+      <section class="preview-grid" aria-label="Image comparison">
+        <article class="preview-panel">
+          <h2>Original</h2>
+          <p id="original-dimensions" class="hint">No image loaded.</p>
+          <div class="canvas-wrap"><canvas id="original-preview"></canvas></div>
+        </article>
+        <article class="preview-panel">
+          <h2>Transformed</h2>
+          <p id="output-dimensions" class="hint">No transformation run.</p>
+          <div class="canvas-wrap"><canvas id="output-preview"></canvas></div>
+        </article>
+      </section>
+    </main>
+    <script type="module" src="./browser-transformer.js"></script>
+  </body>
+</html>
