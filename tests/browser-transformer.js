@@ -26,13 +26,9 @@ function drawImageData(canvas, imageData) {
   canvas.height = imageData.height;
   const context = canvas.getContext("2d", { willReadFrequently: true });
   if (!context) throw new Error("A 2D canvas context is not available.");
-  context.putImageData(
-    new ImageData(new Uint8ClampedArray(imageData.data), imageData.width, imageData.height, {
-      colorSpace: "srgb"
-    }),
-    0,
-    0
-  );
+  const output = context.createImageData(imageData.width, imageData.height);
+  output.data.set(imageData.data);
+  context.putImageData(output, 0, 0);
 }
 
 function getTransformation(name, width, height) {
@@ -105,6 +101,7 @@ fileInput.addEventListener("change", async () => {
   outputDimensions.textContent = "No transformation run.";
 
   let decoded;
+  let stagingCanvas;
   try {
     decoded = await decodeImage(file);
 
@@ -112,7 +109,7 @@ fileInput.addEventListener("change", async () => {
       throw new RangeError("The image exceeds the 40-million-pixel transformation limit.");
     }
 
-    const stagingCanvas = document.createElement("canvas");
+    stagingCanvas = document.createElement("canvas");
     stagingCanvas.width = decoded.width;
     stagingCanvas.height = decoded.height;
     const context = stagingCanvas.getContext("2d", { willReadFrequently: true });
@@ -146,7 +143,10 @@ fileInput.addEventListener("change", async () => {
     originalDimensions.textContent = "Image could not be loaded.";
   } finally {
     decoded?.close();
-    // The staging canvas is local to this handler and can be collected after decoding.
+    if (stagingCanvas) {
+      stagingCanvas.width = 0;
+      stagingCanvas.height = 0;
+    }
   }
 });
 
