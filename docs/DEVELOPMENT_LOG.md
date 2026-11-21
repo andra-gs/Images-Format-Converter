@@ -4,8 +4,8 @@ This file records actual repository progress. Update it after meaningful impleme
 
 ## Project status
 
-- Current stage: Phase 5 - Image manipulation (in progress on this feature branch)
-- Current phase status: Phase 4 is complete. Phase 5 implementation has started on feature branches. The Image Transformer module and focused tests are present on `phase-5-transformation`; Farrel's editor scaffold/adapter is pending on `phase-5-editor-ui`; Adit's adjustment module remains pending. None of these feature-branch changes are merged into `main`. Phase 6 begins only after Phase 5 is integrated and verified.
+- Current stage: Phase 5 - Image manipulation
+- Current phase status: Phase 4 is complete. Phase 5 transformation and adjustment processing modules are implemented on their feature branches, with unit tests, user-confirmed real-image browser checks, and successful CI validation. Editor UI integration and the complete editing-to-conversion workflow remain pending. Phase 6 begins only after Phase 5 is integrated and verified.
 - Latest release: None
 - Last updated: 2026-11-21
 
@@ -26,7 +26,7 @@ This file records actual repository progress. Update it after meaningful impleme
 | Phase 2: Core conversion engine | Tested | PNG, JPEG, WebP, and BMP conversion paths are user-verified; user reports the requested automated tests and build checks passed |
 | Phase 3: Batch processing | Tested | User verified batch queue, worker execution, progress, cancellation, failure isolation, large-image responsiveness, cleanup, individual downloads, ZIP extraction, and image integrity |
 | Phase 4: Advanced formats | Tested | Completed; CI validation and user-run real-browser verification passed. Known format limitations remain documented |
-| Phase 5: Image manipulation | In progress | Image Transformer implementation, 16 focused tests, and a real-image browser test harness are on `phase-5-transformation`. User confirmed 50 repository tests pass, the production build succeeds, and real-image browser checks produce the expected results. Farrel's editor scaffold/adapter and Adit's adjustment module remain pending. No Phase 5 PRs are open or merged |
+| Phase 5: Image manipulation | In progress | Image Transformation and Image Adjustment processing modules are implemented and independently tested; Editor UI/Integration remains pending |
 | Phase 6: Advanced export and image optimization | Not started | Image Optimization, Metadata Management, and Export Presets/UI. Starts after Phase 5 integration |
 | Phase 7: Testing, documentation, and release | Not started | Cross-browser QA, security review, documentation, production validation, and v1.0.0 readiness |
 
@@ -34,86 +34,25 @@ This file records actual repository progress. Update it after meaningful impleme
 
 Add newest entries first.
 
-### 2026-11-21 - Image Transformer real-image browser verification
-- Status: Tested; user-confirmed.
-- Tests performed:
-  - The user ran the browser harness at `/tests/browser-transformer.html` with real image files.
-  - The user reported that the transformation results matched expectations.
-- Test results:
-  - Real-image browser verification is user-confirmed successful.
-  - Combined with the earlier user-confirmed result of 50 passing repository tests and a successful production build, the current Image Transformer implementation has passed its planned module-level verification.
-- Known scope:
-  - The browser harness verifies the standalone Transformer with decoded image data. It does not yet verify the feature inside Farrel's editor or the full editing-to-conversion handoff.
-- Next steps:
-  - Coordinate with Adit and Farrel on processing-module readiness and adapter integration.
-  - Review the latest team branches and shared API usage before opening or merging processing-module PRs.
-  - Keep the editor integration and end-to-end conversion verification as separate remaining Phase 5 tasks.
-
-### 2026-11-21 - Browser test harness and local verification for Image Transformer
-- Status: Implemented; automated verification user-confirmed; real-file browser verification pending.
-- Changes:
-  - Added a browser test page at `tests/browser-transformer.html` for selecting real local image files and running individual transformation cases.
-  - Added comparison previews for original and transformed pixels, with output dimensions and operation status.
-  - Added identity, center crop, aspect-ratio resize, 90/180/270-degree rotation, horizontal flip, vertical flip, and combined-operation test cases.
-  - The harness uses the existing `decodeImage()` adapter, converts its decoded source to sRGB ImageData through Canvas, calls the standalone Image Transformer, and displays the returned pixels.
-  - Kept this harness separate from the production UI and conversion service. It does not change the existing application workflow.
-  - Released the decoder resource and staging canvas after reading source pixels.
-- Files changed:
-  - `tests/browser-transformer.html`
-  - `tests/browser-transformer.css`
-  - `tests/browser-transformer.js`
-  - `docs/DEVELOPMENT_ROADMAP.md`
-  - `docs/DEVELOPMENT_LOG.md`
-- Tests performed by the user on 2026-11-21:
-  - `npm test`: 50 tests passed, 0 failed. This includes the 16 Image Transformer tests.
-  - `npm run build`: Vite production build succeeded.
-- Test results:
-  - Full automated test suite and production build are user-confirmed passing.
-  - Real-image browser testing through the new harness has not yet been performed.
-  - The build reports the existing large HEIC chunks warning; the build itself succeeds.
-- Next steps:
-  - Run `npm run dev` and open `/tests/browser-transformer.html`.
-  - Test a transparent PNG, JPEG, landscape image, and portrait image with every listed operation.
-  - Confirm the preview, output dimensions, and alpha behavior. Report any mismatch before connecting the module to the editor.
-  - Coordinate integration after Adit's processing module and Farrel's adapter are ready.
-
-### 2026-11-21 - Expanded Image Transformer rotation coverage
-- Status: Tested; focused module suite.
-- Changes:
-  - Added non-square source fixtures to verify 90-degree and 270-degree rotation output dimensions and pixel order.
-- Tests performed:
-  - Re-ran the focused Image Transformer Node test suite.
-- Test results:
-  - 16 tests passed, 0 failed.
-  - Full repository tests, production build, and browser checks remain pending.
-
-
-### 2026-11-21 - Initial Image Transformer implementation
-- Status: Implemented; full repository verification pending.
-- Changes:
-  - Added the Image Transformer API using the agreed sRGB ImageData representation.
-  - Implemented source-relative crop, aspect-ratio-aware resize, clockwise right-angle rotation, and horizontal/vertical flips.
-  - Applied Crop → Resize → Rotation → Flip through direct source-coordinate mapping.
-  - Used bilinear interpolation with premultiplied-alpha color sampling for resizing.
-  - Kept input data immutable and allocated only the final output pixel buffer.
-  - Added validation for ImageData, options, crop bounds, and the shared 16,384-pixel / 40-million-pixel limits.
-- Files changed:
-  - `src/js/core/image-transformer.js`
-  - `tests/image-transformer.test.js`
-  - `docs/PHASE_5_TRANSFORMATION.md`
-- Tests performed:
-  - Ran `node --test tests/image-transformer.test.js` against the isolated implementation.
-- Test results:
-  - 15 tests passed, 0 failed.
-  - The full repository `npm test`, `npm run build`, and real-browser checks have not yet been run.
-- Known limitations:
-  - Processing is synchronous. The module is Worker-compatible because it uses typed arrays and no DOM APIs, but Worker orchestration remains outside this module.
-  - Resizing uses bilinear interpolation and may alter pixel values as expected.
-- Next steps:
-  - Run the full repository tests and production build in a local checkout.
-  - Review the implementation with representative real images and large-image performance.
-  - Coordinate integration with Adit and Farrel after their modules and adapter are ready.
-
+### 2026-11-21 - Phase 5 Image Transformation verification and CI results
+- Status: Processing module tested; real-image browser verification and full repository CI passed (user-confirmed browser/local checks and GitHub Actions).
+- Implementation:
+  - Added `applyImageTransformations(imageData, transformations)` with crop, resize, rotation, and horizontal/vertical flip operations using the shared sRGB ImageData representation.
+  - Preserved input immutability and used premultiplied-alpha interpolation during resize to reduce transparent-edge artifacts.
+  - Added dimension, pixel-count, option, and crop-bound validation.
+  - Added 16 focused Image Transformer unit tests and a real-image browser harness.
+- Verification:
+  - The user confirmed the browser harness produces the expected results with real image files.
+  - The user ran `npm test`: 50 tests passed, 0 failed, 0 cancelled, and 0 skipped.
+  - The user ran `npm run build`: Vite production build completed successfully.
+  - GitHub Actions for PR #3 completed successfully. Dependency installation, all 50 tests, and the production build passed.
+- Build note:
+  - Vite reports the existing HEIC-related chunks exceed the 500 kB advisory threshold. This is a bundle-size warning, not a build failure.
+- Verification boundaries:
+  - These results validate the standalone Transformer module and its browser harness. They do not validate the integrated editor or the complete editing-to-conversion workflow.
+- Remaining work:
+  - Integrate the Transformer and Adjuster modules through the Editor UI branch.
+  - Run end-to-end browser checks after editor integration.
 
 ### 2026-11-20 - Animated GIF conversion implementation
 
@@ -1246,3 +1185,81 @@ Only record work that actually happened in the repository. Do not mark a feature
   - Phase 5 and Phase 6 feature implementation status remains unchanged; no feature branches were created by this documentation update.
 
 
+### 2026-11-21 - Phase 5 Image Adjustment module implementation
+- Status: Implemented; focused unit tests passed; browser and editor verification pending
+- Changes:
+  - Added the Image Adjuster module on `phase-5-adjustment` using the agreed sRGB ImageData representation and `applyImageAdjustments(imageData, adjustments)` API.
+  - Implemented brightness, contrast, saturation, grayscale, sepia, and Gaussian blur with the agreed ranges and defaults.
+  - Preserved source immutability, image dimensions, and alpha values. Blur uses premultiplied-alpha sampling and a rolling row cache.
+  - Added validation for ImageData, unknown options, invalid types, parameter ranges, and shared image limits.
+  - Added focused tests for each adjustment, combined operations, blur behavior, transparency, dimensions, and invalid inputs.
+  - Added `docs/PHASE_5_ADJUSTMENT.md` describing algorithms, options, errors, resource ownership, and verification.
+- Files changed:
+  - `src/js/core/image-adjuster.js`
+  - `tests/image-adjuster.test.js`
+  - `docs/PHASE_5_ADJUSTMENT.md`
+  - `docs/DEVELOPMENT_ROADMAP.md`
+  - `docs/DEVELOPMENT_LOG.md`
+  - `docs/TECHNICAL_SPECIFICATION.md`
+- Tests performed:
+  - Ran `node --test tests/image-adjuster.test.js` in a local Node test environment.
+  - Ran `node --check src/js/core/image-adjuster.js`.
+- Test results:
+  - All 16 focused Image Adjuster tests passed.
+  - Syntax validation passed.
+  - The full repository test suite and production build have not been run for this branch update.
+- Known issues:
+  - Real-image browser verification remains pending.
+  - Editor integration and the complete editing-to-conversion workflow remain pending.
+- Next steps:
+  - Verify the module with representative real images.
+  - Coordinate the integration handoff with the Editor UI branch.
+  - Run the full repository test suite and production build before preparing the Pull Request.
+
+
+### 2026-11-21 - Add Image Adjuster real-image browser harness
+- Status: Added; browser verification pending
+- Changes:
+  - Added `tests/browser-adjuster.html`, `tests/browser-adjuster.css`, and `tests/browser-adjuster.js`.
+  - The harness uses the existing image decoder, extracts sRGB ImageData, and displays original and adjusted previews.
+  - Added controls for brightness, contrast, saturation, blur, grayscale, and sepia, plus Reset.
+  - Kept the harness separate from the production editor and conversion flow.
+  - Releases the decoded image and temporary staging canvas after extracting source pixels.
+- Tests performed:
+  - Ran JavaScript syntax validation with `node --check` for the browser harness script in the local Node environment.
+  - The real-browser harness has not yet been run with user image files.
+- Next steps:
+  - Open `http://localhost:5173/tests/browser-adjuster.html` while `npm run dev` is running.
+  - Verify each adjustment and representative combinations using real local images.
+  - Confirm dimensions and alpha transparency remain unchanged.
+
+
+### 2026-11-21 - Phase 5 Image Adjustment verification and CI results
+- Status: Processing module tested; real-image browser verification and full repository CI passed (user-confirmed browser/local checks and GitHub Actions).
+- Verification:
+  - The user confirmed that all Image Adjustment features work correctly in the real-image browser harness.
+  - The user ran `npm test`: 50 tests passed, 0 failed, 0 cancelled, and 0 skipped.
+  - The user ran `npm run build`: Vite production build completed successfully.
+  - GitHub Actions for PR #2 completed successfully. Dependency installation, all 50 tests, and the production build passed.
+- Build note:
+  - Vite reports the existing HEIC-related chunks exceed the 500 kB advisory threshold. This is a bundle-size warning, not a build failure.
+- Verification boundaries:
+  - These results validate the standalone processing module and its browser harness. They do not validate the integrated editor or the complete editing-to-conversion workflow.
+- Remaining work:
+  - Integrate the Transformer and Adjuster modules through the Editor UI branch.
+  - Run end-to-end browser checks after editor integration.
+
+### 2026-11-21 - User verification of Image Adjuster in browser
+- Status: Real-image browser verification passed (user-confirmed); editor integration pending
+- User verification:
+  - The user reported that the Image Adjustment features are working well in the browser harness.
+  - This confirms the six adjustment controls and browser preview workflow at the feature level.
+- Documentation:
+  - Updated the Phase 5 roadmap to mark real-image browser verification complete for Image Adjustment.
+  - Updated the Image Adjustment phase document to record the user-confirmed browser result.
+- Verification boundaries:
+  - This entry does not claim a new full `npm test` run or production build for the latest branch state.
+  - Editor integration and the complete editing-to-conversion workflow remain pending.
+- Next steps:
+  - Run the full repository test suite and production build on the latest `phase-5-adjustment` branch.
+  - Coordinate the processing-module handoff and integration with the Editor UI branch.
