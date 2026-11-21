@@ -91,3 +91,18 @@ These results are user-reported local checks; they were not independently execut
 ## Current status
 
 The editor scaffold, adapter preparation, automated test suite, production build, and reported manual browser checks are verified for the current branch state. Phase 5 is **not complete**: real Transformer/Adjuster integration, edited-pixel conversion handoff, live preview updates, and enabling Apply remain pending.
+
+## Edited-pixel conversion handoff — implementation in progress
+
+A dedicated service entry point has been added:
+
+```javascript
+convertImageDataToFormat(imageData, format, options)
+```
+
+It converts the edited sRGB ImageData into a temporary Canvas-backed source and reuses the existing encoder. The shared validation path checks the generated output signature, decodes the output again, and verifies its dimensions. Temporary Canvas and verification-decoder resources are released; the input ImageData and returned Blob remain caller-owned.
+
+Supported edited-image formats are PNG, JPEG, WebP, BMP, TIFF, and SVG. Animated GIF remains on the existing File-based path and is not yet supported by the edited-ImageData entry point. The new entry point is main-thread-only; existing File/Blob Worker routing is unchanged.
+
+A new test file, `tests/edited-image-conversion.test.js`, covers the edited-pixel handoff, output dimension verification, invalid ImageData rejection, and the explicit GIF limitation. These tests have been added but have **not yet been run locally**. The earlier 47/47 result applies to the previous branch state and does not include these new tests.
+
