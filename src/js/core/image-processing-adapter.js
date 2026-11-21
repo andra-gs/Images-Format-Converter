@@ -245,17 +245,18 @@ export function createImageProcessingAdapter({
 } = {}) {
   const hasTransformer = typeof applyImageTransformations === "function";
   const hasAdjuster = typeof applyImageAdjustments === "function";
+  const modulesReady = hasTransformer && hasAdjuster;
   const capabilities = Object.freeze({
-    resize: hasTransformer,
-    crop: hasTransformer,
-    rotate: hasTransformer,
-    flip: hasTransformer,
-    brightness: hasAdjuster,
-    contrast: hasAdjuster,
-    saturation: hasAdjuster,
-    blur: hasAdjuster,
-    grayscale: hasAdjuster,
-    sepia: hasAdjuster
+    resize: modulesReady,
+    crop: modulesReady,
+    rotate: modulesReady,
+    flip: modulesReady,
+    brightness: modulesReady,
+    contrast: modulesReady,
+    saturation: modulesReady,
+    blur: modulesReady,
+    grayscale: modulesReady,
+    sepia: modulesReady
   });
 
   return Object.freeze({
