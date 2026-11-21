@@ -4,10 +4,10 @@ This file records actual repository progress. Update it after meaningful impleme
 
 ## Project status
 
-- Current stage: Phase 5 - Image manipulation (next planned phase)
-- Current phase status: Phase 4 is complete. HEIC/HEIF, TIFF, SVG, GIF first-frame conversion, animated GIF-to-GIF, and static-image-to-GIF have passed the documented CI and user-run browser verification. Phase 5 implementation has not started; Phase 6 begins only after Phase 5 is integrated and verified.
+- Current stage: Phase 5 - Image manipulation (in progress on this feature branch)
+- Current phase status: Phase 4 is complete. Phase 5 implementation has started on feature branches. The Image Transformer module and focused tests are present on `phase-5-transformation`; Farrel's editor scaffold/adapter is pending on `phase-5-editor-ui`; Adit's adjustment module remains pending. None of these feature-branch changes are merged into `main`. Phase 6 begins only after Phase 5 is integrated and verified.
 - Latest release: None
-- Last updated: 2026-11-20
+- Last updated: 2026-11-21
 
 ## Status legend
 
@@ -26,13 +26,51 @@ This file records actual repository progress. Update it after meaningful impleme
 | Phase 2: Core conversion engine | Tested | PNG, JPEG, WebP, and BMP conversion paths are user-verified; user reports the requested automated tests and build checks passed |
 | Phase 3: Batch processing | Tested | User verified batch queue, worker execution, progress, cancellation, failure isolation, large-image responsiveness, cleanup, individual downloads, ZIP extraction, and image integrity |
 | Phase 4: Advanced formats | Tested | Completed; CI validation and user-run real-browser verification passed. Known format limitations remain documented |
-| Phase 5: Image manipulation | Not started | Image Transformation, Image Adjustment, and Editor UI/Integration |
+| Phase 5: Image manipulation | In progress | Initial Image Transformer implementation and 16 focused tests on `phase-5-transformation`; Farrel's editor scaffold/adapter is pending on `phase-5-editor-ui`; Adit's adjustment module is pending. No Phase 5 PRs are open or merged yet |
 | Phase 6: Advanced export and image optimization | Not started | Image Optimization, Metadata Management, and Export Presets/UI. Starts after Phase 5 integration |
 | Phase 7: Testing, documentation, and release | Not started | Cross-browser QA, security review, documentation, production validation, and v1.0.0 readiness |
 
 ## Change log
 
 Add newest entries first.
+
+### 2026-11-21 - Expanded Image Transformer rotation coverage
+- Status: Tested; focused module suite.
+- Changes:
+  - Added non-square source fixtures to verify 90-degree and 270-degree rotation output dimensions and pixel order.
+- Tests performed:
+  - Re-ran the focused Image Transformer Node test suite.
+- Test results:
+  - 16 tests passed, 0 failed.
+  - Full repository tests, production build, and browser checks remain pending.
+
+
+### 2026-11-21 - Initial Image Transformer implementation
+- Status: Implemented; full repository verification pending.
+- Changes:
+  - Added the Image Transformer API using the agreed sRGB ImageData representation.
+  - Implemented source-relative crop, aspect-ratio-aware resize, clockwise right-angle rotation, and horizontal/vertical flips.
+  - Applied Crop → Resize → Rotation → Flip through direct source-coordinate mapping.
+  - Used bilinear interpolation with premultiplied-alpha color sampling for resizing.
+  - Kept input data immutable and allocated only the final output pixel buffer.
+  - Added validation for ImageData, options, crop bounds, and the shared 16,384-pixel / 40-million-pixel limits.
+- Files changed:
+  - `src/js/core/image-transformer.js`
+  - `tests/image-transformer.test.js`
+  - `docs/PHASE_5_TRANSFORMATION.md`
+- Tests performed:
+  - Ran `node --test tests/image-transformer.test.js` against the isolated implementation.
+- Test results:
+  - 15 tests passed, 0 failed.
+  - The full repository `npm test`, `npm run build`, and real-browser checks have not yet been run.
+- Known limitations:
+  - Processing is synchronous. The module is Worker-compatible because it uses typed arrays and no DOM APIs, but Worker orchestration remains outside this module.
+  - Resizing uses bilinear interpolation and may alter pixel values as expected.
+- Next steps:
+  - Run the full repository tests and production build in a local checkout.
+  - Review the implementation with representative real images and large-image performance.
+  - Coordinate integration with Adit and Farrel after their modules and adapter are ready.
+
 
 ### 2026-11-20 - Animated GIF conversion implementation
 
@@ -1165,39 +1203,3 @@ Only record work that actually happened in the repository. Do not mark a feature
   - Phase 5 and Phase 6 feature implementation status remains unchanged; no feature branches were created by this documentation update.
 
 
-### 2026-11-21 - Initial Image Transformer implementation
-- Status: Implemented; full repository verification pending.
-- Changes:
-  - Added the Image Transformer API using the agreed sRGB ImageData representation.
-  - Implemented source-relative crop, aspect-ratio-aware resize, clockwise right-angle rotation, and horizontal/vertical flips.
-  - Applied Crop → Resize → Rotation → Flip through direct source-coordinate mapping.
-  - Used bilinear interpolation with premultiplied-alpha color sampling for resizing.
-  - Kept input data immutable and allocated only the final output pixel buffer.
-  - Added validation for ImageData, options, crop bounds, and the shared 16,384-pixel / 40-million-pixel limits.
-- Files changed:
-  - `src/js/core/image-transformer.js`
-  - `tests/image-transformer.test.js`
-  - `docs/PHASE_5_TRANSFORMATION.md`
-- Tests performed:
-  - Ran `node --test tests/image-transformer.test.js` against the isolated implementation.
-- Test results:
-  - 15 tests passed, 0 failed.
-  - The full repository `npm test`, `npm run build`, and real-browser checks have not yet been run.
-- Known limitations:
-  - Processing is synchronous. The module is Worker-compatible because it uses typed arrays and no DOM APIs, but Worker orchestration remains outside this module.
-  - Resizing uses bilinear interpolation and may alter pixel values as expected.
-- Next steps:
-  - Run the full repository tests and production build in a local checkout.
-  - Review the implementation with representative real images and large-image performance.
-  - Coordinate integration with Adit and Farrel after their modules and adapter are ready.
-
-
-### 2026-11-21 - Expanded Image Transformer rotation coverage
-- Status: Tested; focused module suite.
-- Changes:
-  - Added non-square source fixtures to verify 90-degree and 270-degree rotation output dimensions and pixel order.
-- Tests performed:
-  - Re-ran the focused Image Transformer Node test suite.
-- Test results:
-  - 16 tests passed, 0 failed.
-  - Full repository tests, production build, and browser checks remain pending.
