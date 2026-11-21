@@ -26,13 +26,41 @@ This file records actual repository progress. Update it after meaningful impleme
 | Phase 2: Core conversion engine | Tested | PNG, JPEG, WebP, and BMP conversion paths are user-verified; user reports the requested automated tests and build checks passed |
 | Phase 3: Batch processing | Tested | User verified batch queue, worker execution, progress, cancellation, failure isolation, large-image responsiveness, cleanup, individual downloads, ZIP extraction, and image integrity |
 | Phase 4: Advanced formats | Tested | Completed; CI validation and user-run real-browser verification passed. Known format limitations remain documented |
-| Phase 5: Image manipulation | In progress | Initial Image Transformer implementation and 16 focused tests on `phase-5-transformation`; Farrel's editor scaffold/adapter is pending on `phase-5-editor-ui`; Adit's adjustment module is pending. No Phase 5 PRs are open or merged yet |
+| Phase 5: Image manipulation | In progress | Image Transformer implementation, 16 focused tests, and a real-image browser test harness are on `phase-5-transformation`. User confirmed 50 repository tests pass and the production build succeeds. Real-file browser verification is pending. Farrel's editor scaffold/adapter and Adit's adjustment module remain pending. No Phase 5 PRs are open or merged |
 | Phase 6: Advanced export and image optimization | Not started | Image Optimization, Metadata Management, and Export Presets/UI. Starts after Phase 5 integration |
 | Phase 7: Testing, documentation, and release | Not started | Cross-browser QA, security review, documentation, production validation, and v1.0.0 readiness |
 
 ## Change log
 
 Add newest entries first.
+
+### 2026-11-21 - Browser test harness and local verification for Image Transformer
+- Status: Implemented; automated verification user-confirmed; real-file browser verification pending.
+- Changes:
+  - Added a browser test page at `tests/browser-transformer.html` for selecting real local image files and running individual transformation cases.
+  - Added comparison previews for original and transformed pixels, with output dimensions and operation status.
+  - Added identity, center crop, aspect-ratio resize, 90/180/270-degree rotation, horizontal flip, vertical flip, and combined-operation test cases.
+  - The harness uses the existing `decodeImage()` adapter, converts its decoded source to sRGB ImageData through Canvas, calls the standalone Image Transformer, and displays the returned pixels.
+  - Kept this harness separate from the production UI and conversion service. It does not change the existing application workflow.
+  - Released the decoder resource and staging canvas after reading source pixels.
+- Files changed:
+  - `tests/browser-transformer.html`
+  - `tests/browser-transformer.css`
+  - `tests/browser-transformer.js`
+  - `docs/DEVELOPMENT_ROADMAP.md`
+  - `docs/DEVELOPMENT_LOG.md`
+- Tests performed by the user on 2026-11-21:
+  - `npm test`: 50 tests passed, 0 failed. This includes the 16 Image Transformer tests.
+  - `npm run build`: Vite production build succeeded.
+- Test results:
+  - Full automated test suite and production build are user-confirmed passing.
+  - Real-image browser testing through the new harness has not yet been performed.
+  - The build reports the existing large HEIC chunks warning; the build itself succeeds.
+- Next steps:
+  - Run `npm run dev` and open `/tests/browser-transformer.html`.
+  - Test a transparent PNG, JPEG, landscape image, and portrait image with every listed operation.
+  - Confirm the preview, output dimensions, and alpha behavior. Report any mismatch before connecting the module to the editor.
+  - Coordinate integration after Adit's processing module and Farrel's adapter are ready.
 
 ### 2026-11-21 - Expanded Image Transformer rotation coverage
 - Status: Tested; focused module suite.
