@@ -318,3 +318,85 @@ Suggested branch names:
 | Phase 6 | `phase-6-optimization` | `phase-6-metadata` | `phase-6-export-ui` |
 
 These are naming conventions only. A branch is not considered created or implemented merely because it appears in this specification.
+
+## 25. Phase 5 shared ImageData contract
+
+The Phase 5 team has agreed to use an sRGB pixel buffer as the shared representation between the Image Transformer, Image Adjuster, and Editor integration.
+
+```javascript
+{
+  data: Uint8ClampedArray,
+  width: number,
+  height: number,
+  colorSpace: "srgb"
+}
+```
+
+Both processing modules receive an ImageData-shaped value, must not mutate the input, and return a new result:
+
+```javascript
+{
+  imageData,
+  width,
+  height
+}
+```
+
+The returned width and height must match the returned `imageData`. Image dimensions and every allocated pixel buffer/canvas are subject to the project limits: 16,384 pixels per side and 40,000,000 total pixels. Alpha values must be preserved according to the agreed operation behavior. Processing modules must not depend on DOM UI state and should remain compatible with Web Workers.
+
+### Image Transformer — `src/js/core/image-transformer.js`
+
+Owner: `andra-gs`.
+
+Public API:
+
+```javascript
+applyImageTransformations(imageData, transformations)
+```
+
+The transformations object contains `resize`, `crop`, `rotation`, `flipHorizontal`, and `flipVertical`. Processing order is crop, resize, rotation, then flip. Resize dimensions are pixels; aspect-ratio mode calculates a missing dimension and fits two provided dimensions proportionally. With aspect ratio disabled, both dimensions are required. Null resize dimensions preserve the current size. Null crop width/height use the remaining source area from the crop origin. Crop coordinates refer to the original source. Rotation accepts 0, 90, 180, and 270 degrees clockwise; 90/270 swap output dimensions.
+
+### Image Adjuster — `src/js/core/image-adjuster.js`
+
+Owner: `Adit1945-web`.
+
+Public API:
+
+```javascript
+applyImageAdjustments(imageData, adjustments)
+```
+
+Defaults and ranges:
+
+| Parameter | Range | Default |
+|---|---:|---:|
+| brightness | -100 to 100 | 0 |
+| contrast | -100 to 100 | 0 |
+| saturation | 0 to 200 | 100 |
+| blur | 0 to 20 px | 0 |
+| grayscale | Boolean | false |
+| sepia | Boolean | false |
+
+Unknown properties and invalid types/ranges are rejected. Processing order is brightness, contrast, saturation, grayscale, sepia, and Gaussian blur. Output dimensions remain unchanged and alpha values are preserved.
+
+### Editor integration — `FarrelPtrv`
+
+The editor's shared state contains separate `transformations` and `adjustments` objects. The processing pipeline is:
+
+```text
+decodeImage()
+  → decoder source to owned ImageData
+  → applyImageTransformations()
+  → applyImageAdjustments()
+  → ImageData to Canvas/encoder adapter
+  → existing conversion service
+```
+
+The decoder result remains owned by the caller. The adapter copies decoded pixels into an owned ImageData buffer and releases only its temporary canvas. Processing modules own their temporary resources and return new ImageData. The adapter does not close the decoder result. Output ImageData is owned by the caller and can be copied into a caller-owned Canvas for preview or encoding.
+
+The editor adapter uses dependency injection for the two processing functions so the UI branch can be prepared before the modules are merged. Until both functions are supplied, capabilities remain unavailable and processing rejects with `EDITOR_PROCESSING_UNAVAILABLE`. The editor Apply action must remain disabled until real modules and conversion handoff are integrated and tested.
+
+The adapter checks cancellation between processing stages using AbortSignal. Cancellation raises AbortError. It validates ImageData structure, sRGB color space, buffer length, output dimensions, and project dimension limits. A module result must have the agreed `{ imageData, width, height }` shape with matching dimensions.
+
+The existing conversion service currently accepts a File/Blob and performs its own decoding and output validation. The final integration must hand the edited pixels into that established service without bypassing output signature/dimension validation or creating a parallel conversion engine. A lossless intermediate or a coordinated service entry point must be selected during final integration; do not silently route the original file back through conversion because that would discard edits.
+
