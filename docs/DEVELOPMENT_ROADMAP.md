@@ -161,7 +161,9 @@ Completion criteria:
 
 ### 5.2 `Adit1945-web`: Image Adjustment
 
-Objective: implement pixel appearance and color adjustments. These operations modify the visual appearance of the image without changing its geometric dimensions.\n\nStatus: Processing module and focused unit tests implemented on `phase-5-adjustment`. Real-image browser verification and editor integration remain pending.
+Objective: implement pixel appearance and color adjustments. These operations modify the visual appearance of the image without changing its geometric dimensions.
+
+Status: Processing module, focused unit tests, and real-image browser verification are complete on `phase-5-adjustment`. The full repository test suite and production build also pass. Editor integration and the complete editing-to-conversion workflow remain pending.
 
 Tasks:
 
