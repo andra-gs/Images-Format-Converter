@@ -34,6 +34,26 @@ This file records actual repository progress. Update it after meaningful impleme
 
 Add newest entries first.
 
+### 2026-11-21 - Phase 5 Image Transformation verification and CI results
+- Status: Processing module tested; real-image browser verification and full repository CI passed (user-confirmed browser/local checks and GitHub Actions).
+- Implementation:
+  - Added `applyImageTransformations(imageData, transformations)` with crop, resize, rotation, and horizontal/vertical flip operations using the shared sRGB ImageData representation.
+  - Preserved input immutability and used premultiplied-alpha interpolation during resize to reduce transparent-edge artifacts.
+  - Added dimension, pixel-count, option, and crop-bound validation.
+  - Added 16 focused Image Transformer unit tests and a real-image browser harness.
+- Verification:
+  - The user confirmed the browser harness produces the expected results with real image files.
+  - The user ran `npm test`: 50 tests passed, 0 failed, 0 cancelled, and 0 skipped.
+  - The user ran `npm run build`: Vite production build completed successfully.
+  - GitHub Actions for PR #3 completed successfully. Dependency installation, all 50 tests, and the production build passed.
+- Build note:
+  - Vite reports the existing HEIC-related chunks exceed the 500 kB advisory threshold. This is a bundle-size warning, not a build failure.
+- Verification boundaries:
+  - These results validate the standalone Transformer module and its browser harness. They do not validate the integrated editor or the complete editing-to-conversion workflow.
+- Remaining work:
+  - Integrate the Transformer and Adjuster modules through the Editor UI branch.
+  - Run end-to-end browser checks after editor integration.
+
 ### 2026-11-20 - Animated GIF conversion implementation
 
 - Status: Implemented; dependency and real-browser verification pending.
