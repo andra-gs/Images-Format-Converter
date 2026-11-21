@@ -126,3 +126,18 @@ The user manually verified the application in the browser after the edited-Image
 - Apply remains disabled as expected while the real Transformer/Adjuster integration is not yet available.
 
 This is a user-reported manual regression check. It does not constitute end-to-end verification of edited image processing.
+
+
+## Queue → Editor bridge — implemented, pending local verification
+
+The Queue publishes the `ifc:queue-change` Custom Event after files are added, removed, or the queue is cleared. Its `detail.entries` payload is a lightweight snapshot containing:
+
+- `id`: queue entry identifier
+- `name`: original file name
+- `file`: original File reference (the Queue remains its owner)
+- `format`: detected format identifier
+- `url`: object URL used by the existing preview
+
+The snapshot is created by `src/js/core/editor-queue-events.js`. The Editor listens for this event and refreshes its selector and preview from the event payload rather than observing or reading Queue DOM mutations. Existing File/Blob conversion and Worker routing are unchanged.
+
+Automated coverage was added in `tests/editor-queue-events.test.js` for the payload shape, original File reference, and empty queue. The tests and browser interactions must be run locally before this bridge is considered verified. This bridge does not yet decode the selected File or enable Apply.
