@@ -40,8 +40,8 @@ Add newest entries first.
 - Recorded the team's final shared sRGB ImageData contract in the Technical Specification and Phase 5 editor notes.
 - Updated the editor draft state to use the agreed `transformations` and `adjustments` groups.
 - Reworked `image-processing-adapter.js` to validate ImageData and dimension limits, copy decoder pixels into an owned pixel buffer, release its temporary canvas, and create a caller-owned Canvas result from ImageData.
-- Added dependency injection for the Transformer and Adjuster functions. The adapter preserves Transform → Adjust ordering, validates each `{ imageData, width, height }` result, and checks cancellation between stages.
-- Kept all capabilities unavailable and Apply disabled until both real processing modules and the final conversion handoff are integrated.
+- Added dependency injection for the Transformer and Adjuster functions. The adapter preserves Transform → Adjust ordering, validates each `{ imageData, width, height }` result, checks cancellation between stages, and wraps unexpected internal failures as `ImageProcessingError`.
+- Kept all capabilities unavailable until both processing functions are supplied and Apply disabled until the decoded-image handoff and final conversion integration are connected. Updated the disabled Apply handler to use the adapter's object-shaped request.
 - Updated the Phase 5 roadmap wording to reference the agreed contracts without marking unimplemented processing features complete.
 - Automated tests were expanded for shared state, pixel validation, limits, decoder copying, canvas cleanup, processing order, output validation, placeholder behavior, and cancellation. Tests were not run in this environment.
 - Existing conversion service, decoder, encoder, Worker orchestration, queue, and ZIP exporter were not modified.
