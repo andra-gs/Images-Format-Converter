@@ -1,6 +1,7 @@
 import { decodeImage } from "./image-decoder.js";
 import { encodeImage } from "./image-encoder.js";
 import { detectImageFormat } from "./format-detector.js";
+import { imageDataToCanvasResult } from "./image-processing-adapter.js";
 
 async function convertGifDirect(file) {
   const { convertImageToGif: convertGif } = await import("./animated-gif.js");
@@ -11,36 +12,69 @@ async function convertGifDirect(file) {
  * Convert a supported source image and verify the generated output.
  * The returned Blob is owned by the caller.
  */
-async function convertImageDirect(file, format, options = {}) {
-  const source = await decodeImage(file);
-  let output;
+/**
+ * Encode an already-decoded image and run the same output verification used by
+ * the File/Blob conversion path.
+ */
+async function encodeAndValidateImage(decodedImage, format, options = {}) {
+  const output = await encodeImage(decodedImage, { ...options, format });
+
+  const detectedOutput = await detectImageFormat(output);
+  if (detectedOutput?.format !== format) {
+    throw new Error(`The generated output did not pass ${format.toUpperCase()} signature validation.`);
+  }
+
+  const verifiedOutput = await decodeImage(output, { format });
 
   try {
-    output = await encodeImage(source, { ...options, format });
-
-    const detectedOutput = await detectImageFormat(output);
-    if (detectedOutput?.format !== format) {
-      throw new Error(`The generated output did not pass ${format.toUpperCase()} signature validation.`);
+    if (verifiedOutput.width !== decodedImage.width || verifiedOutput.height !== decodedImage.height) {
+      throw new Error(`The generated ${format.toUpperCase()} dimensions do not match the source image.`);
     }
+  } finally {
+    verifiedOutput.close();
+  }
 
-    const verifiedOutput = await decodeImage(output, { format });
+  return {
+    blob: output,
+    format,
+    width: decodedImage.width,
+    height: decodedImage.height
+  };
+}
 
-    try {
-      if (verifiedOutput.width !== source.width || verifiedOutput.height !== source.height) {
-        throw new Error(`The generated ${format.toUpperCase()} dimensions do not match the source image.`);
-      }
-    } finally {
-      verifiedOutput.close();
-    }
-
-    return {
-      blob: output,
-      format,
-      width: source.width,
-      height: source.height
-    };
+/**
+ * Convert a File/Blob using the existing decode → encode → verify pipeline.
+ * The returned Blob is owned by the caller.
+ */
+async function convertImageDirect(file, format, options = {}) {
+  const source = await decodeImage(file);
+  try {
+    return await encodeAndValidateImage(source, format, options);
   } finally {
     source.close();
+  }
+}
+
+/**
+ * Encode an edited sRGB ImageData buffer without decoding the original File
+ * again. This path is intentionally main-thread-only and reuses the existing
+ * encoder and output validation. The caller retains ownership of imageData.
+ *
+ * Supported formats are the formats implemented by image-encoder.js:
+ * PNG, JPEG, WebP, BMP, TIFF, and SVG. Animated GIF remains on its existing
+ * File-based conversion path.
+ */
+export async function convertImageDataToFormat(imageData, format, options = {}) {
+  const normalizedFormat = String(format || "").toLowerCase();
+  if (!["png", "jpeg", "webp", "bmp", "tiff", "svg"].includes(normalizedFormat)) {
+    throw new Error("Edited ImageData conversion supports PNG, JPEG, WebP, BMP, TIFF, and SVG.");
+  }
+
+  const decodedCompatibleImage = imageDataToCanvasResult(imageData);
+  try {
+    return await encodeAndValidateImage(decodedCompatibleImage, normalizedFormat, options);
+  } finally {
+    decodedCompatibleImage.close();
   }
 }
 
