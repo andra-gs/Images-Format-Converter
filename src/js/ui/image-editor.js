@@ -177,16 +177,16 @@ if (workspace && fileList) {
   };
 
   const renderDraft = () => {
-    get("editor-width").value = draft.resize.width ?? "";
-    get("editor-height").value = draft.resize.height ?? "";
-    get("editor-aspect").checked = draft.resize.keepAspectRatio;
-    get("editor-crop-x").value = draft.crop.x;
-    get("editor-crop-y").value = draft.crop.y;
-    get("editor-crop-width").value = draft.crop.width ?? "";
-    get("editor-crop-height").value = draft.crop.height ?? "";
-    get("editor-rotation").value = String(draft.rotation);
-    get("editor-flip-horizontal").checked = draft.flipHorizontal;
-    get("editor-flip-vertical").checked = draft.flipVertical;
+    get("editor-width").value = draft.transformations.resize.width ?? "";
+    get("editor-height").value = draft.transformations.resize.height ?? "";
+    get("editor-aspect").checked = draft.transformations.resize.keepAspectRatio;
+    get("editor-crop-x").value = draft.transformations.crop.x;
+    get("editor-crop-y").value = draft.transformations.crop.y;
+    get("editor-crop-width").value = draft.transformations.crop.width ?? "";
+    get("editor-crop-height").value = draft.transformations.crop.height ?? "";
+    get("editor-rotation").value = String(draft.transformations.rotation);
+    get("editor-flip-horizontal").checked = draft.transformations.flipHorizontal;
+    get("editor-flip-vertical").checked = draft.transformations.flipVertical;
     get("editor-brightness").value = draft.adjustments.brightness;
     get("editor-contrast").value = draft.adjustments.contrast;
     get("editor-saturation").value = draft.adjustments.saturation;
@@ -267,10 +267,10 @@ if (workspace && fileList) {
   get("editor-width").addEventListener("input", (event) => {
     const value = Number(event.currentTarget.value);
     if (Number.isFinite(value) && value > 0) {
-      draft.resize.width = Math.round(value);
-      if (draft.resize.keepAspectRatio && sourceDimensions.width) {
-        draft.resize.height = Math.max(1, Math.round(value * sourceDimensions.height / sourceDimensions.width));
-        get("editor-height").value = draft.resize.height;
+      draft.transformations.resize.width = Math.round(value);
+      if (draft.transformations.resize.keepAspectRatio && sourceDimensions.width) {
+        draft.transformations.resize.height = Math.max(1, Math.round(value * sourceDimensions.height / sourceDimensions.width));
+        get("editor-height").value = draft.transformations.resize.height;
       }
     }
   });
@@ -278,34 +278,34 @@ if (workspace && fileList) {
   get("editor-height").addEventListener("input", (event) => {
     const value = Number(event.currentTarget.value);
     if (Number.isFinite(value) && value > 0) {
-      draft.resize.height = Math.round(value);
-      if (draft.resize.keepAspectRatio && sourceDimensions.height) {
-        draft.resize.width = Math.max(1, Math.round(value * sourceDimensions.width / sourceDimensions.height));
-        get("editor-width").value = draft.resize.width;
+      draft.transformations.resize.height = Math.round(value);
+      if (draft.transformations.resize.keepAspectRatio && sourceDimensions.height) {
+        draft.transformations.resize.width = Math.max(1, Math.round(value * sourceDimensions.width / sourceDimensions.height));
+        get("editor-width").value = draft.transformations.resize.width;
       }
     }
   });
 
   get("editor-aspect").addEventListener("change", (event) => {
-    draft.resize.keepAspectRatio = event.currentTarget.checked;
+    draft.transformations.resize.keepAspectRatio = event.currentTarget.checked;
   });
 
   for (const id of ["editor-crop-x", "editor-crop-y", "editor-crop-width", "editor-crop-height"]) {
     get(id).addEventListener("input", (event) => {
       const key = id.replace("editor-crop-", "");
       const value = Number(event.currentTarget.value);
-      if (Number.isFinite(value) && value >= 0) draft.crop[key] = Math.round(value);
+      if (Number.isFinite(value) && value >= 0) draft.transformations.crop[key] = Math.round(value);
     });
   }
 
   get("editor-rotation").addEventListener("change", (event) => {
-    draft.rotation = Number(event.currentTarget.value);
+    draft.transformations.rotation = Number(event.currentTarget.value);
   });
   get("editor-flip-horizontal").addEventListener("change", (event) => {
-    draft.flipHorizontal = event.currentTarget.checked;
+    draft.transformations.flipHorizontal = event.currentTarget.checked;
   });
   get("editor-flip-vertical").addEventListener("change", (event) => {
-    draft.flipVertical = event.currentTarget.checked;
+    draft.transformations.flipVertical = event.currentTarget.checked;
   });
 
   for (const [id, key] of [
