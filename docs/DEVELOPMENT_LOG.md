@@ -34,6 +34,19 @@ This file records actual repository progress. Update it after meaningful impleme
 
 Add newest entries first.
 
+### 2026-11-21 - Phase 5 editor UI scaffold and placeholder adapter
+
+- Status: Implemented scaffold; automated test, production build, and browser verification pending.
+- Confirmed the three Phase 5 branches exist. At session start, the transformation and adjustment branches were identical to `main`; their assigned processing modules were not present.
+- Added the FarrelPtrv editor workspace on `phase-5-editor-ui`.
+- Added an original-image preview linked to the existing selected-file queue and draft controls for resize, crop coordinates, rotation, flips, brightness, contrast, saturation, blur, grayscale, and sepia.
+- Added a temporary processing adapter that explicitly reports all processing capabilities as unavailable. The Apply action remains disabled; the preview remains the original image.
+- Added responsive editor styles, adapter unit tests, and `docs/PHASE_5_EDITOR_UI.md`.
+- Preserved editor draft state when unrelated files are added to or removed from the queue.
+- Existing conversion service and conversion orchestration were not modified.
+- Tests/build/browser checks were not run in this environment. Run `npm test`, `npm run build`, and browser checks in a local checkout before considering the scaffold verified.
+- Next: agree on shared input/output, processing order, error behavior, and resource ownership with both processing-module owners; replace the placeholder only after their modules are integrated.
+
 ### 2026-11-20 - Animated GIF conversion implementation
 
 - Status: Implemented; dependency and real-browser verification pending.
