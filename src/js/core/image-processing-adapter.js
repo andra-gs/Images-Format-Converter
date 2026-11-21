@@ -85,17 +85,22 @@ export function validateImageData(imageData) {
 
 function createCanvas(width, height) {
   if (typeof globalThis.OffscreenCanvas === "function") {
-    return new globalThis.OffscreenCanvas(width, height);
+    try {
+      const canvas = new globalThis.OffscreenCanvas(width, height);
+      if (canvas.getContext?.("2d")) return canvas;
+    } catch {
+      // Fall back to HTML Canvas on the main thread when available.
+    }
   }
 
   if (typeof document !== "undefined" && typeof document.createElement === "function") {
     const canvas = document.createElement("canvas");
     canvas.width = width;
     canvas.height = height;
-    return canvas;
+    if (canvas.getContext?.("2d")) return canvas;
   }
 
-  throw new Error("Canvas is unavailable in this environment.");
+  throw new Error("A usable 2D Canvas context is unavailable in this environment.");
 }
 
 function releaseCanvas(canvas) {
@@ -210,6 +215,14 @@ function readProcessingOutput(result, stageName) {
   return result.imageData;
 }
 
+export class ImageProcessingError extends Error {
+  constructor(message, code = "IMAGE_PROCESSING_FAILED", options = {}) {
+    super(message, options);
+    this.name = "ImageProcessingError";
+    this.code = code;
+  }
+}
+
 function createUnavailableError() {
   const error = new Error(
     "Image editing is not available yet. The Transformer and Adjuster modules have not both been integrated."
@@ -250,26 +263,44 @@ export function createImageProcessingAdapter({
 
     async process({ decodedImage, transformations, adjustments, signal } = {}) {
       if (!hasTransformer || !hasAdjuster) throw createUnavailableError();
-      throwIfAborted(signal);
 
-      let imageData = decodedImageToImageData(decodedImage, { canvasFactory });
-      throwIfAborted(signal);
+      try {
+        throwIfAborted(signal);
 
-      const transformed = await applyImageTransformations(
-        imageData,
-        transformations || createDefaultTransformations()
-      );
-      imageData = readProcessingOutput(transformed, "Image Transformer");
-      throwIfAborted(signal);
+        let imageData = decodedImageToImageData(decodedImage, { canvasFactory });
+        throwIfAborted(signal);
 
-      const adjusted = await applyImageAdjustments(
-        imageData,
-        adjustments || { ...DEFAULT_ADJUSTMENTS }
-      );
-      imageData = readProcessingOutput(adjusted, "Image Adjuster");
-      throwIfAborted(signal);
+        const transformed = await applyImageTransformations(
+          imageData,
+          transformations || createDefaultTransformations()
+        );
+        imageData = readProcessingOutput(transformed, "Image Transformer");
+        throwIfAborted(signal);
 
-      return imageData;
+        const adjusted = await applyImageAdjustments(
+          imageData,
+          adjustments || { ...DEFAULT_ADJUSTMENTS }
+        );
+        imageData = readProcessingOutput(adjusted, "Image Adjuster");
+        throwIfAborted(signal);
+
+        return imageData;
+      } catch (error) {
+        if (
+          error instanceof TypeError ||
+          error instanceof RangeError ||
+          error?.name === "AbortError" ||
+          error?.code
+        ) {
+          throw error;
+        }
+
+        throw new ImageProcessingError(
+          error?.message || "Image processing failed.",
+          "IMAGE_PROCESSING_FAILED",
+          { cause: error }
+        );
+      }
     }
   });
 }
