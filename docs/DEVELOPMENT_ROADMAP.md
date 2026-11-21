@@ -110,7 +110,7 @@ Deliverable: tested advanced-format pipelines. Complete. Limitations remain docu
 
 ## Phase 5: Image manipulation
 
-Status: Planned. Phase 5 has not started. The work is divided among three members. Each member must implement and test the assigned module, then submit a Pull Request to `main`.
+Status: In progress. The initial FarrelPtrv editor workspace and placeholder processing adapter have been added on `phase-5-editor-ui`. Transformation and adjustment modules remain pending on their assigned branches; no real image-editing operation is enabled yet. The work is divided among three members. Each member must implement and test the assigned module, then submit a Pull Request to `main`.
 
 ### Team ownership
 
