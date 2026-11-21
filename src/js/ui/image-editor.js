@@ -335,7 +335,15 @@ if (workspace && fileList) {
   applyButton.addEventListener("click", async () => {
     if (!selectedSource || applyButton.disabled) return;
     try {
-      await adapter.process(selectedSource, draft);
+      if (!selectedSource?.decodedImage) {
+        throw new Error("The decoded-image handoff is not connected yet.");
+      }
+
+      await adapter.process({
+        decodedImage: selectedSource.decodedImage,
+        transformations: draft.transformations,
+        adjustments: draft.adjustments
+      });
     } catch (error) {
       get("editor-preview-caption").textContent = error.message;
     }
