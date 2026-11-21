@@ -110,7 +110,7 @@ Deliverable: tested advanced-format pipelines. Complete. Limitations remain docu
 
 ## Phase 5: Image manipulation
 
-Status: Planned. Phase 5 has not started. The work is divided among three members. Each member must implement and test the assigned module, then submit a Pull Request to `main`.
+Status: In progress. The standalone Image Transformer is implemented and user-verified. The Image Adjuster module and focused unit tests are implemented on `phase-5-adjustment`. Real-image browser verification and editor integration remain pending. The work is divided among three members, with Pull Requests targeting `main`.
 
 ### Team ownership
 
@@ -161,25 +161,25 @@ Completion criteria:
 
 ### 5.2 `Adit1945-web`: Image Adjustment
 
-Objective: implement pixel appearance and color adjustments. These operations modify the visual appearance of the image without changing its geometric dimensions.
+Objective: implement pixel appearance and color adjustments. These operations modify the visual appearance of the image without changing its geometric dimensions.\n\nStatus: Processing module and focused unit tests implemented on `phase-5-adjustment`. Real-image browser verification and editor integration remain pending.
 
 Tasks:
 
-- [ ] Implement brightness adjustment.
-- [ ] Implement contrast adjustment.
-- [ ] Implement saturation adjustment.
-- [ ] Implement grayscale conversion.
-- [ ] Implement sepia adjustment.
-- [ ] Implement blur adjustment.
-- [ ] Define and enforce valid minimum, maximum, and default values for each numeric adjustment.
-- [ ] Ensure adjustment values outside the accepted range are rejected or clamped consistently with the agreed API contract.
-- [ ] Ensure image dimensions remain unchanged by color and appearance adjustments.
-- [ ] Define how alpha transparency is handled by each adjustment, and preserve transparency where the operation allows it.
-- [ ] Ensure adjustments can be combined in a deterministic order.
-- [ ] Avoid mutating the original uploaded File or the original source image data.
-- [ ] Release temporary pixel buffers and canvases after processing.
-- [ ] Add automated tests for default values, boundary values, brightness, contrast, saturation, grayscale, sepia, blur, transparency, dimensions, combined adjustments, and invalid input.
-- [ ] Document the module's public interface and the agreed input/output contract for the editor integration.
+- [x] Implement brightness adjustment.
+- [x] Implement contrast adjustment.
+- [x] Implement saturation adjustment.
+- [x] Implement grayscale conversion.
+- [x] Implement sepia adjustment.
+- [x] Implement blur adjustment.
+- [x] Define and enforce valid minimum, maximum, and default values for each numeric adjustment.
+- [x] Ensure adjustment values outside the accepted range are rejected or clamped consistently with the agreed API contract.
+- [x] Ensure image dimensions remain unchanged by color and appearance adjustments.
+- [x] Define how alpha transparency is handled by each adjustment, and preserve transparency where the operation allows it.
+- [x] Ensure adjustments can be combined in a deterministic order.
+- [x] Avoid mutating the original uploaded File or the original source image data.
+- [x] Release temporary pixel buffers and canvases after processing.
+- [x] Add automated tests for default values, boundary values, brightness, contrast, saturation, grayscale, sepia, blur, transparency, dimensions, combined adjustments, and invalid input.
+- [x] Document the module's public interface and the agreed input/output contract for the editor integration.
 
 Primary implementation file:
 
