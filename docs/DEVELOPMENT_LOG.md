@@ -1163,3 +1163,35 @@ Only record work that actually happened in the repository. Do not mark a feature
 - Test results:
   - Documentation references and phase summaries are synchronized.
   - Phase 5 and Phase 6 feature implementation status remains unchanged; no feature branches were created by this documentation update.
+
+
+### 2026-11-21 - Phase 5 Image Adjustment module implementation
+- Status: Implemented; focused unit tests passed; browser and editor verification pending
+- Changes:
+  - Added the Image Adjuster module on `phase-5-adjustment` using the agreed sRGB ImageData representation and `applyImageAdjustments(imageData, adjustments)` API.
+  - Implemented brightness, contrast, saturation, grayscale, sepia, and Gaussian blur with the agreed ranges and defaults.
+  - Preserved source immutability, image dimensions, and alpha values. Blur uses premultiplied-alpha sampling and a rolling row cache.
+  - Added validation for ImageData, unknown options, invalid types, parameter ranges, and shared image limits.
+  - Added focused tests for each adjustment, combined operations, blur behavior, transparency, dimensions, and invalid inputs.
+  - Added `docs/PHASE_5_ADJUSTMENT.md` describing algorithms, options, errors, resource ownership, and verification.
+- Files changed:
+  - `src/js/core/image-adjuster.js`
+  - `tests/image-adjuster.test.js`
+  - `docs/PHASE_5_ADJUSTMENT.md`
+  - `docs/DEVELOPMENT_ROADMAP.md`
+  - `docs/DEVELOPMENT_LOG.md`
+  - `docs/TECHNICAL_SPECIFICATION.md`
+- Tests performed:
+  - Ran `node --test tests/image-adjuster.test.js` in a local Node test environment.
+  - Ran `node --check src/js/core/image-adjuster.js`.
+- Test results:
+  - All 16 focused Image Adjuster tests passed.
+  - Syntax validation passed.
+  - The full repository test suite and production build have not been run for this branch update.
+- Known issues:
+  - Real-image browser verification remains pending.
+  - Editor integration and the complete editing-to-conversion workflow remain pending.
+- Next steps:
+  - Verify the module with representative real images.
+  - Coordinate the integration handoff with the Editor UI branch.
+  - Run the full repository test suite and production build before preparing the Pull Request.
