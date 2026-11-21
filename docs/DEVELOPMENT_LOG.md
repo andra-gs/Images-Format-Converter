@@ -26,13 +26,28 @@ This file records actual repository progress. Update it after meaningful impleme
 | Phase 2: Core conversion engine | Tested | PNG, JPEG, WebP, and BMP conversion paths are user-verified; user reports the requested automated tests and build checks passed |
 | Phase 3: Batch processing | Tested | User verified batch queue, worker execution, progress, cancellation, failure isolation, large-image responsiveness, cleanup, individual downloads, ZIP extraction, and image integrity |
 | Phase 4: Advanced formats | Tested | Completed; CI validation and user-run real-browser verification passed. Known format limitations remain documented |
-| Phase 5: Image manipulation | In progress | Image Transformer implementation, 16 focused tests, and a real-image browser test harness are on `phase-5-transformation`. User confirmed 50 repository tests pass and the production build succeeds. Real-file browser verification is pending. Farrel's editor scaffold/adapter and Adit's adjustment module remain pending. No Phase 5 PRs are open or merged |
+| Phase 5: Image manipulation | In progress | Image Transformer implementation, 16 focused tests, and a real-image browser test harness are on `phase-5-transformation`. User confirmed 50 repository tests pass, the production build succeeds, and real-image browser checks produce the expected results. Farrel's editor scaffold/adapter and Adit's adjustment module remain pending. No Phase 5 PRs are open or merged |
 | Phase 6: Advanced export and image optimization | Not started | Image Optimization, Metadata Management, and Export Presets/UI. Starts after Phase 5 integration |
 | Phase 7: Testing, documentation, and release | Not started | Cross-browser QA, security review, documentation, production validation, and v1.0.0 readiness |
 
 ## Change log
 
 Add newest entries first.
+
+### 2026-11-21 - Image Transformer real-image browser verification
+- Status: Tested; user-confirmed.
+- Tests performed:
+  - The user ran the browser harness at `/tests/browser-transformer.html` with real image files.
+  - The user reported that the transformation results matched expectations.
+- Test results:
+  - Real-image browser verification is user-confirmed successful.
+  - Combined with the earlier user-confirmed result of 50 passing repository tests and a successful production build, the current Image Transformer implementation has passed its planned module-level verification.
+- Known scope:
+  - The browser harness verifies the standalone Transformer with decoded image data. It does not yet verify the feature inside Farrel's editor or the full editing-to-conversion handoff.
+- Next steps:
+  - Coordinate with Adit and Farrel on processing-module readiness and adapter integration.
+  - Review the latest team branches and shared API usage before opening or merging processing-module PRs.
+  - Keep the editor integration and end-to-end conversion verification as separate remaining Phase 5 tasks.
 
 ### 2026-11-21 - Browser test harness and local verification for Image Transformer
 - Status: Implemented; automated verification user-confirmed; real-file browser verification pending.
