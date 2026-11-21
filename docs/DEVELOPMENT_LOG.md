@@ -849,3 +849,26 @@ Add newest entries first.
 - Existing standard image conversion continues to work.
 - Editor panel remains visible and Apply remains disabled as expected.
 - This verifies the current UI scaffold and existing conversion regression only; edited-pixel end-to-end processing still awaits the Transformer and Adjuster modules.
+
+
+### 2026-11-21 - Queue to Editor Custom Event bridge
+
+- Status: Implemented; automated and browser verification pending
+- Branch: `phase-5-editor-ui`
+- Changes:
+  - Added `ifc:queue-change` as the explicit Queue → Editor communication event.
+  - Added `createEditorQueueSnapshot()` to publish only the queue identifier, file name, original File reference, detected format, and preview object URL.
+  - Updated `main.js` to dispatch queue snapshots after add, remove, and clear operations.
+  - Updated `image-editor.js` to consume event payloads and removed its DOM-based Queue reader and MutationObserver.
+  - Kept the existing File/Blob conversion path and Worker orchestration unchanged.
+  - Added `tests/editor-queue-events.test.js` for the event snapshot contract.
+- Resource ownership:
+  - The Queue retains ownership of each original File and its preview object URL.
+  - The Editor only holds references from the latest snapshot; it does not revoke Queue URLs or close decoder resources.
+- Validation:
+  - Tests and production build have not been run in this environment after these changes.
+  - Browser checks for add, remove, clear, and selection behavior are pending.
+- Remaining work:
+  - Verify the event bridge locally with `npm test` and `npm run build`.
+  - Manually test Queue add/remove/clear and Editor selection behavior.
+  - Connect selected File → Decoder → ImageData adapter in a subsequent integration step; keep Apply disabled until processing modules and the full edited-pixel route are ready.
