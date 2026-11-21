@@ -94,4 +94,6 @@ Test command used during initial implementation:
 node --test tests/image-transformer.test.js
 ```
 
-The focused test suite currently passes 16 tests. This result is not a claim that the full repository test suite, production build, or browser integration has been run.
+The focused test suite contains 16 tests. On 2026-11-21, the user ran the full repository suite and reported 50 tests passed with no failures, followed by a successful Vite production build. The build emitted a warning about the size of the existing HEIC chunks, but completed successfully.
+
+A real-image browser harness is available at `/tests/browser-transformer.html`. It uses the existing decoder, converts the decoded source to sRGB ImageData through Canvas, and exercises identity, crop, resize, rotation, flips, and a combined operation. It displays original and transformed previews with dimensions. The harness has been added but has not yet been run by the user with real files. Browser verification remains required before the module is considered fully verified.
