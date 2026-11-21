@@ -1195,3 +1195,20 @@ Only record work that actually happened in the repository. Do not mark a feature
   - Verify the module with representative real images.
   - Coordinate the integration handoff with the Editor UI branch.
   - Run the full repository test suite and production build before preparing the Pull Request.
+
+
+### 2026-11-21 - Add Image Adjuster real-image browser harness
+- Status: Added; browser verification pending
+- Changes:
+  - Added `tests/browser-adjuster.html`, `tests/browser-adjuster.css`, and `tests/browser-adjuster.js`.
+  - The harness uses the existing image decoder, extracts sRGB ImageData, and displays original and adjusted previews.
+  - Added controls for brightness, contrast, saturation, blur, grayscale, and sepia, plus Reset.
+  - Kept the harness separate from the production editor and conversion flow.
+  - Releases the decoded image and temporary staging canvas after extracting source pixels.
+- Tests performed:
+  - Ran JavaScript syntax validation with `node --check` for the browser harness script in the local Node environment.
+  - The real-browser harness has not yet been run with user image files.
+- Next steps:
+  - Open `http://localhost:5173/tests/browser-adjuster.html` while `npm run dev` is running.
+  - Verify each adjustment and representative combinations using real local images.
+  - Confirm dimensions and alpha transparency remain unchanged.
