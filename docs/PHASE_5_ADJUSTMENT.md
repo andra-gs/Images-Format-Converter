@@ -79,10 +79,12 @@ The implementation is synchronous and Worker-compatible. It uses typed arrays an
 
 The focused Node test suite contains 16 tests covering defaults, input immutability, brightness, contrast, saturation, grayscale, sepia, combined adjustments, Gaussian blur, multi-row blur, alpha preservation, transparent-edge sampling, dimensions, invalid input, option boundaries, and shared image limits.
 
-Run:
+Run the focused tests with:
 
 ```bash
 node --test tests/image-adjuster.test.js
 ```
 
-The focused tests passed locally in the Node test environment. Real-image browser verification and editor integration remain pending. Do not mark the full Image Adjustment task complete until the integrated editor workflow is verified.
+A real-image browser harness is available at `/tests/browser-adjuster.html`. It decodes a selected local image with the existing decoder, copies its pixels into sRGB ImageData, applies the selected adjustments, and displays original and adjusted previews. It also exposes Reset and releases the temporary decoder and staging-canvas resources.
+
+The focused tests passed locally in the Node test environment. The browser harness has been added but has not yet been run with real files. Editor integration also remains pending. Do not mark the full Image Adjustment task complete until these checks are verified.
