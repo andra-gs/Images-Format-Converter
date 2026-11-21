@@ -6,6 +6,7 @@ import {
   decodedImageToImageData,
   EDITOR_PROCESSING_UNAVAILABLE,
   IMAGE_DIMENSIONS_EXCEEDED,
+  ImageProcessingError,
   imageDataToCanvasResult,
   resetEditorState,
   validateImageData,
@@ -220,4 +221,28 @@ test("adapter stops between processing stages when the signal is aborted", async
     (error) => error.name === "AbortError"
   );
   assert.equal(adjusterCalled, false);
+});
+
+test("capabilities stay disabled until both processing modules are provided", () => {
+  const adapter = createImageProcessingAdapter({
+    applyImageTransformations: () => ({ imageData: sampleImageData(), width: 1, height: 1 })
+  });
+  assert.ok(Object.values(adapter.capabilities).every((available) => available === false));
+});
+
+test("adapter wraps unexpected internal failures with the shared processing error", async () => {
+  const adapter = createImageProcessingAdapter({
+    applyImageTransformations: () => {
+      throw new Error("Unexpected transformer failure");
+    },
+    applyImageAdjustments: () => ({ imageData: sampleImageData(), width: 1, height: 1 }),
+    canvasFactory: () => createFakeCanvas(1, 1)
+  });
+
+  await assert.rejects(
+    adapter.process({ decodedImage: { source: {}, width: 1, height: 1 } }),
+    (error) => error instanceof ImageProcessingError &&
+      error.name === "ImageProcessingError" &&
+      error.code === "IMAGE_PROCESSING_FAILED"
+  );
 });
