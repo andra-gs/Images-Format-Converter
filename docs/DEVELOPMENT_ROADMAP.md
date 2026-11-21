@@ -180,6 +180,8 @@ Tasks:
 - [x] Release temporary pixel buffers and canvases after processing.
 - [x] Add automated tests for default values, boundary values, brightness, contrast, saturation, grayscale, sepia, blur, transparency, dimensions, combined adjustments, and invalid input.
 - [x] Document the module's public interface and the agreed input/output contract for the editor integration.
+- [ ] Verify all adjustments with representative real image files in the browser test harness.
+- [ ] Verify the Transform → Adjust pipeline through the integrated editor after both processing modules are merged.
 
 Primary implementation file:
 
