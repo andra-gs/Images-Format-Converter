@@ -872,3 +872,20 @@ Add newest entries first.
   - Verify the event bridge locally with `npm test` and `npm run build`.
   - Manually test Queue add/remove/clear and Editor selection behavior.
   - Connect selected File → Decoder → ImageData adapter in a subsequent integration step; keep Apply disabled until processing modules and the full edited-pixel route are ready.
+
+
+### 2026-11-21 - Fix Editor queue selection ID mismatch
+
+- Status: Fix implemented; local verification pending
+- Branch: `phase-5-editor-ui`
+- Diagnosis:
+  - Queue entry IDs are numeric, but `HTMLSelectElement.value` always returns a string.
+  - The Editor previously compared these values with strict equality, so selecting an item could fail to resolve its queue entry and clear the preview.
+- Changes:
+  - Added `findEditorQueueEntry()` to normalize IDs during lookup.
+  - Updated Editor selection changes to use the normalized lookup.
+  - Explicitly assigns the selected option value as a string.
+  - Added automated coverage for numeric IDs resolved from string select values.
+- Validation:
+  - Automated test and production build have not yet been run locally after this fix.
+  - User must re-test preview display and switching between multiple queued images.
