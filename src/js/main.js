@@ -18,6 +18,7 @@ import {
 } from "lucide";
 import "../styles/main.css";
 import { validateImageFile } from "./core/file-validator.js";
+import { createEditorQueueSnapshot } from "./core/editor-queue-events.js";
 import { convertImageToBmp, convertImageToGif, convertImageToJpeg, convertImageToPng, convertImageToSvg, convertImageToTiff, convertImageToWebp, disposeConversionWorker } from "./core/conversion-service.js";
 
 const iconSet = {
@@ -91,6 +92,12 @@ const formatBytes = (bytes) => {
 
 const updateConvertButton = () => {
   convertButton.disabled = selectedFiles.size === 0 || !["image/png", "image/jpeg", "image/webp", "image/bmp", "image/tiff", "image/svg+xml", "image/gif"].includes(selectedFormat) || isConverting;
+};
+
+const notifyEditorQueueChange = () => {
+  window.dispatchEvent(new CustomEvent("ifc:queue-change", {
+    detail: { entries: createEditorQueueSnapshot([...selectedFiles.values()]) }
+  }));
 };
 
 const updateQueueSummary = () => {
@@ -564,6 +571,7 @@ const addFiles = async (files) => {
 
   const messages = [...rejected, ...warnings];
   showFileFeedback(messages, rejected.length > 0 ? "error" : "warning");
+  notifyEditorQueueChange();
 };
 
 const removeFile = (id) => {
@@ -575,6 +583,7 @@ const removeFile = (id) => {
   fileList.querySelector(`[data-file-id="${id}"]`)?.remove();
   removeConversionResult(id);
   updateQueueSummary();
+  notifyEditorQueueChange();
 };
 
 const clearFiles = () => {
@@ -587,6 +596,7 @@ const clearFiles = () => {
   clearConversionResults();
   fileInput.value = "";
   updateQueueSummary();
+  notifyEditorQueueChange();
 };
 
 browseButton.addEventListener("click", () => fileInput.click());
