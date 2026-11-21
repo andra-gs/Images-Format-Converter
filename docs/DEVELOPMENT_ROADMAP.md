@@ -110,7 +110,7 @@ Deliverable: tested advanced-format pipelines. Complete. Limitations remain docu
 
 ## Phase 5: Image manipulation
 
-Status: In progress. The standalone Image Transformer is implemented and user-verified. The Image Adjuster module and focused unit tests are implemented on `phase-5-adjustment`. Real-image browser verification and editor integration remain pending. The work is divided among three members, with Pull Requests targeting `main`.
+Status: In progress. The standalone Image Transformer and Image Adjuster modules are implemented and independently verified with real images in the browser. Focused unit tests are in place. Editor integration and the complete editing-to-conversion workflow remain pending. The work is divided among three members, with Pull Requests targeting `main`.
 
 ### Team ownership
 
@@ -180,7 +180,7 @@ Tasks:
 - [x] Release temporary pixel buffers and canvases after processing.
 - [x] Add automated tests for default values, boundary values, brightness, contrast, saturation, grayscale, sepia, blur, transparency, dimensions, combined adjustments, and invalid input.
 - [x] Document the module's public interface and the agreed input/output contract for the editor integration.
-- [ ] Verify all adjustments with representative real image files in the browser test harness.
+- [x] Verify all adjustments with representative real image files in the browser test harness (user-confirmed).
 - [ ] Verify the Transform → Adjust pipeline through the integrated editor after both processing modules are merged.
 
 Primary implementation file:
