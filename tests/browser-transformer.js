@@ -26,9 +26,12 @@ function drawImageData(canvas, imageData) {
   canvas.height = imageData.height;
   const context = canvas.getContext("2d", { willReadFrequently: true });
   if (!context) throw new Error("A 2D canvas context is not available.");
-  const output = context.createImageData(imageData.width, imageData.height);
-  output.data.set(imageData.data);
-  context.putImageData(output, 0, 0);
+  // ImageData accepts the transformer's existing buffer, avoiding another full-size copy.
+  context.putImageData(
+    new ImageData(imageData.data, imageData.width, imageData.height),
+    0,
+    0
+  );
 }
 
 function getTransformation(name, width, height) {
