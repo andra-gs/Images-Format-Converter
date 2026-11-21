@@ -148,7 +148,7 @@ src/js/core/image-transformer.js
 tests/image-transformer.test.js
 ```
 
-The exact exported function names and argument shapes must be agreed with `FarrelPtrv` before implementation. Do not independently invent a second editing data model.
+The team has agreed on the shared sRGB ImageData representation and the `applyImageTransformations(imageData, transformations)` API. See `docs/TECHNICAL_SPECIFICATION.md` for the final parameter behavior, output shape, limits, and ownership contract. Do not independently invent a second editing data model.
 
 Completion criteria:
 
@@ -188,7 +188,7 @@ src/js/core/image-adjuster.js
 tests/image-adjuster.test.js
 ```
 
-The exact exported function names, adjustment ranges, and argument shapes must be agreed with `FarrelPtrv` before implementation. Do not create a UI-specific state model inside this processing module.
+The team has agreed on the shared sRGB ImageData representation and the `applyImageAdjustments(imageData, adjustments)` API, including parameter defaults/ranges and processing order. See `docs/TECHNICAL_SPECIFICATION.md` for the final contract. Do not create a UI-specific state model inside this processing module.
 
 Completion criteria:
 
