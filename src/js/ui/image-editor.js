@@ -6,9 +6,7 @@ import {
 } from "../core/image-processing-adapter.js";
 
 const workspace = document.querySelector(".workspace");
-const fileList = document.querySelector("#file-list");
-
-if (workspace && fileList) {
+if (workspace) {
   const adapter = createImageProcessingAdapter();
   const panel = document.createElement("section");
   panel.className = "editor-panel";
@@ -156,18 +154,11 @@ if (workspace && fileList) {
   const dimensionsLabel = get("editor-image-dimensions");
   const applyButton = get("editor-apply");
   let selectedSource = null;
+  let queueEntries = [];
   let sourceDimensions = { width: null, height: null };
   let draft = createDefaultEditorState();
 
-  const readQueue = () => [...fileList.querySelectorAll("[data-file-id]")].map((item) => {
-    const image = item.querySelector(".file-preview img");
-    const name = item.querySelector(".file-name")?.textContent?.trim() || "Image";
-    return {
-      id: item.dataset.fileId,
-      name,
-      url: image?.currentSrc || image?.src || ""
-    };
-  }).filter((entry) => entry.url);
+  const readQueue = () => queueEntries;
 
   const updateValueLabels = () => {
     get("editor-brightness-value").value = String(draft.adjustments.brightness);
@@ -349,9 +340,11 @@ if (workspace && fileList) {
     }
   });
 
+  window.addEventListener("ifc:queue-change", (event) => {
+    queueEntries = Array.isArray(event.detail?.entries) ? event.detail.entries : [];
+    refreshFiles();
+  });
+
   renderDraft();
   refreshFiles();
-
-  const observer = new MutationObserver(refreshFiles);
-  observer.observe(fileList, { childList: true, subtree: true, attributes: true, attributeFilter: ["src"] });
 }
