@@ -40,14 +40,54 @@ The full parameter defaults, ranges, processing order, validation, and error con
 - Until both processing modules are supplied, all capabilities remain unavailable and processing rejects with `EDITOR_PROCESSING_UNAVAILABLE`.
 - Apply remains disabled. The original preview remains read-only; draft controls do not claim to change image pixels.
 
+## Verification completed — 2026-11-21
+
+The user ran the following checks locally on the `phase-5-editor-ui` branch and reported the results:
+
+### Automated tests
+
+Command: `npm test`
+
+- Tests: 47
+- Passed: 47
+- Failed: 0
+- Cancelled: 0
+- Skipped: 0
+- Todo: 0
+
+All 47 available automated tests passed, including adapter validation, ImageData copying, canvas cleanup, injected Transform → Adjust order, output validation, cancellation, and error handling.
+
+### Production build
+
+Command: `npm run build`
+
+- Result: successful; Vite completed the production build in 5.05 seconds.
+- Vite transformed 2,163 modules.
+- Warning: some minified chunks exceed 500 kB. The largest reported HEIC-related chunks are approximately 3.23 MB each before gzip. This is a bundle-size optimization warning, not a build failure.
+
+### Manual browser checks
+
+The user reported all six checks passing:
+
+| Check | Reported result |
+|---|---|
+| Application page opens without errors | Passed |
+| Existing converter features continue working | Passed |
+| Editor panel appears without breaking layout | Passed |
+| Editor sliders, inputs, buttons, and choices are usable | Passed |
+| Apply remains disabled | Expected state confirmed |
+| Browser console has no red errors | Passed |
+
+These results are user-reported local checks; they were not independently executed in this environment.
+
 ## Remaining integration work
 
 1. Integrate the Transformer and Adjuster after their PRs are merged into `main`.
 2. Coordinate the edited-pixel handoff with the existing conversion service. It currently accepts File/Blob inputs and performs its own decoding and output validation; the final route must preserve the edits and retain output signature/dimension checks.
 3. Add preview updates and Apply handoff using the processed result.
-4. Add full UI/integration tests, then run `npm test`, `npm run build`, and browser checks with real images.
-5. Update this document and the development log with verified results.
+4. Add full UI/integration tests and rerun `npm test`, `npm run build`, and browser checks with real images after module integration.
+5. Consider optimizing the oversized HEIC-related production chunks separately; the current warning does not fail the build.
 
-## Verification status
+## Current status
 
-The adapter and test source have been updated on this branch. Automated tests, production build, and browser verification have not yet been run in this environment. Do not treat the editor integration as complete until those checks pass and the real processing modules are integrated.
+The editor scaffold, adapter preparation, automated test suite, production build, and reported manual browser checks are verified for the current branch state. Phase 5 is **not complete**: real Transformer/Adjuster integration, edited-pixel conversion handoff, live preview updates, and enabling Apply remain pending.
