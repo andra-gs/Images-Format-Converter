@@ -110,7 +110,7 @@ Deliverable: tested advanced-format pipelines. Complete. Limitations remain docu
 
 ## Phase 5: Image manipulation
 
-Status: In progress. The shared contracts are agreed. The Image Transformer implementation and automated tests are present on `phase-5-transformation`. The user has confirmed the full repository test suite and production build pass. A real-image browser test page has been added, but real-file browser verification and team integration remain pending.
+Status: In progress. The shared contracts are agreed. The Image Transformer implementation and automated tests are present on `phase-5-transformation`. The user has confirmed the full repository test suite and production build pass. The user has also tested the browser harness with real image files and confirmed the results match expectations. Editor integration and the full editing-to-conversion workflow remain pending.
 
 ### Team ownership
 
@@ -181,7 +181,7 @@ Tasks:
 - [ ] Avoid mutating the original uploaded File or the original source image data.
 - [ ] Release temporary pixel buffers and canvases after processing.
 - [ ] Add automated tests for default values, boundary values, brightness, contrast, saturation, grayscale, sepia, blur, transparency, dimensions, combined adjustments, and invalid input.
-- [ ] Document the module's public interface and the agreed input/output contract for the editor integration.
+- [x] Document the module's public interface and the agreed input/output contract for the editor integration.
 
 Primary implementation file:
 
