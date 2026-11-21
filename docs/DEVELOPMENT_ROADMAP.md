@@ -110,7 +110,7 @@ Deliverable: tested advanced-format pipelines. Complete. Limitations remain docu
 
 ## Phase 5: Image manipulation
 
-Status: In progress. The standalone Image Transformer and Image Adjuster modules are implemented and independently verified with real images in the browser. Focused unit tests are in place. Editor integration and the complete editing-to-conversion workflow remain pending. The work is divided among three members, with Pull Requests targeting `main`.
+Status: In progress. Both standalone processing modules are implemented and independently verified with real images in the browser. Focused unit tests, full repository test suites, and production builds have passed on both feature branches. Editor integration and the complete editing-to-conversion workflow remain pending. The work is divided among three members, with Pull Requests targeting `main`.
 
 ### Team ownership
 
@@ -126,20 +126,20 @@ Objective: implement image geometry and orientation operations. These operations
 
 Tasks:
 
-- [ ] Implement image resizing with explicit output width and height.
-- [ ] Support keeping the original aspect ratio while resizing.
-- [ ] Support unlocking the aspect ratio when the user wants independent width and height values.
-- [ ] Validate width and height values. Reject zero, negative, non-finite, or excessive dimensions using project limits.
-- [ ] Implement cropping by a defined selection rectangle.
-- [ ] Validate crop coordinates and crop dimensions against the source image boundaries.
-- [ ] Implement rotation by 90, 180, and 270 degrees.
-- [ ] Implement horizontal flipping.
-- [ ] Implement vertical flipping.
-- [ ] Ensure output dimensions are correct after resizing, cropping, and rotation.
-- [ ] Handle transparent pixels without introducing an unintended background during transformations.
-- [ ] Release temporary canvases, ImageBitmap objects, and other image resources when processing finishes or fails.
-- [ ] Add automated tests for resize, aspect-ratio behavior, crop bounds, rotation, flipping, output dimensions, invalid input, and resource/error paths.
-- [ ] Document the module's public interface and the agreed input/output contract for the editor integration.
+- [x] Implement image resizing with explicit output width and height.
+- [x] Support keeping the original aspect ratio while resizing.
+- [x] Support unlocking the aspect ratio when the user wants independent width and height values.
+- [x] Validate width and height values. Reject zero, negative, non-finite, or excessive dimensions using project limits.
+- [x] Implement cropping by a defined selection rectangle.
+- [x] Validate crop coordinates and crop dimensions against the source image boundaries.
+- [x] Implement rotation by 90, 180, and 270 degrees.
+- [x] Implement horizontal flipping.
+- [x] Implement vertical flipping.
+- [x] Ensure output dimensions are correct after resizing, cropping, and rotation.
+- [x] Handle transparent pixels without introducing an unintended background during transformations, using premultiplied-alpha interpolation during resize.
+- [x] Keep the processing module free of DOM, Canvas, and ImageBitmap dependencies. It allocates only its output pixel buffer and leaves input ownership with the caller.
+- [x] Add automated tests for resize, aspect-ratio behavior, crop bounds, rotation, flipping, output dimensions, invalid input, and error paths.
+- [x] Document the module's public interface and the agreed input/output contract for the editor integration.
 
 Primary implementation file:
 
@@ -148,10 +148,12 @@ src/js/core/image-transformer.js
 tests/image-transformer.test.js
 ```
 
-The exact exported function names and argument shapes must be agreed with `FarrelPtrv` before implementation. Do not independently invent a second editing data model.
+The shared API is agreed with `FarrelPtrv`: `applyImageTransformations(imageData, transformations)` accepts the shared sRGB ImageData representation and returns `{ imageData, width, height }`. Do not introduce a second editing data model.
 
 Completion criteria:
 
+- Automated unit tests and the production build pass (user-confirmed on 2026-11-21).
+- The user confirmed real-image verification through `/tests/browser-transformer.html` with representative local files.
 - All listed transformations work with representative real images.
 - Aspect ratio and output dimensions match the selected operation.
 - Crop selections outside the source bounds are rejected or safely constrained according to the agreed contract.
