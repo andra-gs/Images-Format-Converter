@@ -1163,3 +1163,30 @@ Only record work that actually happened in the repository. Do not mark a feature
 - Test results:
   - Documentation references and phase summaries are synchronized.
   - Phase 5 and Phase 6 feature implementation status remains unchanged; no feature branches were created by this documentation update.
+
+
+### 2026-11-21 - Initial Image Transformer implementation
+- Status: Implemented; full repository verification pending.
+- Changes:
+  - Added the Image Transformer API using the agreed sRGB ImageData representation.
+  - Implemented source-relative crop, aspect-ratio-aware resize, clockwise right-angle rotation, and horizontal/vertical flips.
+  - Applied Crop → Resize → Rotation → Flip through direct source-coordinate mapping.
+  - Used bilinear interpolation with premultiplied-alpha color sampling for resizing.
+  - Kept input data immutable and allocated only the final output pixel buffer.
+  - Added validation for ImageData, options, crop bounds, and the shared 16,384-pixel / 40-million-pixel limits.
+- Files changed:
+  - `src/js/core/image-transformer.js`
+  - `tests/image-transformer.test.js`
+  - `docs/PHASE_5_TRANSFORMATION.md`
+- Tests performed:
+  - Ran `node --test tests/image-transformer.test.js` against the isolated implementation.
+- Test results:
+  - 15 tests passed, 0 failed.
+  - The full repository `npm test`, `npm run build`, and real-browser checks have not yet been run.
+- Known limitations:
+  - Processing is synchronous. The module is Worker-compatible because it uses typed arrays and no DOM APIs, but Worker orchestration remains outside this module.
+  - Resizing uses bilinear interpolation and may alter pixel values as expected.
+- Next steps:
+  - Run the full repository tests and production build in a local checkout.
+  - Review the implementation with representative real images and large-image performance.
+  - Coordinate integration with Adit and Farrel after their modules and adapter are ready.
