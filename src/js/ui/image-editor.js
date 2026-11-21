@@ -250,7 +250,13 @@ if (workspace && fileList) {
 
     const next = entries.find((entry) => entry.id === previousId) || entries[0];
     fileSelect.value = next.id;
-    setSelectedSource(next);
+
+    // Preserve the current draft when unrelated queue entries are added or removed.
+    if (selectedSource?.id !== next.id) {
+      setSelectedSource(next);
+    } else {
+      selectedSource = next;
+    }
   };
 
   fileSelect.addEventListener("change", () => {
