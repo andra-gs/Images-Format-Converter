@@ -4,6 +4,7 @@ import {
   createImageProcessingAdapter,
   resetEditorState
 } from "../core/image-processing-adapter.js";
+import { findEditorQueueEntry } from "../core/editor-queue-events.js";
 
 const workspace = document.querySelector(".workspace");
 if (workspace) {
@@ -240,7 +241,7 @@ if (workspace) {
     }
 
     const next = entries.find((entry) => entry.id === previousId) || entries[0];
-    fileSelect.value = next.id;
+    fileSelect.value = String(next.id);
 
     // Preserve the current draft when unrelated queue entries are added or removed.
     if (selectedSource?.id !== next.id) {
@@ -251,7 +252,7 @@ if (workspace) {
   };
 
   fileSelect.addEventListener("change", () => {
-    const source = readQueue().find((entry) => entry.id === fileSelect.value);
+    const source = findEditorQueueEntry(readQueue(), fileSelect.value);
     setSelectedSource(source || null);
   });
 
