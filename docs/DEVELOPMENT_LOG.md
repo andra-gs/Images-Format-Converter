@@ -4,10 +4,10 @@ This file records actual repository progress. Update it after meaningful impleme
 
 ## Project status
 
-- Current stage: Phase 5 - Image manipulation (next planned phase)
-- Current phase status: Phase 4 is complete. HEIC/HEIF, TIFF, SVG, GIF first-frame conversion, animated GIF-to-GIF, and static-image-to-GIF have passed the documented CI and user-run browser verification. Phase 5 implementation has not started; Phase 6 begins only after Phase 5 is integrated and verified.
+- Current stage: Phase 5 - Image manipulation
+- Current phase status: Phase 4 is complete. Phase 5 transformation and adjustment processing modules are implemented on their feature branches, with unit tests, user-confirmed real-image browser checks, and successful CI validation. Editor UI integration and the complete editing-to-conversion workflow remain pending. Phase 6 begins only after Phase 5 is integrated and verified.
 - Latest release: None
-- Last updated: 2026-11-20
+- Last updated: 2026-11-21
 
 ## Status legend
 
@@ -26,7 +26,7 @@ This file records actual repository progress. Update it after meaningful impleme
 | Phase 2: Core conversion engine | Tested | PNG, JPEG, WebP, and BMP conversion paths are user-verified; user reports the requested automated tests and build checks passed |
 | Phase 3: Batch processing | Tested | User verified batch queue, worker execution, progress, cancellation, failure isolation, large-image responsiveness, cleanup, individual downloads, ZIP extraction, and image integrity |
 | Phase 4: Advanced formats | Tested | Completed; CI validation and user-run real-browser verification passed. Known format limitations remain documented |
-| Phase 5: Image manipulation | Not started | Image Transformation, Image Adjustment, and Editor UI/Integration |
+| Phase 5: Image manipulation | In progress | Image Transformation and Image Adjustment processing modules are implemented and independently tested; Editor UI/Integration remains pending |
 | Phase 6: Advanced export and image optimization | Not started | Image Optimization, Metadata Management, and Export Presets/UI. Starts after Phase 5 integration |
 | Phase 7: Testing, documentation, and release | Not started | Cross-browser QA, security review, documentation, production validation, and v1.0.0 readiness |
 
@@ -1213,6 +1213,21 @@ Only record work that actually happened in the repository. Do not mark a feature
   - Verify each adjustment and representative combinations using real local images.
   - Confirm dimensions and alpha transparency remain unchanged.
 
+
+### 2026-11-21 - Phase 5 Image Adjustment verification and CI results
+- Status: Processing module tested; real-image browser verification and full repository CI passed (user-confirmed browser/local checks and GitHub Actions).
+- Verification:
+  - The user confirmed that all Image Adjustment features work correctly in the real-image browser harness.
+  - The user ran `npm test`: 50 tests passed, 0 failed, 0 cancelled, and 0 skipped.
+  - The user ran `npm run build`: Vite production build completed successfully.
+  - GitHub Actions for PR #2 completed successfully. Dependency installation, all 50 tests, and the production build passed.
+- Build note:
+  - Vite reports the existing HEIC-related chunks exceed the 500 kB advisory threshold. This is a bundle-size warning, not a build failure.
+- Verification boundaries:
+  - These results validate the standalone processing module and its browser harness. They do not validate the integrated editor or the complete editing-to-conversion workflow.
+- Remaining work:
+  - Integrate the Transformer and Adjuster modules through the Editor UI branch.
+  - Run end-to-end browser checks after editor integration.
 
 ### 2026-11-21 - User verification of Image Adjuster in browser
 - Status: Real-image browser verification passed (user-confirmed); editor integration pending
