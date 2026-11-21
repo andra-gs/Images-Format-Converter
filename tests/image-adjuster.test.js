@@ -64,6 +64,12 @@ test("Gaussian blur preserves alpha and uses premultiplied-alpha samples", () =>
   assert.deepEqual(pixels(result), [14, 14, 14, 255, 201, 201, 201, 128, 255, 255, 255, 0]);
 });
 
+test("premultiplied-alpha blur avoids transparent color fringes", () => {
+  const source = image(2, 1, [255, 0, 0, 0, 0, 0, 255, 255]);
+  const result = applyImageAdjustments(source, { blur: 1 });
+  assert.deepEqual(pixels(result), [0, 0, 255, 0, 0, 0, 255, 255]);
+});
+
 test("Gaussian blur processes multiple rows with a separable kernel", () => {
   const source = image(3, 3, [
     0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255,
