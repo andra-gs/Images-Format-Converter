@@ -28,3 +28,14 @@ test("editor queue snapshot returns an independent array for an empty queue", ()
   const snapshot = createEditorQueueSnapshot([]);
   assert.deepEqual(snapshot, []);
 });
+
+test("editor queue lookup matches numeric queue IDs from select string values", async () => {
+  const { findEditorQueueEntry } = await import("../src/js/core/editor-queue-events.js");
+  const first = { id: 1, name: "first.png" };
+  const second = { id: 2, name: "second.png" };
+  const entries = [first, second];
+
+  assert.equal(findEditorQueueEntry(entries, "1"), first);
+  assert.equal(findEditorQueueEntry(entries, "2"), second);
+  assert.equal(findEditorQueueEntry(entries, "missing"), null);
+});
