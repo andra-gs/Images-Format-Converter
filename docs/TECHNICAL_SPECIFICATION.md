@@ -402,3 +402,21 @@ Invalid input types and malformed ImageData raise TypeError. Invalid values and 
 
 The existing conversion service currently accepts a File/Blob and performs its own decoding and output validation. The final integration must hand the edited pixels into that established service without bypassing output signature/dimension validation or creating a parallel conversion engine. A lossless intermediate or a coordinated service entry point must be selected during final integration; do not silently route the original file back through conversion because that would discard edits.
 
+## 26. Edited ImageData conversion handoff
+
+The Editor integration uses the existing encoder and output-validation pipeline through this service entry point:
+
+```javascript
+convertImageDataToFormat(imageData, format, options)
+```
+
+- Input: the agreed sRGB ImageData representation.
+- Supported formats: PNG, JPEG, WebP, BMP, TIFF, and SVG, matching the current `image-encoder.js` implementations.
+- Animated GIF is intentionally excluded from this edited-pixel entry point. The existing GIF path accepts the original File and preserves its animation behavior; it must not be called with the original file after editing because that would discard the edited pixels.
+- The service copies ImageData into a new Canvas-backed decoded-image-compatible object, then calls the existing `encodeImage()` implementation.
+- The generated Blob is checked using `detectImageFormat()`, decoded again using `decodeImage()`, and checked for matching output dimensions, just like the File/Blob conversion path.
+- The temporary Canvas-backed source and verification decode are released in `finally` blocks. The caller retains ownership of the input ImageData and returned Blob.
+- This edited ImageData path currently runs on the main thread. The existing File/Blob conversion path and Worker routing remain unchanged.
+
+The shared validation routine is `encodeAndValidateImage()`; both direct File/Blob conversion and edited ImageData conversion use it. Do not add a second encoder or bypass output signature/dimension validation.
+
