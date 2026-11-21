@@ -842,3 +842,10 @@ Add newest entries first.
   - Perform browser regression checks for the existing converter and editor scaffold.
   - Browser-test the edited ImageData handoff with real processing modules once Transformer and Adjuster are available.
   - Keep Apply disabled until the complete editing pipeline and UI handoff are integrated and verified.
+
+### 2026-11-21 - Browser regression check
+
+- User manually confirmed the app opens without errors.
+- Existing standard image conversion continues to work.
+- Editor panel remains visible and Apply remains disabled as expected.
+- This verifies the current UI scaffold and existing conversion regression only; edited-pixel end-to-end processing still awaits the Transformer and Adjuster modules.
