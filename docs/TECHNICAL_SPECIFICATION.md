@@ -398,5 +398,7 @@ The editor adapter uses dependency injection for the two processing functions so
 
 The adapter checks cancellation between processing stages using AbortSignal. Cancellation raises AbortError. It validates ImageData structure, sRGB color space, buffer length, output dimensions, and project dimension limits. A module result must have the agreed `{ imageData, width, height }` shape with matching dimensions.
 
+Invalid input types and malformed ImageData raise TypeError. Invalid values and dimensions raise RangeError; excessive dimensions use code `IMAGE_DIMENSIONS_EXCEEDED`. Unexpected internal adapter failures are wrapped as `ImageProcessingError` with code `IMAGE_PROCESSING_FAILED`. Module-specific errors that already carry a code are preserved. The modules use the agreed error codes `INVALID_IMAGE_DATA`, `INVALID_TRANSFORM_OPTIONS`, `INVALID_ADJUSTMENT_OPTIONS`, `INVALID_CROP_BOUNDS`, `IMAGE_DIMENSIONS_EXCEEDED`, and `IMAGE_PROCESSING_FAILED`.
+
 The existing conversion service currently accepts a File/Blob and performs its own decoding and output validation. The final integration must hand the edited pixels into that established service without bypassing output signature/dimension validation or creating a parallel conversion engine. A lossless intermediate or a coordinated service entry point must be selected during final integration; do not silently route the original file back through conversion because that would discard edits.
 
