@@ -11,3 +11,11 @@ export function createEditorQueueSnapshot(entries) {
     url: entry.url
   }));
 }
+
+/**
+ * Resolve a queue entry from a native select value.
+ * HTMLSelectElement.value is always a string, while queue IDs are numeric.
+ */
+export function findEditorQueueEntry(entries, selectedId) {
+  return entries.find((entry) => String(entry.id) === String(selectedId)) || null;
+}
