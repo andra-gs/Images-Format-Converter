@@ -110,7 +110,7 @@ Deliverable: tested advanced-format pipelines. Complete. Limitations remain docu
 
 ## Phase 5: Image manipulation
 
-Status: Planned. Phase 5 has not started. The work is divided among three members. Each member must implement and test the assigned module, then submit a Pull Request to `main`.
+Status: In progress. The shared contracts are agreed. The Image Transformer implementation and automated tests are present on `phase-5-transformation`. The user has confirmed the full repository test suite and production build pass. A real-image browser test page has been added, but real-file browser verification and team integration remain pending.
 
 ### Team ownership
 
@@ -126,20 +126,20 @@ Objective: implement image geometry and orientation operations. These operations
 
 Tasks:
 
-- [ ] Implement image resizing with explicit output width and height.
-- [ ] Support keeping the original aspect ratio while resizing.
-- [ ] Support unlocking the aspect ratio when the user wants independent width and height values.
-- [ ] Validate width and height values. Reject zero, negative, non-finite, or excessive dimensions using project limits.
-- [ ] Implement cropping by a defined selection rectangle.
-- [ ] Validate crop coordinates and crop dimensions against the source image boundaries.
-- [ ] Implement rotation by 90, 180, and 270 degrees.
-- [ ] Implement horizontal flipping.
-- [ ] Implement vertical flipping.
-- [ ] Ensure output dimensions are correct after resizing, cropping, and rotation.
-- [ ] Handle transparent pixels without introducing an unintended background during transformations.
+- [x] Implement image resizing with explicit output width and height.
+- [x] Support keeping the original aspect ratio while resizing.
+- [x] Support unlocking the aspect ratio when the user wants independent width and height values.
+- [x] Validate width and height values. Reject zero, negative, non-finite, or excessive dimensions using project limits.
+- [x] Implement cropping by a defined selection rectangle.
+- [x] Validate crop coordinates and crop dimensions against the source image boundaries.
+- [x] Implement rotation by 90, 180, and 270 degrees.
+- [x] Implement horizontal flipping.
+- [x] Implement vertical flipping.
+- [x] Ensure output dimensions are correct after resizing, cropping, and rotation.
+- [x] Handle transparent pixels without introducing an unintended background during transformations, using premultiplied-alpha interpolation during resize.
 - [ ] Release temporary canvases, ImageBitmap objects, and other image resources when processing finishes or fails.
-- [ ] Add automated tests for resize, aspect-ratio behavior, crop bounds, rotation, flipping, output dimensions, invalid input, and resource/error paths.
-- [ ] Document the module's public interface and the agreed input/output contract for the editor integration.
+- [x] Add automated tests for resize, aspect-ratio behavior, crop bounds, rotation, flipping, output dimensions, invalid input, and error paths.
+- [x] Document the module's public interface and the agreed input/output contract for the editor integration.
 
 Primary implementation file:
 
@@ -148,10 +148,12 @@ src/js/core/image-transformer.js
 tests/image-transformer.test.js
 ```
 
-The exact exported function names and argument shapes must be agreed with `FarrelPtrv` before implementation. Do not independently invent a second editing data model.
+The shared API is agreed with `FarrelPtrv`: `applyImageTransformations(imageData, transformations)` accepts the shared sRGB ImageData representation and returns `{ imageData, width, height }`. Do not introduce a second editing data model.
 
 Completion criteria:
 
+- Automated unit tests and the production build pass (user-confirmed on 2026-11-21).
+- A browser harness is available at `/tests/browser-transformer.html` for real-image verification; the user still needs to run it with representative files.
 - All listed transformations work with representative real images.
 - Aspect ratio and output dimensions match the selected operation.
 - Crop selections outside the source bounds are rejected or safely constrained according to the agreed contract.
