@@ -829,3 +829,16 @@ Add newest entries first.
   - Run `npm test` and `npm run build` on this branch and address any failures.
   - After test results are confirmed, connect the editor's processed ImageData to the new service entry point when the Transformer and Adjuster modules are available.
   - Keep Apply disabled until the real processing modules, UI handoff, and end-to-end behavior are integrated and verified.
+
+### 2026-11-21 - Edited ImageData conversion verification
+
+- Status: Automated tests and production build passed; browser integration verification pending
+- Tests reported by the user on `phase-5-editor-ui`:
+  - `npm test`: 51 passed, 0 failed, 0 cancelled, 0 skipped. This includes four tests for the edited ImageData conversion entry point.
+  - `npm run build`: Vite production build succeeded, transforming 2,163 modules in 4.22 seconds.
+- Known warning:
+  - Vite continues to report two HEIC-related chunks of approximately 3.23 MB each before gzip. The warning does not fail the build and remains a separate optimization task.
+- Remaining work:
+  - Perform browser regression checks for the existing converter and editor scaffold.
+  - Browser-test the edited ImageData handoff with real processing modules once Transformer and Adjuster are available.
+  - Keep Apply disabled until the complete editing pipeline and UI handoff are integrated and verified.
