@@ -196,6 +196,20 @@ function throwIfAborted(signal) {
   throw error;
 }
 
+function readProcessingOutput(result, stageName) {
+  if (
+    !result ||
+    !result.imageData ||
+    result.width !== result.imageData.width ||
+    result.height !== result.imageData.height
+  ) {
+    throw new TypeError(`${stageName} must return { imageData, width, height } with matching dimensions.`);
+  }
+
+  validateImageData(result.imageData);
+  return result.imageData;
+}
+
 function createUnavailableError() {
   const error = new Error(
     "Image editing is not available yet. The Transformer and Adjuster modules have not both been integrated."
@@ -241,14 +255,18 @@ export function createImageProcessingAdapter({
       let imageData = decodedImageToImageData(decodedImage, { canvasFactory });
       throwIfAborted(signal);
 
-      imageData = await applyImageTransformations(imageData, transformations || createDefaultTransformations());
-      validateImageData(imageData?.imageData || imageData);
-      imageData = imageData.imageData || imageData;
+      const transformed = await applyImageTransformations(
+        imageData,
+        transformations || createDefaultTransformations()
+      );
+      imageData = readProcessingOutput(transformed, "Image Transformer");
       throwIfAborted(signal);
 
-      imageData = await applyImageAdjustments(imageData, adjustments || { ...DEFAULT_ADJUSTMENTS });
-      validateImageData(imageData?.imageData || imageData);
-      imageData = imageData.imageData || imageData;
+      const adjusted = await applyImageAdjustments(
+        imageData,
+        adjustments || { ...DEFAULT_ADJUSTMENTS }
+      );
+      imageData = readProcessingOutput(adjusted, "Image Adjuster");
       throwIfAborted(signal);
 
       return imageData;
