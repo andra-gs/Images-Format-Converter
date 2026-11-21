@@ -1212,3 +1212,19 @@ Only record work that actually happened in the repository. Do not mark a feature
   - Open `http://localhost:5173/tests/browser-adjuster.html` while `npm run dev` is running.
   - Verify each adjustment and representative combinations using real local images.
   - Confirm dimensions and alpha transparency remain unchanged.
+
+
+### 2026-11-21 - User verification of Image Adjuster in browser
+- Status: Real-image browser verification passed (user-confirmed); editor integration pending
+- User verification:
+  - The user reported that the Image Adjustment features are working well in the browser harness.
+  - This confirms the six adjustment controls and browser preview workflow at the feature level.
+- Documentation:
+  - Updated the Phase 5 roadmap to mark real-image browser verification complete for Image Adjustment.
+  - Updated the Image Adjustment phase document to record the user-confirmed browser result.
+- Verification boundaries:
+  - This entry does not claim a new full `npm test` run or production build for the latest branch state.
+  - Editor integration and the complete editing-to-conversion workflow remain pending.
+- Next steps:
+  - Run the full repository test suite and production build on the latest `phase-5-adjustment` branch.
+  - Coordinate the processing-module handoff and integration with the Editor UI branch.
