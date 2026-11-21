@@ -126,7 +126,7 @@ test("decoder adapter rejects invalid dimensions before allocating a canvas", ()
       { source: {}, width: 0, height: 1 },
       { canvasFactory: () => { allocated = true; return createFakeCanvas(1, 1); } }
     ),
-    TypeError
+    RangeError
   );
   assert.equal(allocated, false);
 });
