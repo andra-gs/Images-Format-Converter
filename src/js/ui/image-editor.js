@@ -215,6 +215,8 @@ if (workspace) {
     }
     releaseProcessedPreview();
     processedPreviewUrl = nextUrl;
+    preview.onload = null;
+    preview.onerror = null;
     preview.src = nextUrl;
     preview.hidden = false;
     previewEmpty.hidden = true;
