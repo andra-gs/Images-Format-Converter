@@ -335,7 +335,21 @@ if (workspace) {
         dimensionsLabel.textContent = "Preview unavailable";
         previewEmpty.hidden = false;
         preview.hidden = true;
-        get("editor-preview-caption").textContent = error.message || "The selected image could not be decoded for editing.";
+
+        // Keep decoder details visible during development instead of silently
+        // swallowing the failure behind the preview placeholder.
+        console.error("[Image Editor] Failed to load selected image:", {
+          fileName: source.file?.name,
+          fileType: source.file?.type,
+          fileSize: source.file?.size,
+          error,
+          cause: error?.cause
+        });
+        const causeMessage = error?.cause?.message || "";
+        get("editor-preview-caption").textContent = [
+          error.message || "The selected image could not be decoded for editing.",
+          causeMessage && causeMessage !== error.message ? causeMessage : ""
+        ].filter(Boolean).join(" ");
       }
     })();
   };
