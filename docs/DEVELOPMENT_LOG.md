@@ -5,7 +5,7 @@ This file records actual repository progress. Update it after meaningful impleme
 ## Project status
 
 - Current stage: Phase 5 - Image manipulation
-- Current phase status: Phase 4 is complete. On `phase-5-editor-ui`, the Editor is connected to the Decoder, Transformer, Adjuster, and edited-ImageData conversion path. The user reported 86/86 automated tests passing, a successful production build, and successful browser verification that Editor processing works and existing conversion features remain functional. Phase 5 is awaiting final branch review, Pull Request, merge, and post-merge verification. Phase 6 begins only after Phase 5 is integrated and verified.
+- Current phase status: Phase 4 is complete. On `phase-5-editor-ui`, the Editor is connected to the Decoder, Transformer, Adjuster, and edited-ImageData conversion path. The user most recently reported 98/98 automated tests passing after the HEIC/TIFF queue-thumbnail fix, a successful production build, and successful browser verification that Editor processing works and existing conversion features remain functional. Phase 5 is awaiting final branch review, Pull Request, merge, and post-merge verification. Phase 6 begins only after Phase 5 is integrated and verified.
 - Latest release: None
 - Last updated: 2026-11-22
 
@@ -26,13 +26,31 @@ This file records actual repository progress. Update it after meaningful impleme
 | Phase 2: Core conversion engine | Tested | PNG, JPEG, WebP, and BMP conversion paths are user-verified; user reports the requested automated tests and build checks passed |
 | Phase 3: Batch processing | Tested | User verified batch queue, worker execution, progress, cancellation, failure isolation, large-image responsiveness, cleanup, individual downloads, ZIP extraction, and image integrity |
 | Phase 4: Advanced formats | Tested | Completed; CI validation and user-run real-browser verification passed. Known format limitations remain documented |
-| Phase 5: Image manipulation | In progress | Editor, Decoder, Transformer, Adjuster, and edited-pixel conversion are integrated on `phase-5-editor-ui`; user-reported 86/86 tests, production build, and browser integration/regression checks passed; final PR review, merge, and post-merge verification remain |
+| Phase 5: Image manipulation | In progress | Editor, Decoder, Transformer, Adjuster, and edited-pixel conversion are integrated on `phase-5-editor-ui`; user-reported 98/98 tests, production build, and browser integration/regression checks passed; final PR review, merge, and post-merge verification remain |
 | Phase 6: Advanced export and image optimization | Not started | Image Optimization, Metadata Management, and Export Presets/UI. Starts after Phase 5 integration |
 | Phase 7: Testing, documentation, and release | Not started | Cross-browser QA, security review, documentation, production validation, and v1.0.0 readiness |
 
 ## Change log
 
 Add newest entries first.
+
+### 2026-11-22 - Latest Phase 5 verification after HEIC/TIFF queue thumbnail fix
+
+- Status: User-reported automated tests, production build, and manual browser checks passed on the latest `phase-5-editor-ui` state.
+- Automated tests:
+  - `npm test`: 98 tests passed, 0 failed, 0 cancelled, 0 skipped, 0 todo.
+  - Test duration: approximately 627 ms.
+- Production build:
+  - `npm run build`: successful.
+  - Vite transformed 2,168 modules and completed in 3.73 seconds.
+  - Vite emitted its advisory warning for chunks larger than 500 kB; the two HEIC-related chunks are approximately 3.23 MB each before gzip. This is not a build failure.
+- Manual browser verification previously reported for this latest implementation:
+  - HEIC and TIFF queue thumbnails and Editor previews appear.
+  - PNG, JPEG, and WebP queue thumbnails appear and remain usable.
+  - Apply edits works.
+  - A short image-loading delay was observed, with no functional failure reported.
+- Verification boundary: all local command results and browser checks above were reported by the user; they were not independently executed in this environment.
+- Remaining work: final PR review and merge approval, followed by agreed post-merge verification. Do not merge without explicit approval.
 
 ### 2026-11-22 - HEIC/TIFF queue thumbnail browser verification
 
@@ -49,7 +67,7 @@ Add newest entries first.
   - The user noticed a short loading delay while images are loaded. This is expected to be possible because the queue now decodes source images and rasterizes thumbnails; it was not reported as a failure.
 - Verification boundary:
   - These six checks are user-reported manual browser results.
-  - This confirmation does not establish that `npm test` or `npm run build` was rerun after the thumbnail implementation.
+  - The user later reran `npm test` and `npm run build` after the thumbnail implementation; both passed. See the latest verification entry below.
 - Next steps:
   - Check the latest GitHub Actions results and rerun local automated tests/build if needed.
   - Treat thumbnail-loading performance as a separate optimization only if the delay is noticeably disruptive.
@@ -1448,7 +1466,7 @@ Only record work that actually happened in the repository. Do not mark a feature
   - `docs/DEVELOPMENT_LOG.md`
 - Tests performed:
   - Focused tests were added but have not been run in this environment.
-  - Full `npm test`, `npm run build`, and real-browser queue/editor checks remain pending.
+  - The user subsequently confirmed the full `npm test` and `npm run build` passed on the latest branch state (98/98 tests; production build successful). Real-browser queue/editor checks also passed.
 - Next steps:
   - Pull the latest `phase-5-editor-ui` branch, run the full tests and build, then verify queue thumbnails and Editor preview for HEIC, TIFF, PNG, JPEG, and WebP.
 
