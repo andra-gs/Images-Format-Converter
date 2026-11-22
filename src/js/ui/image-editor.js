@@ -1,14 +1,25 @@
 import "../../styles/editor.css";
+import { decodeImage } from "../core/image-decoder.js";
+import {
+  applyImageTransformations
+} from "../core/image-transformer.js";
+import {
+  applyImageAdjustments
+} from "../core/image-adjuster.js";
 import {
   createDefaultEditorState,
   createImageProcessingAdapter,
+  imageDataToCanvasResult,
   resetEditorState
 } from "../core/image-processing-adapter.js";
 import { findEditorQueueEntry } from "../core/editor-queue-events.js";
 
 const workspace = document.querySelector(".workspace");
 if (workspace) {
-  const adapter = createImageProcessingAdapter();
+  const adapter = createImageProcessingAdapter({
+    applyImageTransformations,
+    applyImageAdjustments
+  });
   const panel = document.createElement("section");
   panel.className = "editor-panel";
   panel.id = "image-editor";
@@ -42,7 +53,7 @@ if (workspace) {
           <img id="editor-preview-image" alt="Original image preview" hidden />
         </div>
         <p class="editor-preview-caption" id="editor-preview-caption">
-          Preview is read-only while the processing adapter is a placeholder.
+          Select an image to load it into the editor.
         </p>
       </div>
 
@@ -79,7 +90,7 @@ if (workspace) {
               <input id="editor-crop-height" type="number" min="1" step="1" />
             </label>
           </div>
-          <p class="editor-field-note">Crop selection is a draft control; processing is not connected yet.</p>
+          <p class="editor-field-note">Crop coordinates use pixels from the original image.</p>
         </fieldset>
 
         <fieldset class="editor-control-group">
@@ -135,8 +146,8 @@ if (workspace) {
         </fieldset>
 
         <p class="editor-adapter-notice" role="status">
-          <strong>Preview mode only.</strong> Controls can be configured, but image processing
-          and Apply are disabled until the transformation and adjustment modules are integrated.
+          <strong>Image processing is ready.</strong> Apply edits processes the original image
+          with the selected transformations and adjustments.
         </p>
         <div class="editor-actions">
           <button class="editor-reset-button" id="editor-reset" type="button">Reset changes</button>
@@ -158,6 +169,66 @@ if (workspace) {
   let queueEntries = [];
   let sourceDimensions = { width: null, height: null };
   let draft = createDefaultEditorState();
+  let decodedSource = null;
+  let decodeSequence = 0;
+  let processedPreviewUrl = null;
+  const editedImageDataById = new Map();
+
+  const releaseDecodedSource = () => {
+    decodedSource?.close?.();
+    decodedSource = null;
+  };
+
+  const releaseProcessedPreview = () => {
+    if (processedPreviewUrl) URL.revokeObjectURL(processedPreviewUrl);
+    processedPreviewUrl = null;
+  };
+
+  const createImageDataPreviewUrl = async (imageData) => {
+    const canvasResult = imageDataToCanvasResult(imageData);
+    try {
+      let blob;
+      if (typeof canvasResult.source.convertToBlob === "function") {
+        blob = await canvasResult.source.convertToBlob({ type: "image/png" });
+      } else {
+        blob = await new Promise((resolve, reject) => {
+          canvasResult.source.toBlob((value) => {
+            if (value) resolve(value);
+            else reject(new Error("The edited preview could not be created."));
+          }, "image/png");
+        });
+      }
+      if (!(blob instanceof Blob)) {
+        throw new Error("The browser could not create an edited image preview.");
+      }
+      return URL.createObjectURL(blob);
+    } finally {
+      canvasResult.close();
+    }
+  };
+
+  const showEditedPreview = async (imageData, sourceId) => {
+    const nextUrl = await createImageDataPreviewUrl(imageData);
+    if (selectedSource?.id !== sourceId) {
+      URL.revokeObjectURL(nextUrl);
+      return;
+    }
+    releaseProcessedPreview();
+    processedPreviewUrl = nextUrl;
+    preview.src = nextUrl;
+    preview.hidden = false;
+    previewEmpty.hidden = true;
+    dimensionsLabel.textContent = `${imageData.width} × ${imageData.height} px`;
+  };
+
+  const publishEditedImage = (sourceId, imageData) => {
+    if (imageData) editedImageDataById.set(sourceId, imageData);
+    else editedImageDataById.delete(sourceId);
+
+    window.dispatchEvent(new CustomEvent("ifc:editor-result", {
+      detail: { id: sourceId, imageData: imageData || null }
+    }));
+  };
 
   const readQueue = () => queueEntries;
 
@@ -189,21 +260,30 @@ if (workspace) {
   };
 
   const setSelectedSource = (source) => {
+    decodeSequence += 1;
+    releaseDecodedSource();
+    releaseProcessedPreview();
     selectedSource = source;
     sourceDimensions = { width: null, height: null };
     draft = resetEditorState();
+    applyButton.disabled = true;
     preview.removeAttribute("src");
     preview.hidden = true;
     previewEmpty.hidden = false;
     dimensionsLabel.textContent = "Loading dimensions…";
+    get("editor-preview-caption").textContent = "Loading the selected image.";
 
     if (!source) {
       dimensionsLabel.textContent = "Select an image";
+      get("editor-preview-caption").textContent = "Select an image to load it into the editor.";
       renderDraft();
       return;
     }
 
-    preview.onload = () => {
+    const sourceId = source.id;
+    preview.onload = async () => {
+      if (selectedSource?.id !== sourceId) return;
+
       sourceDimensions = {
         width: preview.naturalWidth,
         height: preview.naturalHeight
@@ -213,11 +293,37 @@ if (workspace) {
       previewEmpty.hidden = true;
       preview.hidden = false;
       renderDraft();
+
+      const requestId = ++decodeSequence;
+      try {
+        const decoded = await decodeImage(source.file);
+        if (requestId !== decodeSequence || selectedSource?.id !== sourceId) {
+          decoded.close?.();
+          return;
+        }
+
+        decodedSource = decoded;
+        applyButton.disabled = false;
+        get("editor-preview-caption").textContent = "Original image loaded. Configure edits and select Apply edits.";
+
+        const editedImageData = editedImageDataById.get(sourceId);
+        if (editedImageData) {
+          await showEditedPreview(editedImageData, sourceId);
+          get("editor-preview-caption").textContent = "Edited preview. Apply edits again to replace the current edited result.";
+        }
+      } catch (error) {
+        if (requestId !== decodeSequence || selectedSource?.id !== sourceId) return;
+        applyButton.disabled = true;
+        get("editor-preview-caption").textContent = error.message || "The selected image could not be decoded for editing.";
+      }
     };
     preview.onerror = () => {
+      if (selectedSource?.id !== sourceId) return;
       dimensionsLabel.textContent = "Preview unavailable";
       previewEmpty.hidden = false;
       preview.hidden = true;
+      applyButton.disabled = true;
+      get("editor-preview-caption").textContent = "The selected image preview could not be loaded.";
     };
     preview.src = source.url;
   };
@@ -322,22 +428,47 @@ if (workspace) {
   get("editor-reset").addEventListener("click", () => {
     draft = resetEditorState(sourceDimensions);
     renderDraft();
+
+    if (selectedSource) {
+      publishEditedImage(selectedSource.id, null);
+      releaseProcessedPreview();
+      preview.src = selectedSource.url;
+      preview.hidden = false;
+      previewEmpty.hidden = true;
+      dimensionsLabel.textContent = `${sourceDimensions.width} × ${sourceDimensions.height} px`;
+      get("editor-preview-caption").textContent = "Edits reset. The original image will be used for conversion.";
+    }
   });
 
   applyButton.addEventListener("click", async () => {
-    if (!selectedSource || applyButton.disabled) return;
-    try {
-      if (!selectedSource?.decodedImage) {
-        throw new Error("The decoded-image handoff is not connected yet.");
-      }
+    if (!selectedSource || !decodedSource || applyButton.disabled) return;
 
-      await adapter.process({
-        decodedImage: selectedSource.decodedImage,
+    const sourceId = selectedSource.id;
+    applyButton.disabled = true;
+    applyButton.textContent = "Applying…";
+    get("editor-preview-caption").textContent = "Applying transformations and adjustments…";
+
+    try {
+      const imageData = await adapter.process({
+        decodedImage: decodedSource,
         transformations: draft.transformations,
         adjustments: draft.adjustments
       });
+
+      if (selectedSource?.id !== sourceId) return;
+
+      await showEditedPreview(imageData, sourceId);
+      publishEditedImage(sourceId, imageData);
+      get("editor-preview-caption").textContent = "Edits applied. The converter will use this edited image; the original file remains unchanged.";
     } catch (error) {
-      get("editor-preview-caption").textContent = error.message;
+      if (selectedSource?.id === sourceId) {
+        get("editor-preview-caption").textContent = error.message || "Image processing failed.";
+      }
+    } finally {
+      if (selectedSource?.id === sourceId && decodedSource) {
+        applyButton.disabled = false;
+      }
+      applyButton.textContent = "Apply edits";
     }
   });
 
@@ -348,4 +479,9 @@ if (workspace) {
 
   renderDraft();
   refreshFiles();
+
+  window.addEventListener("beforeunload", () => {
+    releaseDecodedSource();
+    releaseProcessedPreview();
+  });
 }
