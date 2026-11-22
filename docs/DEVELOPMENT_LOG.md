@@ -1498,3 +1498,33 @@ Only record work that actually happened in the repository. Do not mark a feature
   - Run `npm test` and `npm run build` on the latest branch commit.
   - Verify real HEIC and TIFF files open in the Editor, then regression-test PNG, JPEG, and WebP.
   - Confirm queue switching, Reset, and resource cleanup in the browser before requesting another review.
+
+
+### 2026-11-22 - Phase 6 scope and team restructuring
+- Status: Planning approved by the project owner; implementation not started.
+- Decisions:
+  - Re-scoped Phase 6 to two active contributors: `andra-gs` owns the Image Optimization Engine, and `FarrelPtrv` owns Export Presets and UI Integration.
+  - Removed Metadata Management from Phase 6 and deferred it to a future backlog item. No owner, branch, API, or delivery date is assigned to that deferred work.
+  - Renamed the phase focus to Image Optimization and Export Workflow.
+  - Kept Low, Medium, and High quality presets format-aware. A shared numeric quality value must not be treated as equivalent across different encoders.
+  - Restricted target-file-size attempts to formats where iterative encoding is technically feasible. The application must report achieved size and must not promise an exact target.
+  - Required actual source/output File or Blob size measurement, byte difference, and percentage change.
+  - Required export settings to apply to individual downloads and ZIP export, with per-file failure isolation.
+  - Defined the initial investigation matrix: JPEG/WebP quality controls and possible target-size attempts; PNG lossless encoder-supported optimization; BMP/TIFF/GIF only where actual encoder capabilities support it; no generic raster quality control for SVG.
+  - Phase 6 feature work must wait until Phase 5 post-merge verification on `main` is complete.
+  - Updated collaboration instructions so Phase 6 has two feature branches: `phase-6-optimization` and `phase-6-export-ui`.
+- Documentation updated:
+  - `docs/DEVELOPMENT_ROADMAP.md`
+  - `AGENTS.md`
+  - `docs/DEVELOPMENT_LOG.md`
+- Documentation reviewed and left unchanged:
+  - `docs/PROJECT_CONTEXT.md` and `docs/TECHNICAL_SPECIFICATION.md` were reviewed. No implemented product behavior, architecture, or module API changed; this update changes only planned scope and ownership.
+- Repository workflow:
+  - Created documentation branch `docs/phase-6-two-person-plan` from main commit `940b5f29ae539603df49a87cb15984dc947288a5`.
+  - Open Phase 6 feature branches have not been created.
+  - PR #4 (`security/xanitizer-analysis`) remains open and is separate from Phase 6 planning.
+- Tests:
+  - No application tests, browser checks, or production build were run because this change updates planning and collaboration documentation only.
+- Next steps:
+  - Complete Phase 5 post-merge verification on `main`.
+  - Before Phase 6 coding, agree on optimizer API, preset mappings, supported-format capabilities, error behavior, and size-reporting shape.

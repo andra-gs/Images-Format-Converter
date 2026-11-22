@@ -85,9 +85,9 @@ This repository is maintained by three developers. Use GitHub usernames as the c
 
 | GitHub username | Phase 5 assignment | Phase 6 assignment |
 |---|---|---|
-| `andra-gs` | Image Transformation | Image Optimization |
-| `Adit1945-web` | Image Adjustment | Metadata Management |
-| `FarrelPtrv` | Editor UI and Integration | Export Presets and UI |
+| `andra-gs` | Image Transformation | Image Optimization Engine |
+| `Adit1945-web` | Image Adjustment | Not assigned to Phase 6 |
+| `FarrelPtrv` | Editor UI and Integration | Export Presets and UI Integration |
 
 Before helping with implementation:
 
@@ -109,9 +109,9 @@ Before helping with implementation:
 
 ### Phase 6 assignments
 
-- `andra-gs`: implement image optimization presets, feasible target-file-size behavior, actual output-size measurement, and size comparison.
-- `Adit1945-web`: implement metadata detection, supported EXIF reading, and metadata removal where the selected output format supports it. Document read/remove/preserve capabilities separately.
-- `FarrelPtrv`: implement export preset controls, metadata controls, size reporting, and integration with individual downloads and ZIP export.
+- `andra-gs`: implement the Image Optimization Engine, format-aware Low/Medium/High presets, feasible target-file-size attempts, actual source/output size measurement, size comparison, output validation, and focused tests.
+- `FarrelPtrv`: implement Export Presets and UI Integration, capability-aware controls, actual size reporting, and integration with individual downloads and ZIP export.
+- `Adit1945-web`: no Phase 6 assignment. Metadata Management is deferred to a future backlog item and has no assigned owner or branch.
 
 ### Branch and merge rules
 
@@ -120,9 +120,9 @@ Use these branch names:
 | Phase | `andra-gs` | `Adit1945-web` | `FarrelPtrv` |
 |---|---|---|---|
 | Phase 5 | `phase-5-transformation` | `phase-5-adjustment` | `phase-5-editor-ui` |
-| Phase 6 | `phase-6-optimization` | `phase-6-metadata` | `phase-6-export-ui` |
+| Phase 6 | `phase-6-optimization` | Not applicable | `phase-6-export-ui` |
 
-Create each branch from the latest `main` when its phase starts. Submit Pull Requests to `main`. Merge processing modules before the UI/integration module. The UI/integration owner must update their branch from the latest `main` before final integration. Merge one Pull Request at a time and rerun the complete test suite, production build, and end-to-end browser checks after all three have merged.
+Create each branch from the latest `main` when its phase starts. Submit Pull Requests to `main`. Merge the Image Optimization processing module before the Export UI integration module. Farrel must update `phase-6-export-ui` from the latest `main` before final integration. Merge one Pull Request at a time and rerun the complete test suite, production build, and end-to-end browser checks after all assigned Phase 6 Pull Requests have merged.
 
 Do not create a branch, commit, merge, or claim repository changes unless the operation actually succeeded.
 

@@ -264,145 +264,156 @@ Completion criteria:
 
 Deliverable: an image editor that supports geometric transformation and visual adjustment before conversion, integrated with the existing conversion engine.
 
-## Phase 6: Advanced export and image optimization
+## Phase 6: Image optimization and export workflow
 
-Status: Planned and agreed by the project team on 2026-11-20. Phase 6 begins only after Phase 5 has been integrated and verified. The work is divided among the same three members.
+Status: Planned. The project owner approved a two-person team for this phase on 2026-11-22. Phase 6 begins after Phase 5 post-merge verification is complete. Metadata Management is removed from this phase and deferred to a future backlog item.
 
 ### Team ownership
 
 | GitHub account | Responsibility | Branch |
 |---|---|---|
-| `andra-gs` | Image Optimization | `phase-6-optimization` |
-| `Adit1945-web` | Metadata Management | `phase-6-metadata` |
-| `FarrelPtrv` | Export Presets and UI | `phase-6-export-ui` |
+| `andra-gs` | Image Optimization Engine | `phase-6-optimization` |
+| `FarrelPtrv` | Export Presets and UI Integration | `phase-6-export-ui` |
 
-### 6.1 `andra-gs`: Image Optimization
+### Phase objectives
 
-Objective: implement optimization options that reduce output file size while keeping visual quality within the user's selected preference.
+- Reduce output file size where the selected encoder supports meaningful optimization.
+- Provide clear quality presets without pretending quality values are equivalent across formats.
+- Report actual source and output file sizes, including the size difference and percentage change.
+- Integrate optimization settings with individual downloads and ZIP export.
+- Preserve the existing browser-local conversion architecture, decoders, encoders, and conversion service.
+- Keep unsupported options hidden or clearly unavailable.
+
+### 6.1 `andra-gs`: Image Optimization Engine
+
+Objective: implement the core optimization module and accurate file-size measurement. The optimizer must use the existing encoder/conversion pipeline rather than creating a parallel conversion system.
 
 Tasks:
 
-- [ ] Evaluate the existing encoders and determine which output formats support meaningful optimization controls.
-- [ ] Implement optimization presets for low, medium, and high quality where the target encoder supports the relevant controls.
-- [ ] Map each preset to documented encoder settings. Do not assume that the same quality number produces equivalent results across different formats.
-- [ ] Implement an optional target-file-size mode where it is technically feasible for the selected output format and encoder.
-- [ ] If exact target-size output cannot be guaranteed, report the achieved size and make the limitation clear rather than promising an exact result.
-- [ ] Measure and report the source file size and generated output file size.
-- [ ] Calculate the size difference and percentage reduction or increase accurately.
-- [ ] Ensure optimization does not silently change the selected output format.
-- [ ] Validate the output MIME type and file signature using the existing conversion validation approach.
+- [ ] Inspect existing encoders and identify which formats expose meaningful optimization controls.
+- [ ] Define a supported-format and capability matrix for optimization.
+- [ ] Implement `src/js/core/image-optimizer.js`.
+- [ ] Add Low, Medium, and High quality presets for formats where the encoder supports them.
+- [ ] Map presets to documented, format-specific encoder settings. Do not assume the same quality number produces equivalent results across formats.
+- [ ] Implement target-file-size behavior only for formats where repeated encoding and quality adjustment are technically feasible. Start with JPEG and WebP if the current encoder path supports the required controls.
+- [ ] Do not promise an exact target size. Return the achieved size and clearly report when the requested target cannot be reached.
+- [ ] Measure source and output sizes from actual File/Blob data.
+- [ ] Calculate byte difference and percentage reduction or increase accurately, including cases where output is larger.
+- [ ] Ensure optimization never silently changes the selected output format.
+- [ ] Validate output MIME type and file signature using the existing conversion validation path.
 - [ ] Reopen or decode generated output where the current pipeline supports that verification.
-- [ ] Test visual quality at each preset using representative images, including photographs, graphics, and images with transparency where supported.
-- [ ] Document format-specific limitations, including formats that do not expose a lossy quality control.
-- [ ] Add automated tests for preset mapping, target-size behavior, size calculations, unsupported formats, invalid values, and output validation.
+- [ ] Test visual quality using representative photographs, graphics, and transparent images where supported.
+- [ ] Document format-specific behavior and unsupported optimization options.
+- [ ] Add automated tests for preset mapping, format capability checks, target-size iteration and failure behavior, actual size calculations, invalid values, and output validation.
 
-Primary implementation file:
+Primary files:
 
 ```text
 src/js/core/image-optimizer.js
 tests/image-optimizer.test.js
+docs/PHASE_6_OPTIMIZATION.md
 ```
 
-The exact optimizer API must be agreed with `FarrelPtrv` before UI integration. The optimizer must use the existing encoder/conversion pipeline rather than creating a parallel conversion system.
+Expected API contract: agree with Farrel before implementation. The contract should accept the source image/result and an explicit optimization configuration, use the existing conversion/encoder path, and return the generated Blob plus actual source/output size information. Final names and shapes must be documented before UI integration.
 
 Completion criteria:
 
-- Optimization presets produce valid output for every format explicitly declared as supported.
-- Source and output sizes are measured from actual files, not estimated values presented as exact results.
-- Target-size mode is offered only where feasible and communicates when the requested size cannot be reached.
-- Visual quality and transparency behavior are tested and documented.
-- Automated tests pass.
+- Presets produce valid output for every format explicitly marked as supported.
+- Source and output sizes come from actual file data, not estimates presented as exact values.
+- Target-size behavior is offered only where feasible and reports the achieved result honestly.
+- Visual quality, transparency, and format integrity are tested.
+- The module integrates with the existing conversion service without duplicating decoders or encoders.
+- Focused tests, full test suite, and production build pass.
 
-### 6.2 `Adit1945-web`: Metadata Management
+### 6.2 `FarrelPtrv`: Export Presets and UI Integration
 
-Objective: inspect supported image metadata and give the user a clear option to remove metadata from exported images.
-
-Tasks:
-
-- [ ] Evaluate a browser-compatible metadata reader and document its license, bundle impact, and supported metadata formats.
-- [ ] Detect metadata availability without assuming every image contains EXIF data.
-- [ ] Read supported EXIF fields from image files.
-- [ ] Expose camera make and model when those fields exist.
-- [ ] Expose orientation information when that field exists.
-- [ ] Identify other metadata fields that are safe and useful to show in the interface. Document the exact supported field list.
-- [ ] Handle missing, malformed, unsupported, and partially readable metadata without breaking image conversion.
-- [ ] Implement metadata removal for exported files where the output pipeline can reliably omit the relevant metadata.
-- [ ] Distinguish between metadata that can be read, metadata that can be removed, and metadata that can be preserved. These are separate capabilities.
-- [ ] Verify the behavior separately for each supported output format. Do not claim metadata preservation when the encoder discards metadata.
-- [ ] Ensure metadata removal does not modify the original uploaded file.
-- [ ] Add automated tests for metadata detection, supported field extraction, missing fields, malformed metadata, removal behavior, and format-specific limitations.
-- [ ] Document privacy implications and exactly which metadata fields the application reads or removes.
-
-Primary implementation file:
-
-```text
-src/js/core/metadata-manager.js
-tests/metadata-manager.test.js
-```
-
-The exact metadata result shape and API must be agreed with `FarrelPtrv` before UI integration.
-
-Completion criteria:
-
-- Supported metadata is read accurately from representative real image files.
-- Missing or malformed metadata does not break the conversion workflow.
-- Metadata removal is verified against actual exported files for each format declared as supported.
-- Read, remove, and preserve capabilities are reported separately.
-- Automated tests pass and format limitations are documented.
-
-### 6.3 `FarrelPtrv`: Export Presets and UI
-
-Objective: build the export settings interface and connect it to the optimization and metadata modules.
+Objective: implement the export settings interface and connect it to the Image Optimizer and existing download workflow.
 
 Tasks:
 
-- [ ] Design and implement an export settings panel that follows the existing application design system.
-- [ ] Add low-, medium-, and high-quality optimization preset controls.
-- [ ] Add a target-file-size control only for formats and encoders that support the agreed target-size workflow.
-- [ ] Add metadata inspection controls and a clear presentation of available metadata fields.
-- [ ] Add an option to remove metadata from exported files when the selected output path supports it.
-- [ ] Clearly distinguish metadata removal from metadata preservation. Do not display a preservation option for a format that cannot support it.
-- [ ] Display the actual source file size and final output file size.
-- [ ] Display the actual size difference and percentage change.
-- [ ] Display an estimated size only if it is explicitly labeled as an estimate and the estimate has a documented basis.
-- [ ] Connect export controls to `image-optimizer.js` and `metadata-manager.js` after their APIs are agreed.
-- [ ] Integrate the export settings with individual downloads.
-- [ ] Integrate the export settings with ZIP export so each successful file uses its selected export settings.
-- [ ] Ensure failed optimization or metadata operations are reported per file and do not unnecessarily cancel unrelated batch items.
-- [ ] Ensure the export panel works in light and dark themes.
-- [ ] Ensure responsive layout and keyboard accessibility.
-- [ ] Add UI and integration tests for presets, metadata controls, size reporting, individual downloads, ZIP export, error handling, and theme behavior.
+- [ ] Design an Export Settings panel consistent with the existing application design system.
+- [ ] Add Low, Medium, and High preset controls when supported by the selected output format.
+- [ ] Show format-specific quality controls only when the selected encoder supports them.
+- [ ] Add a target-file-size control only for formats supported by the agreed optimizer contract.
+- [ ] Display the actual source file size.
+- [ ] Display the actual generated output size.
+- [ ] Display the byte difference and percentage reduction or increase.
+- [ ] Make clear when optimization is unavailable for the selected format.
+- [ ] Integrate the panel with `image-optimizer.js` using the agreed API.
+- [ ] Apply the selected settings to individual downloads.
+- [ ] Apply the selected settings to ZIP export so each successful item uses its own selected output settings.
+- [ ] Keep per-file optimization failures isolated so one failed item does not unnecessarily cancel unrelated batch items.
+- [ ] Preserve existing conversion, validation, queue, Worker, and ZIP behavior.
+- [ ] Support light and dark themes.
+- [ ] Ensure responsive desktop/mobile layout and keyboard accessibility.
+- [ ] Add UI and integration tests for presets, capability-dependent controls, size reporting, individual downloads, ZIP export, error states, and theme behavior.
+- [ ] Document the UI behavior and integration contract in `docs/PHASE_6_EXPORT_UI.md`.
 
-Primary implementation files:
+Primary files:
 
 ```text
 src/js/ui/export-panel.js
 src/styles/export-panel.css
 tests/export-panel.test.js
+docs/PHASE_6_EXPORT_UI.md
 ```
 
-The file list is a starting ownership boundary. Coordinate any required changes to shared files before editing them.
+The file list is an initial ownership boundary. Coordinate changes to shared files, especially the conversion service, queue orchestration, and ZIP export, before editing them.
 
 Completion criteria:
 
-- The user can select a supported optimization preset and metadata option before export.
-- The selected settings reach the correct processing modules.
-- Actual source/output size information is displayed accurately.
+- Users can select a supported optimization preset before export.
+- Settings reach the optimizer correctly for each file.
+- Actual size information is accurate and understandable.
 - Individual downloads and ZIP export use the selected settings.
 - Unsupported options are hidden or clearly disabled with an explanation.
-- Automated tests, browser checks, and production build pass.
+- Existing conversion and batch behavior remains functional.
+- Focused tests, full test suite, browser checks, and production build pass.
+
+### Supported-format planning matrix
+
+This matrix describes the initial investigation and intended behavior. Final availability must be based on the actual encoder capabilities and browser verification.
+
+| Output format | Initial optimization plan |
+|---|---|
+| JPEG | Quality control; evaluate iterative quality adjustment for target-size attempts |
+| WebP | Quality control; evaluate iterative quality adjustment for target-size attempts |
+| PNG | Lossless output and encoder-supported optimization; no lossy quality preset unless explicitly implemented |
+| BMP | No quality control in the current baseline encoder; report optimization as unavailable unless a real optimization path is added |
+| TIFF | Follow the current baseline uncompressed encoder; no quality control or compression selection is promised |
+| GIF | Follow the current GIF encoder capabilities; do not expose generic quality presets without a verified mapping |
+| SVG | No raster quality control. Preserve the existing embedded-PNG wrapper behavior and do not describe it as vector optimization |
 
 ### Phase 6 integration order
 
-1. Confirm Phase 5 is merged and stable.
-2. Agree on the optimizer and metadata APIs, supported format matrix, error behavior, and resource ownership.
-3. `andra-gs` and `Adit1945-web` implement their processing modules and automated tests.
-4. Review and merge their Pull Requests into `main` one at a time.
-5. `FarrelPtrv` updates `phase-6-export-ui` from the latest `main`, connects both modules, and completes individual-download and ZIP integration.
-6. Review and merge the export UI Pull Request.
-7. Run the full automated test suite and production build, then test export behavior with representative real files and formats.
+1. Complete Phase 5 post-merge verification on `main`. Do not begin Phase 6 feature implementation until that checkpoint passes.
+2. Create `phase-6-optimization` and `phase-6-export-ui` from the latest `main`.
+3. Agree on optimizer API, preset mapping, supported-format matrix, error behavior, size-reporting shape, and resource ownership.
+4. `andra-gs` implements the optimizer and focused tests. Farrel may build the UI against a temporary mock contract, but must not invent a competing API.
+5. Review and merge the optimizer Pull Request into `main`.
+6. `FarrelPtrv` updates `phase-6-export-ui` from the newly updated `main`, then integrates the real optimizer with individual downloads and ZIP export.
+7. Review and merge the export UI Pull Request.
+8. Run the complete automated test suite and production build, then test representative real files in the browser, including individual downloads, mixed-format batches, and ZIP extraction/integrity.
 
-Deliverable: an export workflow with tested optimization presets, accurate file-size reporting, supported metadata inspection/removal, and integration with individual and ZIP downloads.
+Deliverable: an export workflow with format-aware optimization presets, feasible target-size attempts, accurate file-size reporting, and integration with individual and ZIP downloads.
+
+### Deferred backlog: Metadata Management
+
+Metadata Management is intentionally excluded from Phase 6 to keep the two-person scope focused. It may be proposed as a separate future phase after the export workflow is stable.
+
+Potential future scope:
+
+- Evaluate a browser-compatible metadata reader and document license, bundle impact, and supported formats.
+- Detect metadata availability without assuming every image contains EXIF.
+- Read a documented subset of EXIF fields, such as camera make/model and orientation when present.
+- Handle missing, malformed, unsupported, and partially readable metadata without breaking conversion.
+- Investigate metadata removal for exported formats where the encoder can reliably omit metadata.
+- Distinguish reading, removing, and preserving metadata. Do not claim preservation when an encoder discards metadata.
+- Verify behavior separately for each output format.
+- Ensure metadata operations never modify the original uploaded file.
+- Add tests and document privacy implications and format-specific limitations.
+
+No owner, branch, API, or delivery date is assigned to this deferred work yet.
 
 ## Phase 7: Testing, documentation, and release
 
@@ -460,20 +471,20 @@ Do not mark a phase complete based on appearance alone. A feature must work with
 
 ## Team collaboration and task ownership
 
-This repository is developed by a three-person team. The GitHub account names below are the authoritative task owners. ChatGPT sessions used by any team member must read this section and the Development Roadmap before proposing or changing project files.
+This repository is developed by a three-person team overall. Phase 6 feature work is assigned to two members only. The GitHub account names below are the authoritative task owners. ChatGPT sessions used by any team member must read this section and the Development Roadmap before proposing or changing project files.
 
 | GitHub account | Phase 5 responsibility | Phase 6 responsibility |
 |---|---|---|
-| `andra-gs` | Image Transformation | Image Optimization |
-| `Adit1945-web` | Image Adjustment | Metadata Management |
-| `FarrelPtrv` | Editor UI and Integration | Export Presets and UI |
+| `andra-gs` | Image Transformation | Image Optimization Engine |
+| `Adit1945-web` | Image Adjustment | Not assigned to Phase 6 |
+| `FarrelPtrv` | Editor UI and Integration | Export Presets and UI Integration |
 
 ### Mandatory instructions for ChatGPT sessions
 
 1. Read the root-level `AGENTS.md` before taking action.
 2. Identify the current developer by their GitHub username. If it is not known, ask the user to provide it before selecting an assigned task.
 3. Read `docs/DEVELOPMENT_ROADMAP.md`, this file, `docs/PROJECT_CONTEXT.md`, and `docs/TECHNICAL_SPECIFICATION.md` before making implementation decisions.
-3. Work only on the responsibility assigned to the identified GitHub account for the active phase. Do not silently take over another member's module.
+4. Work only on the responsibility assigned to the identified GitHub account for the active phase. Do not silently take over another member's module.
 4. Do not change the ownership table or reassign tasks unless the project owner explicitly agrees.
 5. Preserve the existing architecture: Vanilla JavaScript ES modules, Vite, plain CSS, browser-local image processing, and the existing conversion pipeline.
 6. Do not claim a feature is complete until its implementation, automated tests, relevant browser checks, and production build have been verified. Record who performed manual tests and what was tested.
@@ -499,6 +510,6 @@ This repository is developed by a three-person team. The GitHub account names be
 | Phase | `andra-gs` | `Adit1945-web` | `FarrelPtrv` |
 |---|---|---|---|
 | Phase 5 | `phase-5-transformation` | `phase-5-adjustment` | `phase-5-editor-ui` |
-| Phase 6 | `phase-6-optimization` | `phase-6-metadata` | `phase-6-export-ui` |
+| Phase 6 | `phase-6-optimization` | Not applicable | `phase-6-export-ui` |
 
 Branch names are the agreed convention. The branches are created when the relevant phase begins; documenting a branch name does not mean that the branch already exists.
