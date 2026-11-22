@@ -34,6 +34,27 @@ This file records actual repository progress. Update it after meaningful impleme
 
 Add newest entries first.
 
+### 2026-11-22 - HEIC/TIFF queue thumbnail browser verification
+
+- Status: User-reported manual browser verification passed for all six Editor checks.
+- Branch: `phase-5-editor-ui`
+- The user confirmed:
+  - HEIC enters the queue and its thumbnail appears; the Editor preview appears.
+  - TIFF enters the queue and its thumbnail appears; the Editor preview appears.
+  - PNG opens and its queue thumbnail appears.
+  - JPEG opens and its queue thumbnail appears.
+  - WebP opens and its queue thumbnail appears.
+  - Editor successfully runs Apply edits.
+- Observed behavior:
+  - The user noticed a short loading delay while images are loaded. This is expected to be possible because the queue now decodes source images and rasterizes thumbnails; it was not reported as a failure.
+- Verification boundary:
+  - These six checks are user-reported manual browser results.
+  - This confirmation does not establish that `npm test` or `npm run build` was rerun after the thumbnail implementation.
+- Next steps:
+  - Check the latest GitHub Actions results and rerun local automated tests/build if needed.
+  - Treat thumbnail-loading performance as a separate optimization only if the delay is noticeably disruptive.
+
+
 ### 2026-11-22 - Phase 5 Editor integration verification
 
 - Status: Feature implementation and user-reported local verification complete on `phase-5-editor-ui`; final PR review and merge pending.
