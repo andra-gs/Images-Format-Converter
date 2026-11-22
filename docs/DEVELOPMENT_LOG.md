@@ -1406,3 +1406,33 @@ Only record work that actually happened in the repository. Do not mark a feature
 - Next steps:
   - Run the full repository test suite and production build on the latest `phase-5-adjustment` branch.
   - Coordinate the processing-module handoff and integration with the Editor UI branch.
+
+
+### 2026-11-22 - Phase 5 Editor review fixes: decoder preview and empty inputs
+
+- Status: Implemented on `phase-5-editor-ui`; automated and real-browser verification pending.
+- Review findings:
+  - Editor preview decoding depended on native `<img>` loading, which could prevent decoder-supported HEIC and TIFF files from opening.
+  - Empty Crop and Resize fields did not consistently map to the shared nullable-dimension contract.
+- Changes:
+  - Decoupled source decoding from native `<img>` loading and now call `decodeImage(source.file)` immediately after selection.
+  - Generate the original preview from decoded sRGB ImageData through the Canvas-to-PNG preview pipeline.
+  - Retain explicit ownership and cleanup for decoded sources, temporary Canvas resources, and Editor-created preview object URLs.
+  - Added `src/js/core/editor-input-state.js` for deterministic Crop and Resize input normalization.
+  - Empty Crop width/height and Resize width/height now map to `null`; empty Crop X/Y map to `0`.
+  - Block Apply when aspect ratio is unlocked and either Resize dimension is missing.
+  - Added `tests/editor-input-state.test.js` for Crop clearing, Resize clearing, aspect-ratio resolution, and unlocked resize validation.
+- Files changed:
+  - `src/js/ui/image-editor.js`
+  - `src/js/core/editor-input-state.js`
+  - `tests/editor-input-state.test.js`
+  - `docs/PHASE_5_EDITOR_UI.md`
+  - `docs/TECHNICAL_SPECIFICATION.md`
+  - `docs/DEVELOPMENT_LOG.md`
+- Tests performed:
+  - Test cases have been added, but `npm test` and `npm run build` have not yet been executed for this updated branch state in this environment.
+  - Real-browser Editor verification for HEIC, TIFF, PNG, JPEG, and WebP remains pending.
+- Next steps:
+  - Run `npm test` and `npm run build` on the latest branch commit.
+  - Verify real HEIC and TIFF files open in the Editor, then regression-test PNG, JPEG, and WebP.
+  - Confirm queue switching, Reset, and resource cleanup in the browser before requesting another review.
