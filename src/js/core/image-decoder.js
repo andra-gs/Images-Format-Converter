@@ -50,22 +50,31 @@ async function decodeWithImageBitmap(file, format) {
 }
 
 async function decodeWithHeicLibrary(file, format) {
-  // heic-to provides a worker-specific entry so the WASM decoder can run
-  // inside the existing conversion worker without requiring DOM APIs.
+  // Decode to a standard PNG Blob first. This avoids relying on the browser
+  // and the HEIC library returning a compatible ImageBitmap implementation.
   const decoderModule = typeof document === "undefined"
     ? await import("heic-to/next")
     : await import("heic-to");
 
-  const bitmap = await decoderModule.heicTo({
+  const pngBlob = await decoderModule.heicTo({
     blob: file,
-    type: "bitmap"
+    type: "image/png"
   });
 
+  if (!(pngBlob instanceof Blob) || pngBlob.size === 0) {
+    throw new Error("The HEIC decoder did not return a valid PNG image.");
+  }
+
   try {
-    return createDecodedResult(bitmap, format, () => bitmap.close?.());
-  } catch (error) {
-    bitmap.close?.();
-    throw error;
+    return await decodeWithImageBitmap(pngBlob, format);
+  } catch (bitmapError) {
+    try {
+      return await decodeWithImageElement(pngBlob, format);
+    } catch (imageError) {
+      const decodeError = new Error("The HEIC image was converted, but the browser could not open the generated preview.");
+      decodeError.cause = imageError || bitmapError;
+      throw decodeError;
+    }
   }
 }
 
