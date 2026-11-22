@@ -9,10 +9,12 @@ import {
 import {
   createDefaultEditorState,
   createImageProcessingAdapter,
+  decodedImageToImageData,
   imageDataToCanvasResult,
   resetEditorState
 } from "../core/image-processing-adapter.js";
 import { findEditorQueueEntry } from "../core/editor-queue-events.js";
+import { updateCropDraft, updateResizeDraft } from "../core/editor-input-state.js";
 
 const workspace = document.querySelector(".workspace");
 if (workspace) {
@@ -170,6 +172,7 @@ if (workspace) {
   let sourceDimensions = { width: null, height: null };
   let draft = createDefaultEditorState();
   let decodedSource = null;
+  let originalImageData = null;
   let decodeSequence = 0;
   let processedPreviewUrl = null;
   const editedImageDataById = new Map();
@@ -207,7 +210,7 @@ if (workspace) {
     }
   };
 
-  const showEditedPreview = async (imageData, sourceId) => {
+  const showImageDataPreview = async (imageData, sourceId) => {
     const nextUrl = await createImageDataPreviewUrl(imageData);
     if (selectedSource?.id !== sourceId) {
       URL.revokeObjectURL(nextUrl);
@@ -222,6 +225,8 @@ if (workspace) {
     previewEmpty.hidden = true;
     dimensionsLabel.textContent = `${imageData.width} × ${imageData.height} px`;
   };
+
+  const showEditedPreview = showImageDataPreview;
 
   const publishEditedImage = (sourceId, imageData) => {
     if (imageData) editedImageDataById.set(sourceId, imageData);
@@ -262,13 +267,16 @@ if (workspace) {
   };
 
   const setSelectedSource = (source) => {
-    decodeSequence += 1;
+    const requestId = ++decodeSequence;
     releaseDecodedSource();
     releaseProcessedPreview();
     selectedSource = source;
+    originalImageData = null;
     sourceDimensions = { width: null, height: null };
     draft = resetEditorState();
     applyButton.disabled = true;
+    preview.onload = null;
+    preview.onerror = null;
     preview.removeAttribute("src");
     preview.hidden = true;
     previewEmpty.hidden = false;
@@ -283,51 +291,53 @@ if (workspace) {
     }
 
     const sourceId = source.id;
-    preview.onload = async () => {
-      if (selectedSource?.id !== sourceId) return;
+    renderDraft();
 
-      sourceDimensions = {
-        width: preview.naturalWidth,
-        height: preview.naturalHeight
-      };
-      draft = createDefaultEditorState(sourceDimensions);
-      dimensionsLabel.textContent = `${sourceDimensions.width} × ${sourceDimensions.height} px`;
-      previewEmpty.hidden = true;
-      preview.hidden = false;
-      renderDraft();
-
-      const requestId = ++decodeSequence;
+    // Decode the File directly. Native <img> support is not a prerequisite:
+    // HEIC/HEIF and TIFF are rasterized by the existing decoder before preview.
+    (async () => {
+      let decoded;
       try {
-        const decoded = await decodeImage(source.file);
+        decoded = await decodeImage(source.file);
         if (requestId !== decodeSequence || selectedSource?.id !== sourceId) {
           decoded.close?.();
           return;
         }
 
         decodedSource = decoded;
+        originalImageData = decodedImageToImageData(decoded);
+        sourceDimensions = { width: originalImageData.width, height: originalImageData.height };
+        draft = createDefaultEditorState(sourceDimensions);
+        renderDraft();
+
+        await showImageDataPreview(originalImageData, sourceId);
+        if (requestId !== decodeSequence || selectedSource?.id !== sourceId) return;
+
         applyButton.disabled = false;
         get("editor-preview-caption").textContent = "Original image loaded. Configure edits and select Apply edits.";
 
         const editedImageData = editedImageDataById.get(sourceId);
         if (editedImageData) {
           await showEditedPreview(editedImageData, sourceId);
-          get("editor-preview-caption").textContent = "Edited preview. Apply edits again to replace the current edited result.";
+          if (requestId === decodeSequence && selectedSource?.id === sourceId) {
+            get("editor-preview-caption").textContent = "Edited preview. Apply edits again to replace the current edited result.";
+          }
         }
       } catch (error) {
-        if (requestId !== decodeSequence || selectedSource?.id !== sourceId) return;
+        if (requestId !== decodeSequence || selectedSource?.id !== sourceId) {
+          if (decoded && decoded !== decodedSource) decoded.close?.();
+          return;
+        }
+        if (decoded && decoded !== decodedSource) decoded.close?.();
+        releaseDecodedSource();
+        originalImageData = null;
         applyButton.disabled = true;
+        dimensionsLabel.textContent = "Preview unavailable";
+        previewEmpty.hidden = false;
+        preview.hidden = true;
         get("editor-preview-caption").textContent = error.message || "The selected image could not be decoded for editing.";
       }
-    };
-    preview.onerror = () => {
-      if (selectedSource?.id !== sourceId) return;
-      dimensionsLabel.textContent = "Preview unavailable";
-      previewEmpty.hidden = false;
-      preview.hidden = true;
-      applyButton.disabled = true;
-      get("editor-preview-caption").textContent = "The selected image preview could not be loaded.";
-    };
-    preview.src = source.url;
+    })();
   };
 
   const refreshFiles = () => {
@@ -365,25 +375,13 @@ if (workspace) {
   });
 
   get("editor-width").addEventListener("input", (event) => {
-    const value = Number(event.currentTarget.value);
-    if (Number.isFinite(value) && value > 0) {
-      draft.transformations.resize.width = Math.round(value);
-      if (draft.transformations.resize.keepAspectRatio && sourceDimensions.width) {
-        draft.transformations.resize.height = Math.max(1, Math.round(value * sourceDimensions.height / sourceDimensions.width));
-        get("editor-height").value = draft.transformations.resize.height;
-      }
-    }
+    updateResizeDraft(draft.transformations.resize, "width", event.currentTarget.value, sourceDimensions);
+    get("editor-height").value = draft.transformations.resize.height ?? "";
   });
 
   get("editor-height").addEventListener("input", (event) => {
-    const value = Number(event.currentTarget.value);
-    if (Number.isFinite(value) && value > 0) {
-      draft.transformations.resize.height = Math.round(value);
-      if (draft.transformations.resize.keepAspectRatio && sourceDimensions.height) {
-        draft.transformations.resize.width = Math.max(1, Math.round(value * sourceDimensions.width / sourceDimensions.height));
-        get("editor-width").value = draft.transformations.resize.width;
-      }
-    }
+    updateResizeDraft(draft.transformations.resize, "height", event.currentTarget.value, sourceDimensions);
+    get("editor-width").value = draft.transformations.resize.width ?? "";
   });
 
   get("editor-aspect").addEventListener("change", (event) => {
@@ -393,8 +391,7 @@ if (workspace) {
   for (const id of ["editor-crop-x", "editor-crop-y", "editor-crop-width", "editor-crop-height"]) {
     get(id).addEventListener("input", (event) => {
       const key = id.replace("editor-crop-", "");
-      const value = Number(event.currentTarget.value);
-      if (Number.isFinite(value) && value >= 0) draft.transformations.crop[key] = Math.round(value);
+      updateCropDraft(draft.transformations.crop, key, event.currentTarget.value);
     });
   }
 
@@ -436,10 +433,9 @@ if (workspace) {
       releaseProcessedPreview();
       preview.onload = null;
       preview.onerror = null;
-      preview.src = selectedSource.url;
-      preview.hidden = false;
-      previewEmpty.hidden = true;
-      dimensionsLabel.textContent = `${sourceDimensions.width} × ${sourceDimensions.height} px`;
+      if (originalImageData) {
+        showImageDataPreview(originalImageData, selectedSource.id);
+      }
       get("editor-preview-caption").textContent = "Edits reset. The original image will be used for conversion.";
     }
   });
@@ -448,6 +444,11 @@ if (workspace) {
     if (!selectedSource || !decodedSource || applyButton.disabled) return;
 
     const sourceId = selectedSource.id;
+    const resize = draft.transformations.resize;
+    if (!resize.keepAspectRatio && (resize.width === null || resize.height === null)) {
+      get("editor-preview-caption").textContent = "Enter both resize width and height when aspect ratio is unlocked.";
+      return;
+    }
     applyButton.disabled = true;
     applyButton.textContent = "Applying…";
     get("editor-preview-caption").textContent = "Applying transformations and adjustments…";
