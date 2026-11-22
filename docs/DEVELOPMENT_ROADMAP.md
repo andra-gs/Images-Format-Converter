@@ -110,7 +110,7 @@ Deliverable: tested advanced-format pipelines. Complete. Limitations remain docu
 
 ## Phase 5: Image manipulation
 
-Status: In progress — implementation and user-reported local verification are complete on `phase-5-editor-ui`; final Pull Request review, merge, and post-merge verification remain. The Editor is connected to the Decoder, Image Transformer, Image Adjuster, and edited-ImageData conversion service. The user reported 86/86 automated tests passing, a successful production build (2,166 modules transformed), and successful browser verification that Editor processing produces the expected result while existing conversion features continue working. Animated GIF remains on the original File-based conversion path to preserve animation. Phase 6 starts only after Phase 5 is merged and verified.
+Status: In progress — the initial implementation and user-reported local verification are complete. Review follow-up fixes for decoder-independent previews and empty Crop/Resize inputs have been committed to `phase-5-editor-ui`; the updated automated suite/build and real-browser format checks are pending before the reviewer is asked to re-review. The Editor is connected to the Decoder, Image Transformer, Image Adjuster, and edited-ImageData conversion service. The user reported 86/86 automated tests passing, a successful production build (2,166 modules transformed), and successful browser verification that Editor processing produces the expected result while existing conversion features continue working. Animated GIF remains on the original File-based conversion path to preserve animation. Phase 6 starts only after Phase 5 is merged and verified.
 
 ### Team ownership
 
