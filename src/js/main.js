@@ -19,7 +19,7 @@ import {
 import "../styles/main.css";
 import { validateImageFile } from "./core/file-validator.js";
 import { createEditorQueueSnapshot } from "./core/editor-queue-events.js";
-import { convertImageToBmp, convertImageToGif, convertImageToJpeg, convertImageToPng, convertImageToSvg, convertImageToTiff, convertImageToWebp, disposeConversionWorker } from "./core/conversion-service.js";
+import { convertImageDataToFormat, convertImageToBmp, convertImageToGif, convertImageToJpeg, convertImageToPng, convertImageToSvg, convertImageToTiff, convertImageToWebp, disposeConversionWorker } from "./core/conversion-service.js";
 
 const iconSet = {
   Images,
@@ -80,7 +80,16 @@ const zipStatus = document.querySelector("#zip-status");
 
 const selectedFiles = new Map();
 const conversionResults = new Map();
+const editedImages = new Map();
 let nextFileId = 0;
+
+window.addEventListener("ifc:editor-result", (event) => {
+  const { id, imageData } = event.detail || {};
+  if (!selectedFiles.has(id)) return;
+
+  if (imageData) editedImages.set(id, imageData);
+  else editedImages.delete(id);
+});
 let isConverting = false;
 let cancelRequested = false;
 
@@ -479,19 +488,36 @@ const runConversion = async () => {
 
     try {
       const quality = Number(outputQuality.value) / 100;
-      const result = selectedFormat === "image/jpeg"
-        ? await convertImageToJpeg(entry.file, { quality })
-        : selectedFormat === "image/webp"
-          ? await convertImageToWebp(entry.file, { quality })
-          : selectedFormat === "image/bmp"
-            ? await convertImageToBmp(entry.file)
-            : selectedFormat === "image/tiff"
-              ? await convertImageToTiff(entry.file)
-              : selectedFormat === "image/svg+xml"
-                ? await convertImageToSvg(entry.file)
-                : selectedFormat === "image/gif"
-                  ? await convertImageToGif(entry.file)
-                  : await convertImageToPng(entry.file);
+      const editedImageData = editedImages.get(entry.id);
+      let result;
+
+      if (editedImageData) {
+        if (selectedFormat === "image/gif") {
+          throw new Error("Edited images cannot be exported as GIF yet. Choose PNG, JPEG, WebP, BMP, TIFF, or SVG, or reset the edits to convert the original file as GIF.");
+        }
+
+        const outputFormat = selectedFormat === "image/svg+xml"
+          ? "svg"
+          : selectedFormat.replace("image/", "");
+        const options = ["image/jpeg", "image/webp"].includes(selectedFormat)
+          ? { quality }
+          : {};
+        result = await convertImageDataToFormat(editedImageData, outputFormat, options);
+      } else {
+        result = selectedFormat === "image/jpeg"
+          ? await convertImageToJpeg(entry.file, { quality })
+          : selectedFormat === "image/webp"
+            ? await convertImageToWebp(entry.file, { quality })
+            : selectedFormat === "image/bmp"
+              ? await convertImageToBmp(entry.file)
+              : selectedFormat === "image/tiff"
+                ? await convertImageToTiff(entry.file)
+                : selectedFormat === "image/svg+xml"
+                  ? await convertImageToSvg(entry.file)
+                  : selectedFormat === "image/gif"
+                    ? await convertImageToGif(entry.file)
+                    : await convertImageToPng(entry.file);
+      }
 
       if (selectedFiles.has(entry.id)) {
         renderConversionResult(entry, result);
@@ -580,6 +606,7 @@ const removeFile = (id) => {
 
   URL.revokeObjectURL(entry.url);
   selectedFiles.delete(id);
+  editedImages.delete(id);
   fileList.querySelector(`[data-file-id="${id}"]`)?.remove();
   removeConversionResult(id);
   updateQueueSummary();
@@ -592,6 +619,7 @@ const clearFiles = () => {
   }
 
   selectedFiles.clear();
+  editedImages.clear();
   fileList.replaceChildren();
   clearConversionResults();
   fileInput.value = "";
