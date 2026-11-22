@@ -121,4 +121,17 @@ The queue previously assigned the original File Object URL directly to an `<img>
 
 The queue now uses the shared `decodeImage()` pipeline and rasterizes the decoded source into a small PNG thumbnail Blob through `src/js/core/image-thumbnail.js`. The resulting thumbnail uses its own Object URL; decoder resources and thumbnail URLs are released when decoding completes, a queue item is removed, the queue is cleared, or the page unloads. If decoding or thumbnail generation fails, the queue retains the format-label fallback.
 
-Focused tests were added in `tests/image-thumbnail.test.js`. Full test/build and real-browser verification with HEIC, TIFF, PNG, JPEG, and WebP are still required; this code change is not yet marked verified.
+Focused tests were added in `tests/image-thumbnail.test.js`.
+
+### User-reported browser verification
+
+The user subsequently tested all six Editor checks and confirmed they passed:
+
+- HEIC enters the queue and its queue thumbnail appears; the Editor preview also appears.
+- TIFF enters the queue and its queue thumbnail appears; the Editor preview also appears.
+- PNG opens and displays its queue thumbnail.
+- JPEG opens and displays its queue thumbnail.
+- WebP opens and displays its queue thumbnail.
+- The Editor successfully runs Apply edits.
+
+The user noted a short loading delay while images are being loaded/decoded. This is recorded as an observed loading behavior, not a failure. No claim is made here that `npm test` or `npm run build` was rerun after the thumbnail change.
