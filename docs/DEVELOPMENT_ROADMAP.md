@@ -110,7 +110,7 @@ Deliverable: tested advanced-format pipelines. Complete. Limitations remain docu
 
 ## Phase 5: Image manipulation
 
-Status: In progress. Both standalone processing modules are implemented and independently verified with real images in the browser. Focused unit tests, full repository test suites, and production builds have passed on both feature branches. Editor integration and the complete editing-to-conversion workflow remain pending. The work is divided among three members, with Pull Requests targeting `main`.
+Status: In progress — the initial implementation and user-reported local verification are complete. Review follow-up fixes for decoder-independent previews and empty Crop/Resize inputs have been committed to `phase-5-editor-ui`; the updated automated suite/build and real-browser format checks are pending before the reviewer is asked to re-review. The Editor is connected to the Decoder, Image Transformer, Image Adjuster, and edited-ImageData conversion service. The user reported 86/86 automated tests passing, a successful production build (2,166 modules transformed), and successful browser verification that Editor processing produces the expected result while existing conversion features continue working. Animated GIF remains on the original File-based conversion path to preserve animation. Phase 6 starts only after Phase 5 is merged and verified.
 
 ### Team ownership
 
@@ -148,7 +148,7 @@ src/js/core/image-transformer.js
 tests/image-transformer.test.js
 ```
 
-The shared API is agreed with `FarrelPtrv`: `applyImageTransformations(imageData, transformations)` accepts the shared sRGB ImageData representation and returns `{ imageData, width, height }`. Do not introduce a second editing data model.
+The team has agreed on the shared sRGB ImageData representation and the `applyImageTransformations(imageData, transformations)` API. The function returns `{ imageData, width, height }`. See `docs/TECHNICAL_SPECIFICATION.md` for the final parameter behavior, output shape, limits, and ownership contract. Do not independently introduce a second editing data model.
 
 Completion criteria:
 
@@ -258,9 +258,9 @@ Completion criteria:
 1. All three members agree on the editing data model, module contracts, error handling, and resource ownership before implementation.
 2. `andra-gs` and `Adit1945-web` implement their independent processing modules and tests.
 3. Their Pull Requests are reviewed and merged into `main` one at a time.
-4. `FarrelPtrv` updates `phase-5-editor-ui` from the latest `main`, connects the merged modules, and completes the editor integration.
-5. The editor Pull Request is reviewed and merged.
-6. The team runs all automated tests and the production build, then tests the complete editing-to-conversion workflow in the browser.
+4. `FarrelPtrv` updates `phase-5-editor-ui` from the latest `main`, connects the merged modules, and completes the editor integration. This integration has been implemented and locally verified on the feature branch.
+5. Review and merge the Editor Pull Request into `main`.
+6. After merge, rerun the complete automated test suite and production build, then repeat the editing-to-conversion browser regression checks.
 
 Deliverable: an image editor that supports geometric transformation and visual adjustment before conversion, integrated with the existing conversion engine.
 

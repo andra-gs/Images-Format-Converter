@@ -18,7 +18,10 @@ import {
 } from "lucide";
 import "../styles/main.css";
 import { validateImageFile } from "./core/file-validator.js";
-import { convertImageToBmp, convertImageToGif, convertImageToJpeg, convertImageToPng, convertImageToSvg, convertImageToTiff, convertImageToWebp, disposeConversionWorker } from "./core/conversion-service.js";
+import { createEditorQueueSnapshot } from "./core/editor-queue-events.js";
+import { decodeImage } from "./core/image-decoder.js";
+import { createImageThumbnail } from "./core/image-thumbnail.js";
+import { convertImageDataToFormat, convertImageToBmp, convertImageToGif, convertImageToJpeg, convertImageToPng, convertImageToSvg, convertImageToTiff, convertImageToWebp, disposeConversionWorker } from "./core/conversion-service.js";
 
 const iconSet = {
   Images,
@@ -79,7 +82,17 @@ const zipStatus = document.querySelector("#zip-status");
 
 const selectedFiles = new Map();
 const conversionResults = new Map();
+const editedImages = new Map();
+const queueThumbnailUrls = new Map();
 let nextFileId = 0;
+
+window.addEventListener("ifc:editor-result", (event) => {
+  const { id, imageData } = event.detail || {};
+  if (!selectedFiles.has(id)) return;
+
+  if (imageData) editedImages.set(id, imageData);
+  else editedImages.delete(id);
+});
 let isConverting = false;
 let cancelRequested = false;
 
@@ -91,6 +104,12 @@ const formatBytes = (bytes) => {
 
 const updateConvertButton = () => {
   convertButton.disabled = selectedFiles.size === 0 || !["image/png", "image/jpeg", "image/webp", "image/bmp", "image/tiff", "image/svg+xml", "image/gif"].includes(selectedFormat) || isConverting;
+};
+
+const notifyEditorQueueChange = () => {
+  window.dispatchEvent(new CustomEvent("ifc:queue-change", {
+    detail: { entries: createEditorQueueSnapshot([...selectedFiles.values()]) }
+  }));
 };
 
 const updateQueueSummary = () => {
@@ -187,6 +206,39 @@ formatTrigger.addEventListener("keydown", (event) => {
   if (event.key === "Escape") closeFormatMenu();
 });
 
+const releaseQueueThumbnail = (fileId) => {
+  const url = queueThumbnailUrls.get(fileId);
+  if (url) URL.revokeObjectURL(url);
+  queueThumbnailUrls.delete(fileId);
+};
+
+const loadQueueThumbnail = async (entry, item, preview, image, fallback) => {
+  let decoded;
+  try {
+    // Use the same format-aware decoder as the Editor. Native <img> loading
+    // cannot be assumed for HEIC/HEIF or TIFF source files.
+    decoded = await decodeImage(entry.file, { format: entry.format.format });
+    const thumbnailBlob = await createImageThumbnail(decoded);
+
+    // The file may have been removed while decoding was in progress.
+    if (!selectedFiles.has(entry.id) || !item.isConnected) return;
+
+    releaseQueueThumbnail(entry.id);
+    const thumbnailUrl = URL.createObjectURL(thumbnailBlob);
+    queueThumbnailUrls.set(entry.id, thumbnailUrl);
+    image.src = thumbnailUrl;
+    image.hidden = false;
+    fallback.remove();
+  } catch (error) {
+    if (selectedFiles.has(entry.id) && item.isConnected) {
+      fallback.textContent = entry.format.label;
+      console.warn(`[Queue Thumbnail] Could not create thumbnail for ${entry.file.name}:`, error);
+    }
+  } finally {
+    decoded?.close?.();
+  }
+};
+
 const renderFile = (entry) => {
   const item = document.createElement("li");
   item.className = "file-item";
@@ -195,17 +247,20 @@ const renderFile = (entry) => {
   const preview = document.createElement("div");
   preview.className = "file-preview";
 
+  const fallback = document.createElement("span");
+  fallback.className = "file-preview-fallback";
+  fallback.textContent = entry.format.label;
+
   const image = document.createElement("img");
-  image.src = entry.url;
   image.alt = "";
   image.loading = "lazy";
+  image.hidden = true;
   image.addEventListener("error", () => {
-    const fallback = document.createElement("span");
-    fallback.className = "file-preview-fallback";
-    fallback.textContent = entry.format.label;
-    preview.replaceChildren(fallback);
+    image.hidden = true;
+    if (!fallback.isConnected) preview.append(fallback);
+    releaseQueueThumbnail(entry.id);
   }, { once: true });
-  preview.append(image);
+  preview.append(fallback, image);
 
   const details = document.createElement("div");
   details.className = "file-details";
@@ -229,6 +284,7 @@ const renderFile = (entry) => {
 
   item.append(preview, details, removeButton);
   fileList.append(item);
+  loadQueueThumbnail(entry, item, preview, image, fallback);
 };
 
 const showFileFeedback = (messages, state = "info") => {
@@ -472,19 +528,36 @@ const runConversion = async () => {
 
     try {
       const quality = Number(outputQuality.value) / 100;
-      const result = selectedFormat === "image/jpeg"
-        ? await convertImageToJpeg(entry.file, { quality })
-        : selectedFormat === "image/webp"
-          ? await convertImageToWebp(entry.file, { quality })
-          : selectedFormat === "image/bmp"
-            ? await convertImageToBmp(entry.file)
-            : selectedFormat === "image/tiff"
-              ? await convertImageToTiff(entry.file)
-              : selectedFormat === "image/svg+xml"
-                ? await convertImageToSvg(entry.file)
-                : selectedFormat === "image/gif"
-                  ? await convertImageToGif(entry.file)
-                  : await convertImageToPng(entry.file);
+      const editedImageData = editedImages.get(entry.id);
+      let result;
+
+      if (editedImageData) {
+        if (selectedFormat === "image/gif") {
+          throw new Error("Edited images cannot be exported as GIF yet. Choose PNG, JPEG, WebP, BMP, TIFF, or SVG, or reset the edits to convert the original file as GIF.");
+        }
+
+        const outputFormat = selectedFormat === "image/svg+xml"
+          ? "svg"
+          : selectedFormat.replace("image/", "");
+        const options = ["image/jpeg", "image/webp"].includes(selectedFormat)
+          ? { quality }
+          : {};
+        result = await convertImageDataToFormat(editedImageData, outputFormat, options);
+      } else {
+        result = selectedFormat === "image/jpeg"
+          ? await convertImageToJpeg(entry.file, { quality })
+          : selectedFormat === "image/webp"
+            ? await convertImageToWebp(entry.file, { quality })
+            : selectedFormat === "image/bmp"
+              ? await convertImageToBmp(entry.file)
+              : selectedFormat === "image/tiff"
+                ? await convertImageToTiff(entry.file)
+                : selectedFormat === "image/svg+xml"
+                  ? await convertImageToSvg(entry.file)
+                  : selectedFormat === "image/gif"
+                    ? await convertImageToGif(entry.file)
+                    : await convertImageToPng(entry.file);
+      }
 
       if (selectedFiles.has(entry.id)) {
         renderConversionResult(entry, result);
@@ -564,6 +637,7 @@ const addFiles = async (files) => {
 
   const messages = [...rejected, ...warnings];
   showFileFeedback(messages, rejected.length > 0 ? "error" : "warning");
+  notifyEditorQueueChange();
 };
 
 const removeFile = (id) => {
@@ -571,22 +645,28 @@ const removeFile = (id) => {
   if (!entry) return;
 
   URL.revokeObjectURL(entry.url);
+  releaseQueueThumbnail(id);
   selectedFiles.delete(id);
+  editedImages.delete(id);
   fileList.querySelector(`[data-file-id="${id}"]`)?.remove();
   removeConversionResult(id);
   updateQueueSummary();
+  notifyEditorQueueChange();
 };
 
 const clearFiles = () => {
   for (const entry of selectedFiles.values()) {
     URL.revokeObjectURL(entry.url);
+    releaseQueueThumbnail(entry.id);
   }
 
   selectedFiles.clear();
+  editedImages.clear();
   fileList.replaceChildren();
   clearConversionResults();
   fileInput.value = "";
   updateQueueSummary();
+  notifyEditorQueueChange();
 };
 
 browseButton.addEventListener("click", () => fileInput.click());
@@ -669,6 +749,7 @@ app.style.visibility = "visible";
 window.addEventListener("beforeunload", () => {
   for (const entry of selectedFiles.values()) {
     URL.revokeObjectURL(entry.url);
+    releaseQueueThumbnail(entry.id);
   }
   disposeConversionWorker();
 });

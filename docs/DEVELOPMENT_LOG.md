@@ -5,9 +5,9 @@ This file records actual repository progress. Update it after meaningful impleme
 ## Project status
 
 - Current stage: Phase 5 - Image manipulation
-- Current phase status: Phase 4 is complete. Phase 5 transformation and adjustment processing modules are implemented on their feature branches, with unit tests, user-confirmed real-image browser checks, and successful CI validation. Editor UI integration and the complete editing-to-conversion workflow remain pending. Phase 6 begins only after Phase 5 is integrated and verified.
+- Current phase status: Phase 4 is complete. On `phase-5-editor-ui`, the Editor is connected to the Decoder, Transformer, Adjuster, and edited-ImageData conversion path. The user most recently reported 98/98 automated tests passing after the HEIC/TIFF queue-thumbnail fix, a successful production build, and successful browser verification that Editor processing works and existing conversion features remain functional. Phase 5 is awaiting final branch review, Pull Request, merge, and post-merge verification. Phase 6 begins only after Phase 5 is integrated and verified.
 - Latest release: None
-- Last updated: 2026-11-21
+- Last updated: 2026-11-22
 
 ## Status legend
 
@@ -26,13 +26,195 @@ This file records actual repository progress. Update it after meaningful impleme
 | Phase 2: Core conversion engine | Tested | PNG, JPEG, WebP, and BMP conversion paths are user-verified; user reports the requested automated tests and build checks passed |
 | Phase 3: Batch processing | Tested | User verified batch queue, worker execution, progress, cancellation, failure isolation, large-image responsiveness, cleanup, individual downloads, ZIP extraction, and image integrity |
 | Phase 4: Advanced formats | Tested | Completed; CI validation and user-run real-browser verification passed. Known format limitations remain documented |
-| Phase 5: Image manipulation | In progress | Image Transformation and Image Adjustment processing modules are implemented and independently tested; Editor UI/Integration remains pending |
+| Phase 5: Image manipulation | In progress | Editor, Decoder, Transformer, Adjuster, and edited-pixel conversion are integrated on `phase-5-editor-ui`; user-reported 98/98 tests, production build, and browser integration/regression checks passed; final PR review, merge, and post-merge verification remain |
 | Phase 6: Advanced export and image optimization | Not started | Image Optimization, Metadata Management, and Export Presets/UI. Starts after Phase 5 integration |
 | Phase 7: Testing, documentation, and release | Not started | Cross-browser QA, security review, documentation, production validation, and v1.0.0 readiness |
 
 ## Change log
 
 Add newest entries first.
+
+### 2026-11-22 - Latest Phase 5 verification after HEIC/TIFF queue thumbnail fix
+
+- Status: User-reported automated tests, production build, and manual browser checks passed on the latest `phase-5-editor-ui` state.
+- Automated tests:
+  - `npm test`: 98 tests passed, 0 failed, 0 cancelled, 0 skipped, 0 todo.
+  - Test duration: approximately 627 ms.
+- Production build:
+  - `npm run build`: successful.
+  - Vite transformed 2,168 modules and completed in 3.73 seconds.
+  - Vite emitted its advisory warning for chunks larger than 500 kB; the two HEIC-related chunks are approximately 3.23 MB each before gzip. This is not a build failure.
+- Manual browser verification previously reported for this latest implementation:
+  - HEIC and TIFF queue thumbnails and Editor previews appear.
+  - PNG, JPEG, and WebP queue thumbnails appear and remain usable.
+  - Apply edits works.
+  - A short image-loading delay was observed, with no functional failure reported.
+- Verification boundary: all local command results and browser checks above were reported by the user; they were not independently executed in this environment.
+- Remaining work: final PR review and merge approval, followed by agreed post-merge verification. Do not merge without explicit approval.
+
+### 2026-11-22 - HEIC/TIFF queue thumbnail browser verification
+
+- Status: User-reported manual browser verification passed for all six Editor checks.
+- Branch: `phase-5-editor-ui`
+- The user confirmed:
+  - HEIC enters the queue and its thumbnail appears; the Editor preview appears.
+  - TIFF enters the queue and its thumbnail appears; the Editor preview appears.
+  - PNG opens and its queue thumbnail appears.
+  - JPEG opens and its queue thumbnail appears.
+  - WebP opens and its queue thumbnail appears.
+  - Editor successfully runs Apply edits.
+- Observed behavior:
+  - The user noticed a short loading delay while images are loaded. This is expected to be possible because the queue now decodes source images and rasterizes thumbnails; it was not reported as a failure.
+- Verification boundary:
+  - These six checks are user-reported manual browser results.
+  - The user later reran `npm test` and `npm run build` after the thumbnail implementation; both passed. See the latest verification entry below.
+- Next steps:
+  - Check the latest GitHub Actions results and rerun local automated tests/build if needed.
+  - Treat thumbnail-loading performance as a separate optimization only if the delay is noticeably disruptive.
+
+
+### 2026-11-22 - Phase 5 Editor integration verification
+
+- Status: Feature implementation and user-reported local verification complete on `phase-5-editor-ui`; final PR review and merge pending.
+- Branch: `phase-5-editor-ui`
+- Integration:
+  - Connected the selected queued File to the Decoder and ImageData adapter.
+  - Connected the processing adapter to the real Transformer and Adjuster modules in Transform → Adjust order.
+  - Connected Apply, processed preview, and Reset behavior.
+  - Connected edited ImageData to the existing conversion service for PNG, JPEG, WebP, BMP, TIFF, and SVG.
+  - Preserved the original File-based conversion path and existing Worker orchestration. Animated GIF remains on its File-based path to preserve animation.
+- Verification reported by the user:
+  - `npm test`: 86 passed, 0 failed, 0 cancelled, 0 skipped, 0 todo.
+  - `npm run build`: successful; Vite transformed 2,166 modules and completed in 5.57 seconds.
+  - Browser integration: Editor successfully processed an image and produced the expected result.
+  - Browser regression: existing conversion features continued working.
+- Known build warning: HEIC-related chunks remain approximately 3.23 MB each before gzip; Vite's chunk-size warning did not fail the build.
+- Remaining work: perform final branch/diff review, open and review the Pull Request to `main`, merge according to team rules, then rerun the agreed post-merge tests and browser checks. Do not begin Phase 6 before integration is complete.
+
+
+### 2026-11-21 - Fix Editor queue selection ID mismatch
+
+- Status: Fix implemented; local verification pending
+- Branch: `phase-5-editor-ui`
+- Diagnosis:
+  - Queue entry IDs are numeric, but `HTMLSelectElement.value` always returns a string.
+  - The Editor previously compared these values with strict equality, so selecting an item could fail to resolve its queue entry and clear the preview.
+- Changes:
+  - Added `findEditorQueueEntry()` to normalize IDs during lookup.
+  - Updated Editor selection changes to use the normalized lookup.
+  - Explicitly assigns the selected option value as a string.
+  - Added automated coverage for numeric IDs resolved from string select values.
+- Validation:
+  - The user retested the preview with two queued images: the first image appeared, selecting the second updated the preview, and selecting the first again restored its preview.
+  - The user reported no new browser Console errors.
+  - Preview selection behavior is user-confirmed; full processing-module integration remains pending.
+
+### 2026-11-21 - Queue to Editor Custom Event bridge
+
+- Status: Implemented; automated and browser verification pending
+- Branch: `phase-5-editor-ui`
+- Changes:
+  - Added `ifc:queue-change` as the explicit Queue → Editor communication event.
+  - Added `createEditorQueueSnapshot()` to publish only the queue identifier, file name, original File reference, detected format, and preview object URL.
+  - Updated `main.js` to dispatch queue snapshots after add, remove, and clear operations.
+  - Updated `image-editor.js` to consume event payloads and removed its DOM-based Queue reader and MutationObserver.
+  - Kept the existing File/Blob conversion path and Worker orchestration unchanged.
+  - Added `tests/editor-queue-events.test.js` for the event snapshot contract.
+- Resource ownership:
+  - The Queue retains ownership of each original File and its preview object URL.
+  - The Editor only holds references from the latest snapshot; it does not revoke Queue URLs or close decoder resources.
+- Validation:
+  - Tests and production build have not been run in this environment after these changes.
+  - Browser checks for add, remove, clear, and selection behavior are pending.
+- Remaining work:
+  - Verify the event bridge locally with `npm test` and `npm run build`.
+  - Manually test Queue add/remove/clear and Editor selection behavior.
+  - Connect selected File → Decoder → ImageData adapter in a subsequent integration step; keep Apply disabled until processing modules and the full edited-pixel route are ready.
+
+### 2026-11-21 - Browser regression check
+
+- User manually confirmed the app opens without errors.
+- Existing standard image conversion continues to work.
+- Editor panel remains visible and Apply remains disabled as expected.
+- This verifies the current UI scaffold and existing conversion regression only; edited-pixel end-to-end processing still awaits the Transformer and Adjuster modules.
+
+### 2026-11-21 - Edited ImageData conversion verification
+
+- Status: Automated tests and production build passed; browser integration verification pending
+- Tests reported by the user on `phase-5-editor-ui`:
+  - `npm test`: 51 passed, 0 failed, 0 cancelled, 0 skipped. This includes four tests for the edited ImageData conversion entry point.
+  - `npm run build`: Vite production build succeeded, transforming 2,163 modules in 4.22 seconds.
+- Known warning:
+  - Vite continues to report two HEIC-related chunks of approximately 3.23 MB each before gzip. The warning does not fail the build and remains a separate optimization task.
+- Remaining work:
+  - Perform browser regression checks for the existing converter and editor scaffold.
+  - Browser-test the edited ImageData handoff with real processing modules once Transformer and Adjuster are available.
+  - Keep Apply disabled until the complete editing pipeline and UI handoff are integrated and verified.
+
+### 2026-11-21 - Edited ImageData conversion handoff
+
+- Status: Implemented; new automated tests pending local execution
+- Branch: `phase-5-editor-ui`
+- Changes:
+  - Refactored the direct conversion path to share `encodeAndValidateImage()` for encoding, output signature detection, output re-decoding, dimension verification, and verification-resource cleanup.
+  - Added `convertImageDataToFormat(imageData, format, options)` to accept the edited sRGB ImageData representation without decoding the original File again.
+  - The new entry point copies ImageData into a temporary Canvas-backed source, reuses the existing `encodeImage()`, and releases the temporary Canvas in a `finally` block.
+  - Preserved the existing File/Blob conversion API and Worker routing.
+  - Limited edited-ImageData output to PNG, JPEG, WebP, BMP, TIFF, and SVG, which are supported by the current image encoder. Animated GIF remains on its existing File-based path because it has separate animation-preservation behavior.
+  - Added `tests/edited-image-conversion.test.js` for the edited-pixel handoff, output dimension verification, invalid ImageData, and GIF limitation.
+  - Updated the technical specification and Phase 5 editor documentation.
+- Validation:
+  - The new tests have been added but have not yet been run locally.
+  - The previous user-reported 47/47 test result and production build apply to the branch state before these changes; they must be rerun.
+- Remaining work:
+  - Run `npm test` and `npm run build` on this branch and address any failures.
+  - After test results are confirmed, connect the editor's processed ImageData to the new service entry point when the Transformer and Adjuster modules are available.
+  - Keep Apply disabled until the real processing modules, UI handoff, and end-to-end behavior are integrated and verified.
+
+### 2026-11-21 - Phase 5 editor scaffold verification
+
+- Status: Scaffold and adapter preparation verified; final image-processing integration remains in progress.
+- Tests performed by the user on branch `phase-5-editor-ui`:
+  - Ran `npm test`: 47 tests passed, 0 failed, 0 cancelled, 0 skipped, and 0 todo.
+  - Ran `npm run build`: Vite production build completed successfully in 5.05 seconds after transforming 2,163 modules.
+  - Reported that the application opens without errors, existing converter features continue to work, the editor panel does not break the layout, editor controls are usable, Apply remains disabled as intended, and the browser console has no red errors.
+- Build note:
+  - Vite emitted a warning for minified chunks larger than 500 kB. The largest HEIC-related chunks were approximately 3.23 MB each before gzip. This is an optimization warning; the build itself succeeded.
+- Test interpretation:
+  - The 47 passing automated tests verify the available code and adapter behavior, including injected Transform → Adjust sequencing. They do not establish that the real Transformer and Adjuster modules are integrated.
+  - Browser checks are recorded as user-reported results and were not independently run in this environment.
+- Remaining work:
+  - Integrate the real processing modules after their PRs are merged into `main`.
+  - Complete the edited-pixel handoff and preview/Apply integration while preserving the existing conversion service's output validation.
+  - Repeat automated and browser regression checks after integration.
+  - Consider a separate bundle-size optimization for the HEIC-related chunks.
+
+### 2026-11-21 - Phase 5 shared ImageData adapter preparation
+
+- Status: Adapter and documentation scaffold implemented; automated test execution, production build, and browser verification pending.
+- Recorded the team's final shared sRGB ImageData contract in the Technical Specification and Phase 5 editor notes.
+- Updated the editor draft state to use the agreed `transformations` and `adjustments` groups.
+- Reworked `image-processing-adapter.js` to validate ImageData and dimension limits, copy decoder pixels into an owned pixel buffer, release its temporary canvas, and create a caller-owned Canvas result from ImageData.
+- Added dependency injection for the Transformer and Adjuster functions. The adapter preserves Transform → Adjust ordering, validates each `{ imageData, width, height }` result, checks cancellation between stages, and wraps unexpected internal failures as `ImageProcessingError`.
+- Kept all capabilities unavailable until both processing functions are supplied and Apply disabled until the decoded-image handoff and final conversion integration are connected. Updated the disabled Apply handler to use the adapter's object-shaped request.
+- Updated the Phase 5 roadmap wording to reference the agreed contracts without marking unimplemented processing features complete.
+- Automated tests were expanded for shared state, pixel validation, limits, decoder copying, canvas cleanup, processing order, output validation, placeholder behavior, and cancellation. Tests were not run in this environment.
+- Existing conversion service, decoder, encoder, Worker orchestration, queue, and ZIP exporter were not modified.
+- Next: inspect and integrate the two processing modules after their PRs are merged; coordinate a lossless edited-pixel handoff that retains the existing conversion service's output validation.
+
+### 2026-11-21 - Phase 5 editor UI scaffold and placeholder adapter
+
+- Status: Implemented scaffold; automated test, production build, and browser verification pending.
+- Confirmed the three Phase 5 branches exist. At session start, the transformation and adjustment branches were identical to `main`; their assigned processing modules were not present.
+- Added the FarrelPtrv editor workspace on `phase-5-editor-ui`.
+- Added an original-image preview linked to the existing selected-file queue and draft controls for resize, crop coordinates, rotation, flips, brightness, contrast, saturation, blur, grayscale, and sepia.
+- Added a temporary processing adapter that explicitly reports all processing capabilities as unavailable. The Apply action remains disabled; the preview remains the original image.
+- Added responsive editor styles, adapter unit tests, and `docs/PHASE_5_EDITOR_UI.md`.
+- Preserved editor draft state when unrelated files are added to or removed from the queue.
+- Existing conversion service and conversion orchestration were not modified.
+- Tests/build/browser checks were not run in this environment. Run `npm test`, `npm run build`, and browser checks in a local checkout before considering the scaffold verified.
+- Next: agree on shared input/output, processing order, error behavior, and resource ownership with both processing-module owners; replace the placeholder only after their modules are integrated.
+
 
 ### 2026-11-21 - Phase 5 Image Transformation verification and CI results
 - Status: Processing module tested; real-image browser verification and full repository CI passed (user-confirmed browser/local checks and GitHub Actions).
@@ -1263,3 +1445,56 @@ Only record work that actually happened in the repository. Do not mark a feature
 - Next steps:
   - Run the full repository test suite and production build on the latest `phase-5-adjustment` branch.
   - Coordinate the processing-module handoff and integration with the Editor UI branch.
+
+
+### 2026-11-22 - Fix HEIC/TIFF queue thumbnails
+
+- Status: Implemented on `phase-5-editor-ui`; automated and browser verification pending.
+- Root cause:
+  - The queue's `renderFile()` assigned the original File Object URL directly to an `<img>` element.
+  - HEIC/HEIF and TIFF could be decoded by the Editor but were not necessarily displayable by the browser's native image element, so the queue showed only its format fallback.
+- Changes:
+  - Queue thumbnails now use the shared `decodeImage()` pipeline and rasterize decoded sources to small PNG thumbnail Blobs through a dedicated helper.
+  - Added per-item thumbnail Object URL tracking and cleanup for removal, queue clearing, image-load failure, and page unload.
+  - Kept the original File Object URL and conversion path unchanged.
+  - Added focused unit tests for thumbnail dimensions, aspect ratio, Blob output, invalid inputs, and canvas cleanup.
+- Files changed:
+  - `src/js/main.js`
+  - `src/js/core/image-thumbnail.js`
+  - `tests/image-thumbnail.test.js`
+  - `docs/PHASE_5_EDITOR_UI.md`
+  - `docs/DEVELOPMENT_LOG.md`
+- Tests performed:
+  - Focused tests were added but have not been run in this environment.
+  - The user subsequently confirmed the full `npm test` and `npm run build` passed on the latest branch state (98/98 tests; production build successful). Real-browser queue/editor checks also passed.
+- Next steps:
+  - Pull the latest `phase-5-editor-ui` branch, run the full tests and build, then verify queue thumbnails and Editor preview for HEIC, TIFF, PNG, JPEG, and WebP.
+
+### 2026-11-22 - Phase 5 Editor review fixes: decoder preview and empty inputs
+
+- Status: Implemented on `phase-5-editor-ui`; automated and real-browser verification pending.
+- Review findings:
+  - Editor preview decoding depended on native `<img>` loading, which could prevent decoder-supported HEIC and TIFF files from opening.
+  - Empty Crop and Resize fields did not consistently map to the shared nullable-dimension contract.
+- Changes:
+  - Decoupled source decoding from native `<img>` loading and now call `decodeImage(source.file)` immediately after selection.
+  - Generate the original preview from decoded sRGB ImageData through the Canvas-to-PNG preview pipeline.
+  - Retain explicit ownership and cleanup for decoded sources, temporary Canvas resources, and Editor-created preview object URLs.
+  - Added `src/js/core/editor-input-state.js` for deterministic Crop and Resize input normalization.
+  - Empty Crop width/height and Resize width/height now map to `null`; empty Crop X/Y map to `0`.
+  - Block Apply when aspect ratio is unlocked and either Resize dimension is missing.
+  - Added `tests/editor-input-state.test.js` for Crop clearing, Resize clearing, aspect-ratio resolution, and unlocked resize validation.
+- Files changed:
+  - `src/js/ui/image-editor.js`
+  - `src/js/core/editor-input-state.js`
+  - `tests/editor-input-state.test.js`
+  - `docs/PHASE_5_EDITOR_UI.md`
+  - `docs/TECHNICAL_SPECIFICATION.md`
+  - `docs/DEVELOPMENT_LOG.md`
+- Tests performed:
+  - Test cases have been added, but `npm test` and `npm run build` have not yet been executed for this updated branch state in this environment.
+  - Real-browser Editor verification for HEIC, TIFF, PNG, JPEG, and WebP remains pending.
+- Next steps:
+  - Run `npm test` and `npm run build` on the latest branch commit.
+  - Verify real HEIC and TIFF files open in the Editor, then regression-test PNG, JPEG, and WebP.
+  - Confirm queue switching, Reset, and resource cleanup in the browser before requesting another review.

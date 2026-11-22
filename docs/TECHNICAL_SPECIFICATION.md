@@ -355,3 +355,154 @@ Suggested branch names:
 | Phase 6 | `phase-6-optimization` | `phase-6-metadata` | `phase-6-export-ui` |
 
 These are naming conventions only. A branch is not considered created or implemented merely because it appears in this specification.
+
+## 25. Phase 5 shared ImageData contract
+
+The Phase 5 team has agreed to use an sRGB pixel buffer as the shared representation between the Image Transformer, Image Adjuster, and Editor integration.
+
+```javascript
+{
+  data: Uint8ClampedArray,
+  width: number,
+  height: number,
+  colorSpace: "srgb"
+}
+```
+
+Both processing modules receive an ImageData-shaped value, must not mutate the input, and return a new result:
+
+```javascript
+{
+  imageData,
+  width,
+  height
+}
+```
+
+The returned width and height must match the returned `imageData`. Image dimensions and every allocated pixel buffer/canvas are subject to the project limits: 16,384 pixels per side and 40,000,000 total pixels. Alpha values must be preserved according to the agreed operation behavior. Processing modules must not depend on DOM UI state and should remain compatible with Web Workers.
+
+### Image Transformer — `src/js/core/image-transformer.js`
+
+Owner: `andra-gs`.
+
+Public API:
+
+```javascript
+applyImageTransformations(imageData, transformations)
+```
+
+The transformations object contains `resize`, `crop`, `rotation`, `flipHorizontal`, and `flipVertical`. Processing order is crop, resize, rotation, then flip. Resize dimensions are pixels; aspect-ratio mode calculates a missing dimension and fits two provided dimensions proportionally. With aspect ratio disabled, both dimensions are required. Null resize dimensions preserve the current size. Null crop width/height use the remaining source area from the crop origin. Crop coordinates refer to the original source. Rotation accepts 0, 90, 180, and 270 degrees clockwise; 90/270 swap output dimensions.
+
+### Image Adjuster — `src/js/core/image-adjuster.js`
+
+Owner: `Adit1945-web`.
+
+Public API:
+
+```javascript
+applyImageAdjustments(imageData, adjustments)
+```
+
+Defaults and ranges:
+
+| Parameter | Range | Default |
+|---|---:|---:|
+| brightness | -100 to 100 | 0 |
+| contrast | -100 to 100 | 0 |
+| saturation | 0 to 200 | 100 |
+| blur | 0 to 20 px | 0 |
+| grayscale | Boolean | false |
+| sepia | Boolean | false |
+
+Unknown properties and invalid types/ranges are rejected. Processing order is brightness, contrast, saturation, grayscale, sepia, and Gaussian blur. Output dimensions remain unchanged and alpha values are preserved.
+
+### Editor integration — `FarrelPtrv`
+
+The editor's shared state contains separate `transformations` and `adjustments` objects. The processing pipeline is:
+
+```text
+decodeImage()
+  → decoder source to owned ImageData
+  → applyImageTransformations()
+  → applyImageAdjustments()
+  → ImageData to Canvas/encoder adapter
+  → existing conversion service
+```
+
+The decoder result remains owned by the caller. The adapter copies decoded pixels into an owned ImageData buffer and releases only its temporary canvas. Processing modules own their temporary resources and return new ImageData. The adapter does not close the decoder result. Output ImageData is owned by the caller and can be copied into a caller-owned Canvas for preview or encoding.
+
+The editor adapter uses dependency injection for the two processing functions so the UI branch can be prepared before the modules are merged. Until both functions are supplied, capabilities remain unavailable and processing rejects with `EDITOR_PROCESSING_UNAVAILABLE`. The editor Apply action must remain disabled until real modules and conversion handoff are integrated and tested.
+
+The adapter checks cancellation between processing stages using AbortSignal. Cancellation raises AbortError. It validates ImageData structure, sRGB color space, buffer length, output dimensions, and project dimension limits. A module result must have the agreed `{ imageData, width, height }` shape with matching dimensions.
+
+Invalid input types and malformed ImageData raise TypeError. Invalid values and dimensions raise RangeError; excessive dimensions use code `IMAGE_DIMENSIONS_EXCEEDED`. Unexpected internal adapter failures are wrapped as `ImageProcessingError` with code `IMAGE_PROCESSING_FAILED`. Module-specific errors that already carry a code are preserved. The modules use the agreed error codes `INVALID_IMAGE_DATA`, `INVALID_TRANSFORM_OPTIONS`, `INVALID_ADJUSTMENT_OPTIONS`, `INVALID_CROP_BOUNDS`, `IMAGE_DIMENSIONS_EXCEEDED`, and `IMAGE_PROCESSING_FAILED`.
+
+The existing conversion service currently accepts a File/Blob and performs its own decoding and output validation. The final integration must hand the edited pixels into that established service without bypassing output signature/dimension validation or creating a parallel conversion engine. A lossless intermediate or a coordinated service entry point must be selected during final integration; do not silently route the original file back through conversion because that would discard edits.
+
+## Queue → Editor event contract
+
+The Queue and Editor communicate through the browser Custom Event `ifc:queue-change`. The event detail contains an `entries` array of lightweight snapshots with `id`, `name`, `file`, `format`, and `url`. The Queue owns the original File and preview object URL; the Editor consumes references and must not revoke Queue-owned URLs. Queue mutations (add, remove, clear) publish a fresh snapshot. This event bridge does not change the existing File/Blob conversion or Worker path.
+
+## 26. Edited ImageData conversion handoff
+
+The Editor integration uses the existing encoder and output-validation pipeline through this service entry point:
+
+```javascript
+convertImageDataToFormat(imageData, format, options)
+```
+
+- Input: the agreed sRGB ImageData representation.
+- Supported formats: PNG, JPEG, WebP, BMP, TIFF, and SVG, matching the current `image-encoder.js` implementations.
+- Animated GIF is intentionally excluded from this edited-pixel entry point. The existing GIF path accepts the original File and preserves its animation behavior; it must not be called with the original file after editing because that would discard the edited pixels.
+- The service copies ImageData into a new Canvas-backed decoded-image-compatible object, then calls the existing `encodeImage()` implementation.
+- The generated Blob is checked using `detectImageFormat()`, decoded again using `decodeImage()`, and checked for matching output dimensions, just like the File/Blob conversion path.
+- The temporary Canvas-backed source and verification decode are released in `finally` blocks. The caller retains ownership of the input ImageData and returned Blob.
+- This edited ImageData path currently runs on the main thread. The existing File/Blob conversion path and Worker routing remain unchanged.
+
+The shared validation routine is `encodeAndValidateImage()`; both direct File/Blob conversion and edited ImageData conversion use it. Do not add a second encoder or bypass output signature/dimension validation.
+
+## 27. Phase 5 Editor integration — current implementation status
+
+This section records the implementation state on the `phase-5-editor-ui` branch and supersedes the earlier planning-only statements in Section 25 that describe the adapter as waiting for module integration or the conversion service as accepting only File/Blob input.
+
+### Implemented editor pipeline
+
+The Editor UI is connected to the actual Image Transformer and Image Adjuster modules through `createImageProcessingAdapter()` in `src/js/core/image-processing-adapter.js`. The adapter receives the processing functions through dependency injection, copies decoded source pixels into an owned sRGB ImageData buffer, applies transformations before adjustments, validates the returned image data and dimensions, and supports cancellation between processing stages.
+
+The Editor UI in `src/js/ui/image-editor.js` provides queue-based image selection, original and processed previews, resize and aspect-ratio controls, crop controls, rotation and flips, brightness, contrast, saturation, blur, grayscale, sepia, Apply, and Reset. Apply processes the selected decoded source and publishes the edited ImageData to the application. Reset clears the edited result and returns conversion to the original File. The original File is retained and is not mutated.
+
+The Queue publishes `ifc:queue-change` snapshots when files are added, removed, or cleared. The Editor consumes those snapshots and does not take ownership of or revoke Queue-owned input object URLs.
+
+### Conversion handoff
+
+The application stores edited ImageData separately from the original File. When an edited image is converted, `main.js` calls `convertImageDataToFormat(imageData, format, options)` through the existing conversion service. Supported edited-image output formats are PNG, JPEG, WebP, BMP, TIFF, and SVG. The shared encoder and output-validation path checks the output signature, decodes the result again, and verifies its dimensions.
+
+Edited ImageData export to GIF is not supported. GIF conversion continues through the original File-based path to preserve the existing animated-GIF behavior. If the user has edited an image and selects GIF, the application reports that limitation instead of silently converting the unedited original and discarding the edits.
+
+The edited ImageData conversion path currently runs on the main thread. The established File/Blob conversion path and its Worker orchestration remain unchanged.
+
+### Verification recorded for 2026-11-22
+
+- Automated tests: `npm test` — 86 tests passed, 0 failed.
+- Production build: `npm run build` — successful with Vite. The build reports a large-chunk warning for HEIC-related bundles; this is a warning, not a build failure.
+- Browser integration: the user reports that the Editor successfully processes an image, displays the expected result, and leaves the existing conversion features working.
+- Queue preview selection was manually verified when switching between queued images.
+
+These results were recorded on the feature branch. Phase 5 remains subject to final branch review, pull-request review, merge approval, and post-merge verification before it is marked complete.
+
+
+## 28. Editor preview decoding and optional dimension inputs
+
+The Editor must not depend on native `<img>` support for the selected source format. On selection, it calls `decodeImage(file)` directly, copies the decoded source into owned sRGB ImageData using `decodedImageToImageData()`, and generates the original preview through the ImageData-to-Canvas PNG preview pipeline. This is required for decoder-supported formats such as HEIC/HEIF and TIFF that may not load in a browser image element.
+
+The Editor owns the decoder result and closes it when the selected source changes, decoding fails, or the page unloads. The adapter releases its temporary Canvas after copying pixels. The Editor owns generated preview object URLs and revokes them when replaced, when the selected source changes, and on page unload. Queue-owned source URLs remain owned by the Queue and are not revoked by the Editor.
+
+Input semantics:
+
+- Crop `x` and `y`: empty values normalize to `0`.
+- Crop `width` and `height`: empty values normalize to `null`, meaning the crop extends to the remaining right or bottom edge.
+- Resize `width` and `height`: empty values normalize to `null`; stale numeric values must not be retained.
+- With resize aspect ratio locked, the user-entered dimension recalculates the opposite draft dimension. If one dimension is null at processing time, the Transformer derives it from the other dimension and the cropped source aspect ratio.
+- With aspect ratio unlocked, both positive dimensions are required before Apply; a missing dimension must not be sent to the Transformer as a valid resize request.
+
+Focused unit coverage is in `tests/editor-input-state.test.js`. Real-browser checks for HEIC, TIFF, PNG, JPEG, and WebP remain required for the integrated Editor; unit tests alone do not establish browser compatibility.
