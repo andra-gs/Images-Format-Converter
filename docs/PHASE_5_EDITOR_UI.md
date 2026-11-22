@@ -53,8 +53,8 @@ All results below were run locally by the user on `phase-5-editor-ui` and report
 
 Command: `npm test`
 
-- Tests: 86
-- Passed: 86
+- Tests: 98
+- Passed: 98
 - Failed: 0
 - Cancelled: 0
 - Skipped: 0
@@ -67,8 +67,8 @@ Coverage includes the conversion service, edited-ImageData output validation, qu
 Command: `npm run build`
 
 - Result: successful.
-- Vite transformed 2,166 modules.
-- Build completed in 5.57 seconds.
+- Vite transformed 2,168 modules.
+- Build completed in 3.73 seconds.
 - Vite emitted a warning that some minified chunks exceed 500 kB. The two HEIC-related chunks are approximately 3.23 MB each before gzip. This is a bundle-size optimization warning, not a build failure.
 
 ### Manual browser integration and regression check
@@ -134,4 +134,32 @@ The user subsequently tested all six Editor checks and confirmed they passed:
 - WebP opens and displays its queue thumbnail.
 - The Editor successfully runs Apply edits.
 
-The user noted a short loading delay while images are being loaded/decoded. This is recorded as an observed loading behavior, not a failure. No claim is made here that `npm test` or `npm run build` was rerun after the thumbnail change.
+The user noted a short loading delay while images are being loaded/decoded. This is recorded as an observed loading behavior, not a failure. After this browser verification, the user reran `npm test` and `npm run build` on the latest branch state; the latest results are recorded below.
+
+
+## Latest verification after queue thumbnail fix — 2026-11-22
+
+The user confirmed running both commands locally after the latest queue-thumbnail implementation:
+
+### Automated tests
+
+Command: `npm test`
+
+- Tests: 98
+- Passed: 98
+- Failed: 0
+- Cancelled: 0
+- Skipped: 0
+- Todo: 0
+- Duration: approximately 627 ms.
+
+### Production build
+
+Command: `npm run build`
+
+- Result: successful.
+- Vite transformed 2,168 modules.
+- Build completed in 3.73 seconds.
+- HEIC-related chunks are approximately 3.23 MB each before gzip. Vite emitted its advisory warning for chunks larger than 500 kB; this did not fail the build.
+
+These are user-reported local results from the latest code state, not independently executed results in this environment.
