@@ -113,3 +113,12 @@ The automated suite covers the input-state contract and Transformer behavior. Th
 - Repeat switching between queued files and confirm previews do not become stale.
 - Confirm Reset restores the decoded original preview.
 - Confirm no object-URL or decoder-resource errors appear in the Console.
+
+
+## Queue thumbnail follow-up — HEIC/TIFF
+
+The queue previously assigned the original File Object URL directly to an `<img>`. Browsers without native HEIC/HEIF or TIFF image-element support therefore showed the format fallback instead of an image, even though the Editor could decode and preview the same file.
+
+The queue now uses the shared `decodeImage()` pipeline and rasterizes the decoded source into a small PNG thumbnail Blob through `src/js/core/image-thumbnail.js`. The resulting thumbnail uses its own Object URL; decoder resources and thumbnail URLs are released when decoding completes, a queue item is removed, the queue is cleared, or the page unloads. If decoding or thumbnail generation fails, the queue retains the format-label fallback.
+
+Focused tests were added in `tests/image-thumbnail.test.js`. Full test/build and real-browser verification with HEIC, TIFF, PNG, JPEG, and WebP are still required; this code change is not yet marked verified.
