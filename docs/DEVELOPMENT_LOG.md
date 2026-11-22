@@ -5,7 +5,7 @@ This file records actual repository progress. Update it after meaningful impleme
 ## Project status
 
 - Current stage: Phase 5 - Image manipulation
-- Current phase status: Phase 4 is complete. The Image Transformer and Image Adjuster modules have been implemented, independently tested, and merged into `main`. On `phase-5-editor-ui`, the editor workspace, ImageData adapter preparation, edited-image conversion handoff, Queue event bridge, and image preview selection have been implemented; the user confirmed preview switching between queued images. Full processing-module integration, Apply functionality, and the complete editing-to-conversion workflow remain pending. Phase 6 begins only after Phase 5 is integrated and verified.
+- Current phase status: Phase 4 is complete. On `phase-5-editor-ui`, the Editor is connected to the Decoder, Transformer, Adjuster, and edited-ImageData conversion path. The user reported 86/86 automated tests passing, a successful production build, and successful browser verification that Editor processing works and existing conversion features remain functional. Phase 5 is awaiting final branch review, Pull Request, merge, and post-merge verification. Phase 6 begins only after Phase 5 is integrated and verified.
 - Latest release: None
 - Last updated: 2026-11-22
 
@@ -26,13 +26,32 @@ This file records actual repository progress. Update it after meaningful impleme
 | Phase 2: Core conversion engine | Tested | PNG, JPEG, WebP, and BMP conversion paths are user-verified; user reports the requested automated tests and build checks passed |
 | Phase 3: Batch processing | Tested | User verified batch queue, worker execution, progress, cancellation, failure isolation, large-image responsiveness, cleanup, individual downloads, ZIP extraction, and image integrity |
 | Phase 4: Advanced formats | Tested | Completed; CI validation and user-run real-browser verification passed. Known format limitations remain documented |
-| Phase 5: Image manipulation | In progress | Transformer and Adjuster modules are merged into `main`; Editor UI, ImageData adapter, queue bridge, and preview are prepared on `phase-5-editor-ui`; processing integration and Apply remain pending |
+| Phase 5: Image manipulation | In progress | Editor, Decoder, Transformer, Adjuster, and edited-pixel conversion are integrated on `phase-5-editor-ui`; user-reported 86/86 tests, production build, and browser integration/regression checks passed; final PR review, merge, and post-merge verification remain |
 | Phase 6: Advanced export and image optimization | Not started | Image Optimization, Metadata Management, and Export Presets/UI. Starts after Phase 5 integration |
 | Phase 7: Testing, documentation, and release | Not started | Cross-browser QA, security review, documentation, production validation, and v1.0.0 readiness |
 
 ## Change log
 
 Add newest entries first.
+
+### 2026-11-22 - Phase 5 Editor integration verification
+
+- Status: Feature implementation and user-reported local verification complete on `phase-5-editor-ui`; final PR review and merge pending.
+- Branch: `phase-5-editor-ui`
+- Integration:
+  - Connected the selected queued File to the Decoder and ImageData adapter.
+  - Connected the processing adapter to the real Transformer and Adjuster modules in Transform → Adjust order.
+  - Connected Apply, processed preview, and Reset behavior.
+  - Connected edited ImageData to the existing conversion service for PNG, JPEG, WebP, BMP, TIFF, and SVG.
+  - Preserved the original File-based conversion path and existing Worker orchestration. Animated GIF remains on its File-based path to preserve animation.
+- Verification reported by the user:
+  - `npm test`: 86 passed, 0 failed, 0 cancelled, 0 skipped, 0 todo.
+  - `npm run build`: successful; Vite transformed 2,166 modules and completed in 5.57 seconds.
+  - Browser integration: Editor successfully processed an image and produced the expected result.
+  - Browser regression: existing conversion features continued working.
+- Known build warning: HEIC-related chunks remain approximately 3.23 MB each before gzip; Vite's chunk-size warning did not fail the build.
+- Remaining work: perform final branch/diff review, open and review the Pull Request to `main`, merge according to team rules, then rerun the agreed post-merge tests and browser checks. Do not begin Phase 6 before integration is complete.
+
 
 ### 2026-11-21 - Fix Editor queue selection ID mismatch
 
