@@ -489,3 +489,20 @@ The edited ImageData conversion path currently runs on the main thread. The esta
 - Queue preview selection was manually verified when switching between queued images.
 
 These results were recorded on the feature branch. Phase 5 remains subject to final branch review, pull-request review, merge approval, and post-merge verification before it is marked complete.
+
+
+## 28. Editor preview decoding and optional dimension inputs
+
+The Editor must not depend on native `<img>` support for the selected source format. On selection, it calls `decodeImage(file)` directly, copies the decoded source into owned sRGB ImageData using `decodedImageToImageData()`, and generates the original preview through the ImageData-to-Canvas PNG preview pipeline. This is required for decoder-supported formats such as HEIC/HEIF and TIFF that may not load in a browser image element.
+
+The Editor owns the decoder result and closes it when the selected source changes, decoding fails, or the page unloads. The adapter releases its temporary Canvas after copying pixels. The Editor owns generated preview object URLs and revokes them when replaced, when the selected source changes, and on page unload. Queue-owned source URLs remain owned by the Queue and are not revoked by the Editor.
+
+Input semantics:
+
+- Crop `x` and `y`: empty values normalize to `0`.
+- Crop `width` and `height`: empty values normalize to `null`, meaning the crop extends to the remaining right or bottom edge.
+- Resize `width` and `height`: empty values normalize to `null`; stale numeric values must not be retained.
+- With resize aspect ratio locked, the user-entered dimension recalculates the opposite draft dimension. If one dimension is null at processing time, the Transformer derives it from the other dimension and the cropped source aspect ratio.
+- With aspect ratio unlocked, both positive dimensions are required before Apply; a missing dimension must not be sent to the Transformer as a valid resize request.
+
+Focused unit coverage is in `tests/editor-input-state.test.js`. Real-browser checks for HEIC, TIFF, PNG, JPEG, and WebP remain required for the integrated Editor; unit tests alone do not establish browser compatibility.
