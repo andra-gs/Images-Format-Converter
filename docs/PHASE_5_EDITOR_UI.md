@@ -91,3 +91,25 @@ Phase 5 is ready for final branch review and a Pull Request to `main`. It is not
 - Animated GIF export from edited ImageData is not supported by the current edited-pixel conversion entry point. The existing File-based animated GIF route is preserved.
 - HEIC-related production chunks remain large; optimization is a separate follow-up and did not block the successful build.
 - Cross-browser, mobile, accessibility, and broader release-readiness checks remain part of the project's later QA/release work.
+
+
+## Review follow-up — HEIC/TIFF preview and empty dimension inputs
+
+The review follow-up on `phase-5-editor-ui` changes the Editor preview source:
+
+- The Editor now calls the existing `decodeImage(source.file)` directly when a queue item is selected. It no longer waits for the native `<img>` element to load the original file.
+- The decoded source is copied into owned sRGB ImageData through `decodedImageToImageData()`. The original preview is then generated through the same ImageData-to-Canvas PNG preview pipeline used for edited images. This lets decoder-supported HEIC/HEIF and TIFF files reach the Editor even when the browser cannot render those source formats in an `<img>`.
+- The decoder result remains owned by the Editor and is closed when the selected source changes, decoding fails, or the page unloads. Temporary Canvas resources are released by the adapter, and generated preview object URLs are revoked when replaced or when the source changes/unloads.
+- Crop width/height inputs now store `null` when cleared; empty X/Y inputs store `0`.
+- Resize width/height inputs now store `null` when cleared instead of retaining stale values. With aspect ratio locked, the entered dimension updates its counterpart; the Transformer resolves a null dimension from the remaining dimension. With aspect ratio unlocked, Apply is blocked until both dimensions are supplied.
+- Added focused tests for empty Crop and Resize fields, aspect-ratio resolution, and the unlocked-resize requirement.
+
+### Required real-browser review follow-up
+
+The automated suite covers the input-state contract and Transformer behavior. The following must still be confirmed with actual files in the integrated Editor before the review can be considered fully verified:
+
+- Open HEIC and TIFF files in the Editor and confirm an original preview and enabled Apply button.
+- Confirm PNG, JPEG, and WebP still open and can be edited.
+- Repeat switching between queued files and confirm previews do not become stale.
+- Confirm Reset restores the decoded original preview.
+- Confirm no object-URL or decoder-resource errors appear in the Console.
