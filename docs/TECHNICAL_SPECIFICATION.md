@@ -461,3 +461,31 @@ convertImageDataToFormat(imageData, format, options)
 
 The shared validation routine is `encodeAndValidateImage()`; both direct File/Blob conversion and edited ImageData conversion use it. Do not add a second encoder or bypass output signature/dimension validation.
 
+## 27. Phase 5 Editor integration — current implementation status
+
+This section records the implementation state on the `phase-5-editor-ui` branch and supersedes the earlier planning-only statements in Section 25 that describe the adapter as waiting for module integration or the conversion service as accepting only File/Blob input.
+
+### Implemented editor pipeline
+
+The Editor UI is connected to the actual Image Transformer and Image Adjuster modules through `createImageProcessingAdapter()` in `src/js/core/image-processing-adapter.js`. The adapter receives the processing functions through dependency injection, copies decoded source pixels into an owned sRGB ImageData buffer, applies transformations before adjustments, validates the returned image data and dimensions, and supports cancellation between processing stages.
+
+The Editor UI in `src/js/ui/image-editor.js` provides queue-based image selection, original and processed previews, resize and aspect-ratio controls, crop controls, rotation and flips, brightness, contrast, saturation, blur, grayscale, sepia, Apply, and Reset. Apply processes the selected decoded source and publishes the edited ImageData to the application. Reset clears the edited result and returns conversion to the original File. The original File is retained and is not mutated.
+
+The Queue publishes `ifc:queue-change` snapshots when files are added, removed, or cleared. The Editor consumes those snapshots and does not take ownership of or revoke Queue-owned input object URLs.
+
+### Conversion handoff
+
+The application stores edited ImageData separately from the original File. When an edited image is converted, `main.js` calls `convertImageDataToFormat(imageData, format, options)` through the existing conversion service. Supported edited-image output formats are PNG, JPEG, WebP, BMP, TIFF, and SVG. The shared encoder and output-validation path checks the output signature, decodes the result again, and verifies its dimensions.
+
+Edited ImageData export to GIF is not supported. GIF conversion continues through the original File-based path to preserve the existing animated-GIF behavior. If the user has edited an image and selects GIF, the application reports that limitation instead of silently converting the unedited original and discarding the edits.
+
+The edited ImageData conversion path currently runs on the main thread. The established File/Blob conversion path and its Worker orchestration remain unchanged.
+
+### Verification recorded for 2026-11-22
+
+- Automated tests: `npm test` — 86 tests passed, 0 failed.
+- Production build: `npm run build` — successful with Vite. The build reports a large-chunk warning for HEIC-related bundles; this is a warning, not a build failure.
+- Browser integration: the user reports that the Editor successfully processes an image, displays the expected result, and leaves the existing conversion features working.
+- Queue preview selection was manually verified when switching between queued images.
+
+These results were recorded on the feature branch. Phase 5 remains subject to final branch review, pull-request review, merge approval, and post-merge verification before it is marked complete.
