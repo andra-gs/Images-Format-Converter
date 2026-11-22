@@ -110,7 +110,7 @@ Deliverable: tested advanced-format pipelines. Complete. Limitations remain docu
 
 ## Phase 5: Image manipulation
 
-Status: In progress. Both standalone processing modules (Image Transformer and Image Adjuster) have been implemented, independently tested, and merged into `main`. Their real-image browser verification, focused tests, repository test suites, and production builds have passed. The initial FarrelPtrv editor workspace, ImageData adapter preparation, edited-image conversion handoff, Queue event bridge, and image preview selection have been added on `phase-5-editor-ui`. Full processing-module integration, Apply functionality, and the complete editing-to-conversion workflow remain pending. The work is divided among three members, with Pull Requests targeting `main`.
+Status: In progress — implementation and user-reported local verification are complete on `phase-5-editor-ui`; final Pull Request review, merge, and post-merge verification remain. The Editor is connected to the Decoder, Image Transformer, Image Adjuster, and edited-ImageData conversion service. The user reported 86/86 automated tests passing, a successful production build (2,166 modules transformed), and successful browser verification that Editor processing produces the expected result while existing conversion features continue working. Animated GIF remains on the original File-based conversion path to preserve animation. Phase 6 starts only after Phase 5 is merged and verified.
 
 ### Team ownership
 
@@ -258,9 +258,9 @@ Completion criteria:
 1. All three members agree on the editing data model, module contracts, error handling, and resource ownership before implementation.
 2. `andra-gs` and `Adit1945-web` implement their independent processing modules and tests.
 3. Their Pull Requests are reviewed and merged into `main` one at a time.
-4. `FarrelPtrv` updates `phase-5-editor-ui` from the latest `main`, connects the merged modules, and completes the editor integration.
-5. The editor Pull Request is reviewed and merged.
-6. The team runs all automated tests and the production build, then tests the complete editing-to-conversion workflow in the browser.
+4. `FarrelPtrv` updates `phase-5-editor-ui` from the latest `main`, connects the merged modules, and completes the editor integration. This integration has been implemented and locally verified on the feature branch.
+5. Review and merge the Editor Pull Request into `main`.
+6. After merge, rerun the complete automated test suite and production build, then repeat the editing-to-conversion browser regression checks.
 
 Deliverable: an image editor that supports geometric transformation and visual adjustment before conversion, integrated with the existing conversion engine.
 
