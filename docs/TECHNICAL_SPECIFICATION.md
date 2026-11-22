@@ -284,20 +284,57 @@ Transformation and adjustment modules must not depend on DOM UI state. They shou
 | `Adit1945-web` | Metadata Manager | Metadata availability detection, supported EXIF field extraction, metadata removal where output format permits | `src/js/core/metadata-manager.js`, `tests/metadata-manager.test.js` |
 | `FarrelPtrv` | Export UI and integration | Export controls, preset selection, metadata options, size reporting, individual-download and ZIP integration | `src/js/ui/export-panel.js`, `src/styles/export-panel.css`, `tests/export-panel.test.js` |
 
-### Contracts that must be agreed before coding
+### Agreed Phase 5 processing contract
 
-The following details are deliberately not hard-coded yet. The three developers must agree on them and record the decision before parallel implementation:
+The processing-module contract was agreed by the project team before implementation. The editor operation-history and reset-state design remains an editor-level coordination item.
 
-1. The shared image representation passed between the editor UI and processing modules.
-2. Function signatures, parameter units, default values, valid ranges, and return types for each transformation and adjustment.
-3. Whether editing operations are applied immediately to a working image or represented as an ordered, reversible operation list.
-4. How original image data is retained for reset without unnecessary duplication of large binary buffers.
-5. Resource ownership and cleanup for Canvas, OffscreenCanvas, ImageBitmap, Blob, and Object URLs.
-6. How errors and unsupported operations are represented and surfaced to the UI.
-7. Optimizer preset mapping for each output encoder and the exact meaning of any target-size request.
-8. Metadata fields supported by the reader and the per-format behavior for reading, removing, or preserving metadata.
+#### Shared image representation
 
-Do not invent incompatible contracts independently in separate branches. The UI/integration developer must coordinate the contract with both processing-module owners before relying on it.
+Both processing modules accept an sRGB ImageData-shaped value:
+
+```javascript
+{
+  data: Uint8ClampedArray,
+  width: number,
+  height: number,
+  colorSpace: "srgb"
+}
+```
+
+Inputs are immutable. Each module returns a new value in `{ imageData, width, height }`. The caller owns returned buffers. Both modules preserve the source alpha channel and use the shared limits of 16,384 pixels per side and 40,000,000 pixels total.
+
+#### Public APIs
+
+```javascript
+applyImageTransformations(imageData, transformations)
+applyImageAdjustments(imageData, adjustments)
+```
+
+The Transformer applies Crop → Resize → Rotation → Flip. The Adjuster applies Brightness → Contrast → Saturation → Grayscale → Sepia → Blur.
+
+#### Adjustment options
+
+| Option | Range | Default |
+|---|---:|---:|
+| `brightness` | -100 to 100 | 0 |
+| `contrast` | -100 to 100 | 0 |
+| `saturation` | 0 to 200 | 100 |
+| `grayscale` | boolean | false |
+| `sepia` | boolean | false |
+| `blur` | 0 to 20 pixels | 0 |
+
+Blur uses Gaussian Blur with an integer radius in pixels. The Image Adjuster rejects unknown properties and values outside the documented ranges.
+
+#### Errors and resource ownership
+
+- Wrong input types or invalid ImageData structures throw `TypeError`.
+- Invalid parameter ranges and dimensions throw `RangeError`.
+- Internal processing failures use an `ImageProcessingError` with a `.code` property.
+- Shared error codes include `INVALID_IMAGE_DATA`, `INVALID_TRANSFORM_OPTIONS`, `INVALID_ADJUSTMENT_OPTIONS`, `INVALID_CROP_BOUNDS`, `IMAGE_DIMENSIONS_EXCEEDED`, and `IMAGE_PROCESSING_FAILED`.
+- Processing modules do not depend on DOM or UI state. They do not mutate or close caller-owned input data. The caller owns returned ImageData buffers.
+- Cancellation is coordinated by the asynchronous pipeline or Worker layer through `AbortSignal`; the synchronous pixel modules do not own cancellation.
+
+The editor developer must coordinate the editable operation state, original-image retention for reset, and integration sequence with both processing-module owners. Do not create incompatible contracts independently in separate branches.
 
 ### Execution and testing requirements
 
