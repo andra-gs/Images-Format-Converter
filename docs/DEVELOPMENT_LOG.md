@@ -1408,6 +1408,29 @@ Only record work that actually happened in the repository. Do not mark a feature
   - Coordinate the processing-module handoff and integration with the Editor UI branch.
 
 
+### 2026-11-22 - Fix HEIC/TIFF queue thumbnails
+
+- Status: Implemented on `phase-5-editor-ui`; automated and browser verification pending.
+- Root cause:
+  - The queue's `renderFile()` assigned the original File Object URL directly to an `<img>` element.
+  - HEIC/HEIF and TIFF could be decoded by the Editor but were not necessarily displayable by the browser's native image element, so the queue showed only its format fallback.
+- Changes:
+  - Queue thumbnails now use the shared `decodeImage()` pipeline and rasterize decoded sources to small PNG thumbnail Blobs through a dedicated helper.
+  - Added per-item thumbnail Object URL tracking and cleanup for removal, queue clearing, image-load failure, and page unload.
+  - Kept the original File Object URL and conversion path unchanged.
+  - Added focused unit tests for thumbnail dimensions, aspect ratio, Blob output, invalid inputs, and canvas cleanup.
+- Files changed:
+  - `src/js/main.js`
+  - `src/js/core/image-thumbnail.js`
+  - `tests/image-thumbnail.test.js`
+  - `docs/PHASE_5_EDITOR_UI.md`
+  - `docs/DEVELOPMENT_LOG.md`
+- Tests performed:
+  - Focused tests were added but have not been run in this environment.
+  - Full `npm test`, `npm run build`, and real-browser queue/editor checks remain pending.
+- Next steps:
+  - Pull the latest `phase-5-editor-ui` branch, run the full tests and build, then verify queue thumbnails and Editor preview for HEIC, TIFF, PNG, JPEG, and WebP.
+
 ### 2026-11-22 - Phase 5 Editor review fixes: decoder preview and empty inputs
 
 - Status: Implemented on `phase-5-editor-ui`; automated and real-browser verification pending.
