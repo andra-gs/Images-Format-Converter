@@ -4,10 +4,10 @@ This file records actual repository progress. Update it after meaningful impleme
 
 ## Project status
 
-- Current stage: Phase 5 - Image manipulation (in progress on feature branches)
-- Current phase status: Phase 4 is complete. Phase 5 editor scaffolding and the ImageData adapter preparation are in progress on `phase-5-editor-ui`; Transformer and Adjuster implementations remain with their assigned owners. Apply remains disabled until real modules and conversion handoff are integrated and verified. Phase 6 begins only after Phase 5 is integrated and verified.
+- Current stage: Phase 5 - Image manipulation
+- Current phase status: Phase 4 is complete. The Image Transformer and Image Adjuster modules have been implemented, independently tested, and merged into `main`. On `phase-5-editor-ui`, the editor workspace, ImageData adapter preparation, edited-image conversion handoff, Queue event bridge, and image preview selection have been implemented; the user confirmed preview switching between queued images. Full processing-module integration, Apply functionality, and the complete editing-to-conversion workflow remain pending. Phase 6 begins only after Phase 5 is integrated and verified.
 - Latest release: None
-- Last updated: 2026-11-21
+- Last updated: 2026-11-22
 
 ## Status legend
 
@@ -26,13 +26,92 @@ This file records actual repository progress. Update it after meaningful impleme
 | Phase 2: Core conversion engine | Tested | PNG, JPEG, WebP, and BMP conversion paths are user-verified; user reports the requested automated tests and build checks passed |
 | Phase 3: Batch processing | Tested | User verified batch queue, worker execution, progress, cancellation, failure isolation, large-image responsiveness, cleanup, individual downloads, ZIP extraction, and image integrity |
 | Phase 4: Advanced formats | Tested | Completed; CI validation and user-run real-browser verification passed. Known format limitations remain documented |
-| Phase 5: Image manipulation | In progress | Editor UI and ImageData adapter preparation on `phase-5-editor-ui`; processing modules and final integration remain pending |
+| Phase 5: Image manipulation | In progress | Transformer and Adjuster modules are merged into `main`; Editor UI, ImageData adapter, queue bridge, and preview are prepared on `phase-5-editor-ui`; processing integration and Apply remain pending |
 | Phase 6: Advanced export and image optimization | Not started | Image Optimization, Metadata Management, and Export Presets/UI. Starts after Phase 5 integration |
 | Phase 7: Testing, documentation, and release | Not started | Cross-browser QA, security review, documentation, production validation, and v1.0.0 readiness |
 
 ## Change log
 
 Add newest entries first.
+
+### 2026-11-21 - Fix Editor queue selection ID mismatch
+
+- Status: Fix implemented; local verification pending
+- Branch: `phase-5-editor-ui`
+- Diagnosis:
+  - Queue entry IDs are numeric, but `HTMLSelectElement.value` always returns a string.
+  - The Editor previously compared these values with strict equality, so selecting an item could fail to resolve its queue entry and clear the preview.
+- Changes:
+  - Added `findEditorQueueEntry()` to normalize IDs during lookup.
+  - Updated Editor selection changes to use the normalized lookup.
+  - Explicitly assigns the selected option value as a string.
+  - Added automated coverage for numeric IDs resolved from string select values.
+- Validation:
+  - The user retested the preview with two queued images: the first image appeared, selecting the second updated the preview, and selecting the first again restored its preview.
+  - The user reported no new browser Console errors.
+  - Preview selection behavior is user-confirmed; full processing-module integration remains pending.
+
+### 2026-11-21 - Queue to Editor Custom Event bridge
+
+- Status: Implemented; automated and browser verification pending
+- Branch: `phase-5-editor-ui`
+- Changes:
+  - Added `ifc:queue-change` as the explicit Queue → Editor communication event.
+  - Added `createEditorQueueSnapshot()` to publish only the queue identifier, file name, original File reference, detected format, and preview object URL.
+  - Updated `main.js` to dispatch queue snapshots after add, remove, and clear operations.
+  - Updated `image-editor.js` to consume event payloads and removed its DOM-based Queue reader and MutationObserver.
+  - Kept the existing File/Blob conversion path and Worker orchestration unchanged.
+  - Added `tests/editor-queue-events.test.js` for the event snapshot contract.
+- Resource ownership:
+  - The Queue retains ownership of each original File and its preview object URL.
+  - The Editor only holds references from the latest snapshot; it does not revoke Queue URLs or close decoder resources.
+- Validation:
+  - Tests and production build have not been run in this environment after these changes.
+  - Browser checks for add, remove, clear, and selection behavior are pending.
+- Remaining work:
+  - Verify the event bridge locally with `npm test` and `npm run build`.
+  - Manually test Queue add/remove/clear and Editor selection behavior.
+  - Connect selected File → Decoder → ImageData adapter in a subsequent integration step; keep Apply disabled until processing modules and the full edited-pixel route are ready.
+
+### 2026-11-21 - Browser regression check
+
+- User manually confirmed the app opens without errors.
+- Existing standard image conversion continues to work.
+- Editor panel remains visible and Apply remains disabled as expected.
+- This verifies the current UI scaffold and existing conversion regression only; edited-pixel end-to-end processing still awaits the Transformer and Adjuster modules.
+
+### 2026-11-21 - Edited ImageData conversion verification
+
+- Status: Automated tests and production build passed; browser integration verification pending
+- Tests reported by the user on `phase-5-editor-ui`:
+  - `npm test`: 51 passed, 0 failed, 0 cancelled, 0 skipped. This includes four tests for the edited ImageData conversion entry point.
+  - `npm run build`: Vite production build succeeded, transforming 2,163 modules in 4.22 seconds.
+- Known warning:
+  - Vite continues to report two HEIC-related chunks of approximately 3.23 MB each before gzip. The warning does not fail the build and remains a separate optimization task.
+- Remaining work:
+  - Perform browser regression checks for the existing converter and editor scaffold.
+  - Browser-test the edited ImageData handoff with real processing modules once Transformer and Adjuster are available.
+  - Keep Apply disabled until the complete editing pipeline and UI handoff are integrated and verified.
+
+### 2026-11-21 - Edited ImageData conversion handoff
+
+- Status: Implemented; new automated tests pending local execution
+- Branch: `phase-5-editor-ui`
+- Changes:
+  - Refactored the direct conversion path to share `encodeAndValidateImage()` for encoding, output signature detection, output re-decoding, dimension verification, and verification-resource cleanup.
+  - Added `convertImageDataToFormat(imageData, format, options)` to accept the edited sRGB ImageData representation without decoding the original File again.
+  - The new entry point copies ImageData into a temporary Canvas-backed source, reuses the existing `encodeImage()`, and releases the temporary Canvas in a `finally` block.
+  - Preserved the existing File/Blob conversion API and Worker routing.
+  - Limited edited-ImageData output to PNG, JPEG, WebP, BMP, TIFF, and SVG, which are supported by the current image encoder. Animated GIF remains on its existing File-based path because it has separate animation-preservation behavior.
+  - Added `tests/edited-image-conversion.test.js` for the edited-pixel handoff, output dimension verification, invalid ImageData, and GIF limitation.
+  - Updated the technical specification and Phase 5 editor documentation.
+- Validation:
+  - The new tests have been added but have not yet been run locally.
+  - The previous user-reported 47/47 test result and production build apply to the branch state before these changes; they must be rerun.
+- Remaining work:
+  - Run `npm test` and `npm run build` on this branch and address any failures.
+  - After test results are confirmed, connect the editor's processed ImageData to the new service entry point when the Transformer and Adjuster modules are available.
+  - Keep Apply disabled until the real processing modules, UI handoff, and end-to-end behavior are integrated and verified.
 
 ### 2026-11-21 - Phase 5 editor scaffold verification
 
@@ -65,7 +144,6 @@ Add newest entries first.
 - Existing conversion service, decoder, encoder, Worker orchestration, queue, and ZIP exporter were not modified.
 - Next: inspect and integrate the two processing modules after their PRs are merged; coordinate a lossless edited-pixel handoff that retains the existing conversion service's output validation.
 
-
 ### 2026-11-21 - Phase 5 editor UI scaffold and placeholder adapter
 
 - Status: Implemented scaffold; automated test, production build, and browser verification pending.
@@ -78,6 +156,27 @@ Add newest entries first.
 - Existing conversion service and conversion orchestration were not modified.
 - Tests/build/browser checks were not run in this environment. Run `npm test`, `npm run build`, and browser checks in a local checkout before considering the scaffold verified.
 - Next: agree on shared input/output, processing order, error behavior, and resource ownership with both processing-module owners; replace the placeholder only after their modules are integrated.
+
+
+### 2026-11-21 - Phase 5 Image Transformation verification and CI results
+- Status: Processing module tested; real-image browser verification and full repository CI passed (user-confirmed browser/local checks and GitHub Actions).
+- Implementation:
+  - Added `applyImageTransformations(imageData, transformations)` with crop, resize, rotation, and horizontal/vertical flip operations using the shared sRGB ImageData representation.
+  - Preserved input immutability and used premultiplied-alpha interpolation during resize to reduce transparent-edge artifacts.
+  - Added dimension, pixel-count, option, and crop-bound validation.
+  - Added 16 focused Image Transformer unit tests and a real-image browser harness.
+- Verification:
+  - The user confirmed the browser harness produces the expected results with real image files.
+  - The user ran `npm test`: 50 tests passed, 0 failed, 0 cancelled, and 0 skipped.
+  - The user ran `npm run build`: Vite production build completed successfully.
+  - GitHub Actions for PR #3 completed successfully. Dependency installation, all 50 tests, and the production build passed.
+- Build note:
+  - Vite reports the existing HEIC-related chunks exceed the 500 kB advisory threshold. This is a bundle-size warning, not a build failure.
+- Verification boundaries:
+  - These results validate the standalone Transformer module and its browser harness. They do not validate the integrated editor or the complete editing-to-conversion workflow.
+- Remaining work:
+  - Integrate the Transformer and Adjuster modules through the Editor UI branch.
+  - Run end-to-end browser checks after editor integration.
 
 ### 2026-11-20 - Animated GIF conversion implementation
 
@@ -115,7 +214,8 @@ Add newest entries first.
   - The package lock needs a full npm-generated resolution for modern-gif and modern-palette. Run `npm install` after pulling before using the app.
   - Transparency, disposal, looping, frame delays, Worker fallback, and large-animation memory behavior still require real-file verification.
 - Next steps:
-  - Run `npm install`, `npm test`, and `npm run build`.  - Test animated GIF-to-GIF with multiple frames, partial-frame updates, transparency, disposal methods, finite/infinite looping, and varying frame delays.
+  - Run `npm install`, `npm test`, and `npm run build`.
+  - Test animated GIF-to-GIF with multiple frames, partial-frame updates, transparency, disposal methods, finite/infinite looping, and varying frame delays.
   - Test static PNG/JPEG/WebP/BMP/TIFF/HEIC/SVG inputs to GIF.
   - Test GIF-to-PNG/JPEG/WebP/BMP/TIFF/SVG to confirm first-frame behavior remains unchanged.
   - Verify individual downloads, ZIP export, Worker execution, and fallback behavior.
@@ -214,7 +314,8 @@ Add newest entries first.
   - Kept TIFF decoding planned until real-file browser and Worker verification passes.
 - Tests performed:
   - HEIC/HEIF decoder, main conversion, and Worker tests were user-confirmed.
-  - TIFF implementation has not yet been run through npm tests, production build, or real TIFF fixtures.- Next steps:
+  - TIFF implementation has not yet been run through npm tests, production build, or real TIFF fixtures.
+- Next steps:
   - Run npm install to update package-lock.json, then npm test and npm run build.
   - Test real single-page TIFF files with common compression variants.
   - Test multi-page TIFF and confirm the first page is used.
@@ -313,7 +414,8 @@ Add newest entries first.
   - Verified per-file queue states and batch progress.
   - Verified that a failed file does not stop other conversions.
   - Verified cancellation after the active file finishes.
-  - Verified large-image processing keeps the interface responsive.  - Verified file removal, Clear all, and resource cleanup.
+  - Verified large-image processing keeps the interface responsive.
+  - Verified file removal, Clear all, and resource cleanup.
   - Verified converted files can be downloaded and opened.
   - User reported that all requested Phase 3 tests behaved as expected.
 - Test results:
@@ -412,7 +514,8 @@ Add newest entries first.
 ### 2026-11-18 - WebP conversion verified and enabled in the main interface
 
 - Status: Tested; user-confirmed real-file browser verification
-- User-confirmed checks:  - PNG, JPEG, WebP, and BMP inputs convert successfully to WebP.
+- User-confirmed checks:
+  - PNG, JPEG, WebP, and BMP inputs convert successfully to WebP.
   - PNG transparency remains intact.
   - Quality adjustment works.
   - The output MIME type is exactly `image/webp`.
@@ -511,7 +614,8 @@ Add newest entries first.
   - JPEG output remains disabled in the main application until the browser test confirms real output behavior.
   - Transparent source pixels currently use a white background. User-selectable JPEG background color remains a later UI enhancement.
 - Next steps:
-  - Pull the latest `main`, run `npm test` and `npm run build`.  - Open `/tests/browser-encoder.html` and test PNG, JPEG, WebP, and BMP sources.
+  - Pull the latest `main`, run `npm test` and `npm run build`.
+  - Open `/tests/browser-encoder.html` and test PNG, JPEG, WebP, and BMP sources.
   - Include a transparent PNG, verify the transparent areas become white, and check output quality, MIME type, dimensions, preview, and download.
   - Enable JPEG output in the main interface only after the user confirms these checks.
 
@@ -610,7 +714,8 @@ Add newest entries first.
 
 - Status: Tested
 - User-confirmed tests:
-  - Tested real PNG files in the browser; status showed `Decode Successful`.  - Tested real JPEG files in the browser; status showed `Decode Successful`.
+  - Tested real PNG files in the browser; status showed `Decode Successful`.
+  - Tested real JPEG files in the browser; status showed `Decode Successful`.
   - Tested real WebP files in the browser; status showed `Decode Successful`.
   - Tested real BMP files in the browser; status showed `Decode Successful`.
 - Changes:
@@ -709,7 +814,8 @@ Add newest entries first.
 - User-confirmed tests:
   - Startup skeleton follows both light and dark themes.
   - Theme preference remains correct after page refresh.
-  - No unstyled page appears during startup.  - `npm run build` succeeds for the version tested by the user before this Phase 2 code update.
+  - No unstyled page appears during startup.
+  - `npm run build` succeeds for the version tested by the user before this Phase 2 code update.
 - Repository audit:
   - Confirmed `package-lock.json` exists on `main`.
   - Confirmed the current application entry point and UI structure.
@@ -809,83 +915,475 @@ Add newest entries first.
 - Known issues:
   - Startup skeleton is removed when the application module initializes. A JavaScript loading failure will leave the skeleton visible rather than exposing an unstyled application.
 - Next steps:
+  - Verify custom dropdown spacing, mouse selection, keyboard controls, and outside-click close.
+  - Reload the page with cache disabled and confirm the skeleton appears without an unstyled flash.
+  - Run `npm run build`.
 
-### 2026-11-21 - Edited ImageData conversion handoff
 
-- Status: Implemented; new automated tests pending local execution
-- Branch: `phase-5-editor-ui`
+### 2026-11-17 - Output format option spacing adjustment
+- Status: Implemented, pending visual confirmation
 - Changes:
-  - Refactored the direct conversion path to share `encodeAndValidateImage()` for encoding, output signature detection, output re-decoding, dimension verification, and verification-resource cleanup.
-  - Added `convertImageDataToFormat(imageData, format, options)` to accept the edited sRGB ImageData representation without decoding the original File again.
-  - The new entry point copies ImageData into a temporary Canvas-backed source, reuses the existing `encodeImage()`, and releases the temporary Canvas in a `finally` block.
-  - Preserved the existing File/Blob conversion API and Worker routing.
-  - Limited edited-ImageData output to PNG, JPEG, WebP, BMP, TIFF, and SVG, which are supported by the current image encoder. Animated GIF remains on its existing File-based path because it has separate animation-preservation behavior.
-  - Added `tests/edited-image-conversion.test.js` for the edited-pixel handoff, output dimension verification, invalid ImageData, and GIF limitation.
-  - Updated the technical specification and Phase 5 editor documentation.
-- Validation:
-  - The new tests have been added but have not yet been run locally.
-  - The previous user-reported 47/47 test result and production build apply to the branch state before these changes; they must be rerun.
-- Remaining work:
-  - Run `npm test` and `npm run build` on this branch and address any failures.
-  - After test results are confirmed, connect the editor's processed ImageData to the new service entry point when the Transformer and Adjuster modules are available.
-  - Keep Apply disabled until the real processing modules, UI handoff, and end-to-end behavior are integrated and verified.
+  - Added vertical and horizontal padding to native output-format option elements.
+  - Added option line-height to improve readability and spacing in the opened dropdown where the browser supports option styling.
+- Files changed:
+  - `src/styles/components.css`
+  - `docs/DEVELOPMENT_LOG.md`
+- Tests performed:
+  - Reviewed the existing select styling and the user-provided screenshot.
+- Test results:
+  - CSS adjustment committed to `main`.
+  - Actual dropdown appearance still requires user confirmation because native select popup styling can vary by browser and operating system.
+- Known issues:
+  - Some browsers/operating systems limit styling of native select option menus. If padding remains unchanged in the user's browser, replace the native select with a fully custom accessible dropdown in a separate implementation.
+- Next steps:
+  - Pull the update and check the Output format dropdown.
+  - If native option padding is still ignored, implement a custom accessible select.
 
-### 2026-11-21 - Edited ImageData conversion verification
+### 2026-11-17 - User verification of conversion settings UI
+- Status: Tested
+- Tests performed by the user:
+  - Selected an image and confirmed Conversion Settings and Conversion Results appear.
+  - Confirmed output format choices are available.
+  - Confirmed the quality slider appears only for JPEG and WebP.
+  - Changed the slider and confirmed the percentage value updates.
+  - Cleared all selected images and confirmed both panels disappear.
+  - Confirmed desktop and mobile layouts look normal.
+  - Ran `npm run build`; Vite transformed 2,102 modules and completed the production build in 21.79 seconds.
+- Test results:
+  - All seven user-reported checks passed.
+  - The output-format dropdown has a spacing issue visible in the supplied screenshot; a CSS adjustment is recorded in the newer entry above.
+- Known issues:
+  - The Convert images button remains disabled until the Phase 2 conversion engine exists.
+  - Format choices are interface options only; they do not indicate completed conversion support.
+- Next steps:
+  - Confirm the dropdown option spacing after the CSS update.
+  - Then begin Phase 2 with file validation, format capability detection, and browser image decoding.
 
-- Status: Automated tests and production build passed; browser integration verification pending
-- Tests reported by the user on `phase-5-editor-ui`:
-  - `npm test`: 51 passed, 0 failed, 0 cancelled, 0 skipped. This includes four tests for the edited ImageData conversion entry point.
-  - `npm run build`: Vite production build succeeded, transforming 2,163 modules in 4.22 seconds.
-- Known warning:
-  - Vite continues to report two HEIC-related chunks of approximately 3.23 MB each before gzip. The warning does not fail the build and remains a separate optimization task.
-- Remaining work:
-  - Perform browser regression checks for the existing converter and editor scaffold.
-  - Browser-test the edited ImageData handoff with real processing modules once Transformer and Adjuster are available.
-  - Keep Apply disabled until the complete editing pipeline and UI handoff are integrated and verified.
-
-### 2026-11-21 - Browser regression check
-
-- User manually confirmed the app opens without errors.
-- Existing standard image conversion continues to work.
-- Editor panel remains visible and Apply remains disabled as expected.
-- This verifies the current UI scaffold and existing conversion regression only; edited-pixel end-to-end processing still awaits the Transformer and Adjuster modules.
-
-
-### 2026-11-21 - Queue to Editor Custom Event bridge
-
-- Status: Implemented; automated and browser verification pending
-- Branch: `phase-5-editor-ui`
+### 2026-11-17 - Conversion settings and results interface
+- Status: Implemented
 - Changes:
-  - Added `ifc:queue-change` as the explicit Queue → Editor communication event.
-  - Added `createEditorQueueSnapshot()` to publish only the queue identifier, file name, original File reference, detected format, and preview object URL.
-  - Updated `main.js` to dispatch queue snapshots after add, remove, and clear operations.
-  - Updated `image-editor.js` to consume event payloads and removed its DOM-based Queue reader and MutationObserver.
-  - Kept the existing File/Blob conversion path and Worker orchestration unchanged.
-  - Added `tests/editor-queue-events.test.js` for the event snapshot contract.
-- Resource ownership:
-  - The Queue retains ownership of each original File and its preview object URL.
-  - The Editor only holds references from the latest snapshot; it does not revoke Queue URLs or close decoder resources.
-- Validation:
-  - Tests and production build have not been run in this environment after these changes.
-  - Browser checks for add, remove, clear, and selection behavior are pending.
-- Remaining work:
-  - Verify the event bridge locally with `npm test` and `npm run build`.
-  - Manually test Queue add/remove/clear and Editor selection behavior.
-  - Connect selected File → Decoder → ImageData adapter in a subsequent integration step; keep Apply disabled until processing modules and the full edited-pixel route are ready.
+  - Added a conversion settings panel that appears after at least one image is selected.
+  - Added output format choices for PNG, JPEG, WebP, and BMP as planned core output targets.
+  - Added a quality slider for JPEG and WebP selections, with a live percentage value.
+  - Added a disabled Convert images button and clear notice that conversion is not active yet.
+  - Added a conversion results panel with an honest empty state. No fake result cards or download actions are shown.
+  - Kept settings and results hidden when the file queue is empty.
+  - Added responsive styling for the new panels and controls.
+- Files changed:
+  - `index.html`
+  - `src/js/main.js`
+  - `src/styles/components.css`
+  - `docs/DEVELOPMENT_ROADMAP.md`
+  - `docs/DEVELOPMENT_LOG.md`
+- Tests performed:
+  - Reviewed the source changes and confirmed the settings UI is only a preview; no conversion operation is triggered.
+  - Browser interaction and production build for this latest update had not been tested at implementation time.
+- Test results:
+  - Implementation is committed to `main`.
+  - User subsequently verified the settings interface; see the newer verification entry above.
+- Known issues:
+  - Format options represent planned output targets and do not imply that conversion is already supported.
+  - The Convert images button remains disabled until the Phase 2 conversion engine exists.
+- Next steps:
+  - Complete visual confirmation of the select option spacing.
+  - Then begin Phase 2 with file validation, format capability detection, and browser image decoding.
 
+### 2026-11-17 - Phase 1 workspace UI verification
+- Status: Tested for the user-reported interactions
+- Tests performed by the user:
+  - Selected multiple image files at once.
+  - Added images through drag-and-drop.
+  - Confirmed thumbnails and file sizes appear.
+  - Removed individual images.
+  - Cleared the entire selection with Clear all.
+  - Switched between light and dark themes.
+  - Refreshed the page and confirmed the selected theme persisted.
+  - Checked the mobile layout and reported no visible issues.
+  - Navigated the interface with keyboard controls.
+  - Confirmed Enter/Space opens the file picker from the upload area.
+  - Ran `npm run build`; Vite transformed 2,102 modules and completed the production build in 18.18 seconds.
+- Test results:
+  - All user-reported checks passed for the version tested before the latest settings/results UI update.
+- Next steps:
+  - Continue Phase 2 after the settings/results UI was verified.
 
-### 2026-11-21 - Fix Editor queue selection ID mismatch
-
-- Status: Fix implemented; local verification pending
-- Branch: `phase-5-editor-ui`
-- Diagnosis:
-  - Queue entry IDs are numeric, but `HTMLSelectElement.value` always returns a string.
-  - The Editor previously compared these values with strict equality, so selecting an item could fail to resolve its queue entry and clear the preview.
+### 2026-11-17 - Phase 1 initial workspace UI
+- Status: Implemented
 - Changes:
-  - Added `findEditorQueueEntry()` to normalize IDs during lookup.
-  - Updated Editor selection changes to use the normalized lookup.
-  - Explicitly assigns the selected option value as a string.
-  - Added automated coverage for numeric IDs resolved from string select values.
-- Validation:
-  - Automated test and production build have not yet been run locally after this fix.
-  - User must re-test preview display and switching between multiple queued images.
+  - Replaced the foundation placeholder with the initial converter workspace.
+  - Added application branding, privacy messaging, hero section, and upload workspace.
+  - Added file picker and drag-and-drop selection for multiple image files.
+  - Added image preview thumbnails, file size/type details, duplicate filtering, per-file removal, and clear-all behavior.
+  - Added light/dark theme switching with preference persistence in localStorage.
+  - Added responsive layout and keyboard activation for the dropzone.
+  - Kept conversion controls out of this iteration because the conversion engine belongs to Phase 2.
+- Files changed:
+  - `index.html`
+  - `src/js/main.js`
+  - `src/styles/variables.css`
+  - `src/styles/layout.css`
+  - `src/styles/components.css`
+  - `src/styles/themes.css`
+- Tests performed:
+  - Reviewed the updated source and confirmed all changes were committed to `main`.
+  - No local browser interaction or production build was run by the assistant.
+- Test results:
+  - The user later manually verified file selection, drag-and-drop, previews, removal, clear-all, theme switching, theme persistence, mobile layout, keyboard navigation, and production build. All reported checks passed for the version tested.
+- Known issues:
+  - Conversion execution and result downloads are not implemented yet.
+  - Unsupported or malformed image files may still fail at preview time; deeper validation belongs to Phase 2.
+- Next steps:
+  - Finish the settings and results interface.
+  - Begin core conversion after verification.
+
+### 2026-11-17 - Phase 0 foundation implementation
+- Status: In progress
+- Decisions confirmed:
+  - Plain CSS, without Tailwind CSS.
+  - Lucide installed through NPM.
+  - Vite entry point at root-level `index.html`.
+- Changes:
+  - Added `package.json` with Vite dev, build, and preview scripts.
+  - Added `vite.config.js`.
+  - Added root `index.html` with a local-first foundation screen.
+  - Added `src/js/main.js` as the ES module entry point and initialized Lucide icons.
+  - Added modular styles: `main.css`, `variables.css`, `reset.css`, `layout.css`, `components.css`, and `themes.css`.
+  - Added `public/favicon.svg`.
+  - Updated README, technical specification, project instructions, and roadmap.
+- Files changed:
+  - `package.json`, `vite.config.js`, `index.html`, `src/js/main.js`
+  - `src/styles/main.css`, `variables.css`, `reset.css`, `layout.css`, `components.css`, `themes.css`
+  - `public/favicon.svg`, `README.md`
+  - `docs/TECHNICAL_SPECIFICATION.md`, `docs/CHATGPT_PROJECT_INSTRUCTIONS.md`
+  - `docs/DEVELOPMENT_ROADMAP.md`, `docs/DEVELOPMENT_LOG.md`
+- Tests performed:
+  - Confirmed new files were committed to branch `main`.
+  - No npm install, local dev-server, or production-build command was run in this environment.
+- Test results:
+  - Source foundation files are present in the repository.
+  - Runtime behavior, package resolution, and production build remain unverified.
+- Known issues:
+  - `package-lock.json` has not been generated. Run `npm install` locally.
+  - Localhost and production build verification remain open Phase 0 tasks.
+  - The starter page is not an image uploader or converter.
+- Next steps:
+  - Pull the latest `main`.
+  - Run `npm install` to generate `package-lock.json`.
+  - Run `npm run dev` and verify the page in a browser.
+  - Run `npm run build` and fix any errors before completing Phase 0.
+
+### 2026-11-17 - Initial repository audit
+- Status: In progress
+- Changes:
+  - Inspected the public GitHub repository and confirmed `main` as the default branch.
+  - Reviewed README, project context, technical specification, roadmap, development log, ChatGPT Project instructions, and starter prompt.
+  - Confirmed the repository initially had no application source, `package.json`, Vite configuration, or `src/` directory.
+  - Marked repository creation as completed in the roadmap and corrected the README clone URL.
+- Files changed:
+  - `README.md`
+  - `docs/DEVELOPMENT_ROADMAP.md`
+  - `docs/DEVELOPMENT_LOG.md`
+- Tests performed:
+  - Inspected repository metadata, default branch, root contents, documentation directory, and commit history.
+- Test results:
+  - No application build or runtime test was possible before the Vite project was created.
+- Known issues:
+  - Candidate libraries for HEIC/HEIF, TIFF, and animated GIF need evaluation in their respective phases.
+- Next steps:
+  - Confirm initial dependency policy and styling approach.
+  - Initialize Vite and add the source structure.
+  - Run the development server and verify localhost.
+
+### 2026-11-17 - Planning baseline
+- Recorded the agreed Vanilla JavaScript and Vite direction.
+- Recorded the client-side processing requirement and planned image formats.
+- Recorded light and dark themes, hybrid processing, and phased MVP development.
+- No application features had been implemented or tested at this point.
+
+
+## Entry template
+
+```markdown
+### YYYY-MM-DD - Short change title
+- Status: In progress / Implemented / Tested / Blocked
+- Changes:
+  - ...
+- Files changed:
+  - ...
+- Tests performed:
+  - ...
+- Test results:
+  - ...
+- Known issues:
+  - ...
+- Next steps:
+  - ...
+```
+
+## Important rule
+
+Only record work that actually happened in the repository. Do not mark a feature as implemented or tested based only on a plan, code suggestion, or mockup.
+
+
+### 2026-11-19 - Initial static GIF first-frame decoder
+- Status: Implemented; real-browser verification pending
+- Changes:
+  - Evaluated browser-compatible GIF parsing options and selected gifuct-js 2.1.2, an MIT-licensed parser/decompressor with a single runtime dependency.
+  - Added a GIF decoder adapter that parses logical-screen dimensions and decompresses only the first image frame.
+  - Rasterizes the first frame to OffscreenCanvas or HTML Canvas, respecting frame offsets, transparency, and the global background color when applicable.
+  - Added dimension and pixel-area limits before allocating the raster canvas.
+  - GIF conversion can use the existing Worker path and main-thread fallback.
+  - Documented the policy: animated GIF input becomes a still image from its first image frame. Animation, timing, and later frames are not preserved.
+  - Kept GIF decoding marked planned in the capability registry until the user completes real-browser verification.
+  - Added unit coverage for first-frame rasterization and malformed GIF errors, plus GIF support in the browser decoder test page.
+- Files changed:
+  - `package.json`, `package-lock.json`
+  - `src/js/core/image-decoder.js`, `src/js/core/capability-registry.js`
+  - `tests/image-decoder.test.js`, `tests/capability-registry.test.js`
+  - `tests/browser-decoder.html`, `tests/browser-decoder.js`
+  - `README.md`, `docs/PROJECT_CONTEXT.md`, `docs/TECHNICAL_SPECIFICATION.md`, `docs/DEVELOPMENT_ROADMAP.md`
+- Tests performed:
+  - Added automated test cases. They have not been run in this environment.
+  - Real browser and main-application verification remain pending.
+- Test results:
+  - No test or production build result is claimed yet.
+- Known issues:
+  - The browser file preview may still display an animated GIF as provided by the browser; the conversion result is explicitly based on the first image frame.
+  - GIF decoding remains unavailable in the capability registry until manual verification passes.
+- Next steps:
+  - Run npm test and npm run build.
+  - Test real static and animated GIF files in the browser decoder page and main application.
+  - Verify first-frame selection, transparency, logical dimensions, worker execution, downloads, and ZIP export.
+
+
+### 2026-11-19 - SVG browser verification completed
+- Status: Tested; user-confirmed
+- Tests performed:
+  - The user ran the SVG test workflow in the real browser and reported that all tests produced the expected results.
+  - Safe SVG fixture sanitization and rasterization passed.
+  - Main-application conversions from SVG to PNG, JPEG, WebP, BMP, and TIFF passed.
+  - Dimension, color, preview, and downloaded output checks passed.
+  - The user also verified malformed/unsupported SVG handling and the sanitizer's restricted behavior.
+- Test results:
+  - SVG decoding is now marked implemented in the capability registry.
+  - SVG is included among available input formats.
+- Known limitations:
+  - Only the sanitizer's documented SVG subset is retained. Unsupported SVG features may be removed before rasterization.
+  - SVG decoding runs on the main thread because it uses DOMParser and XMLSerializer.
+- Next steps:
+  - Continue Phase 4 with static GIF first-frame decoding. Animated GIF preservation remains a separate task.
+
+
+### 2026-11-19 - Fix GIF decoder module import
+- Status: Fixed; local verification pending
+- Issue reported:
+  - The application remained on the startup skeleton.
+  - The browser decoder page did not respond after selecting a GIF.
+  - Console error: Cannot destructure property 'parseGIF' of 'gifuct' as it is undefined.
+- Root cause:
+  - gifuct-js 2.1.2 exposes `parseGIF` and `decompressFrame` as named exports.
+  - The initial integration incorrectly imported a default export and destructured the named functions from it.
+  - This caused the image decoder module to fail during module initialization, preventing the application entry point and browser decoder test module from loading.
+- Fix:
+  - Replaced the default import and destructuring with direct named imports:
+    `import { parseGIF, decompressFrame } from "gifuct-js";`
+- Files changed:
+  - `src/js/core/image-decoder.js`
+- Tests performed:
+  - Confirmed the package's published entry point and source exports expose the functions as named exports.
+  - No local npm test, production build, or browser test was run in this environment.
+- Next steps:
+  - Run `npm test`, `npm run build`, and verify the main app and browser decoder page.
+
+
+### 2026-11-19 - GIF first-frame decoding verified
+- Status: Tested; user-confirmed
+- Tests performed:
+  - The user confirmed that GIF decoding produced the expected image dimensions in the browser decoder test.
+  - The user confirmed that GIF conversion through the main application produced the expected result.
+- Test results:
+  - GIF first-frame decoding is now marked implemented in the capability registry and available as an input format.
+  - Static and animated GIF inputs are converted as still images using the first image frame only.
+- Known limitations:
+  - Animation playback, frame timing, and later frames are not preserved.
+  - Animated GIF output is not implemented.
+- Next steps:
+  - Define and implement raster-to-SVG output with explicit labeling that the raster image is embedded and is not vectorized.
+
+
+### 2026-11-19 - Implement raster-to-SVG wrapper output
+- Status: Implemented; real-browser verification pending
+- Implementation:
+  - Added an SVG encoder that converts the decoded source to PNG and embeds it as a base64 data resource inside an SVG image element.
+  - Preserved the source pixel dimensions in the SVG width, height, and viewBox.
+  - Extended the SVG sanitizer to allow image elements only with bounded base64-encoded PNG data URIs. External image URLs and other data MIME types remain disallowed.
+  - Routed SVG output through the main thread because output verification uses DOMParser and XMLSerializer.
+  - Added SVG to the output format dropdown, conversion service, capability registry, filename extension handling, and ZIP-compatible result flow.
+  - Added automated encoder and capability-registry tests.
+  - Labeled the format as an embedded PNG wrapper, not vectorization.
+- Known limitations:
+  - The SVG contains a raster PNG. It does not create editable vector paths or resolution-independent image detail.
+  - Embedded PNG data is limited by the sanitizer to a 64 MiB base64 payload.
+  - SVG output is main-thread only.
+- Tests performed:
+  - Automated tests and production build have not been run in this environment.
+  - Real-browser conversion and sanitizer verification are pending user testing.
+- Next steps:
+  - Run npm test and npm run build, then verify SVG output in the browser with transparent and opaque images, re-decoding, dimensions, individual download, and ZIP export.
+
+### 2026-11-20 - Phase 4 validation and completion
+- Status: Complete; CI-validated and user-verified
+- Changes:
+  - Added the Phase 4 GitHub Actions validation workflow.
+  - Upgraded checkout and setup-node actions to v5 to use the Node.js 24 action runtime; the project itself continues to use Node.js 22.
+  - Synchronized package-lock.json for gifuct-js and modern-gif dependencies in the phase-4 branch.
+  - Corrected pull-request workflow branch filters so PRs targeting main or phase-4 are included.
+  - Limited workflow token permissions to contents: read and removed automatic lockfile mutation/push steps; the committed lockfile is validated with npm ci.
+  - Updated README, project context, technical specification, and roadmap to reflect completed GIF support and Phase 4 status.
+- Tests performed:
+  - GitHub Actions completed npm ci, npm test, and npm run build successfully on commit c34d26b.
+  - The user confirmed real-browser tests for animated GIF conversion, including timing, looping, transparency, frame order, batch processing, individual downloads, and ZIP export.
+- Test results:
+  - CI check "validate" completed with success.
+  - The user confirmed that the GIF browser checks behaved as expected.
+- Known limitations:
+  - GIF-to-static conversion uses only the first frame.
+  - Animated GIF re-encoding can quantize colors and simplify partial transparency.
+  - Animated GIF-to-WebP/APNG is not supported.
+  - TIFF decoding uses the first page; baseline TIFF output is uncompressed.
+  - Raster-to-SVG embeds PNG data and is not true vectorization.
+- Next steps:
+  - Begin Phase 5 Image Manipulation on a separate phase-5 branch after Phase 4 PR review/merge.
+
+### 2026-11-20 - Phase 5 and Phase 6 team task allocation
+- Status: Planning agreed; implementation not started
+- Decisions:
+  - The project owner approved a three-person division of work for Phase 5 and Phase 6.
+  - `andra-gs` owns Phase 5 Image Transformation and Phase 6 Image Optimization.
+  - `Adit1945-web` owns Phase 5 Image Adjustment and Phase 6 Metadata Management.
+  - `FarrelPtrv` owns Phase 5 Editor UI and Integration and Phase 6 Export Presets and UI.
+  - Phase 6 is defined as Advanced Export and Image Optimization.
+  - The former Testing and Release checklist has been moved to Phase 7.
+  - Separate feature branches, Pull Requests, code review, ordered integration, and post-merge regression testing are required.
+- Documentation updated:
+  - `docs/DEVELOPMENT_ROADMAP.md`
+  - `docs/PROJECT_CONTEXT.md`
+  - `docs/TECHNICAL_SPECIFICATION.md`
+  - `docs/CHATGPT_PROJECT_INSTRUCTIONS.md`
+  - `README.md`
+- Implementation status:
+  - No Phase 5 or Phase 6 feature code has been implemented as part of this planning update.
+  - No feature branches have been created as part of this planning update.
+- Tests performed:
+  - Documentation content and GitHub commits were checked after each update.
+  - No application tests or production build were run because this change updates planning documentation only.
+- Next steps:
+  - All three members review the ownership table and detailed tasks.
+  - Agree on shared processing APIs, editing state, resource ownership, and error contracts before parallel implementation.
+  - Start Phase 5 branches from the latest `main`.
+
+
+### 2026-11-20 - Documentation synchronization after AGENTS.md rename
+
+- Status: Documentation synchronized; feature implementation unchanged.
+- Changes:
+  - Established the root-level `AGENTS.md` as the canonical persistent instruction file for ChatGPT coding sessions.
+  - Updated README documentation links and team guidance to point to `AGENTS.md` instead of the removed `docs/CHATGPT_PROJECT_INSTRUCTIONS.md` path.
+  - Updated the starter prompt so it starts from the current project state and asks each contributor to identify their GitHub username and assigned phase task, rather than incorrectly starting at Phase 0.
+  - Synchronized current phase summaries and phase tracking with the completed Phase 4 and planned Phases 5, 6, and 7.
+  - Corrected the GIF verification status in the technical specification to match the user's real-browser confirmation on 2026-11-20.
+  - Clarified current unsupported GIF and TIFF capabilities in the project context.
+- Files changed:
+  - `README.md`
+  - `AGENTS.md`
+  - `docs/PROJECT_CONTEXT.md`
+  - `docs/TECHNICAL_SPECIFICATION.md`
+  - `docs/DEVELOPMENT_ROADMAP.md`
+  - `docs/DEVELOPMENT_LOG.md`
+  - `docs/STARTER_PROMPT.md`
+- Tests performed:
+  - Reviewed the current documentation on GitHub and checked cross-file references, phase ownership, branch names, and current status wording.
+  - No application tests or production build were run because this update changes documentation only.
+- Test results:
+  - Documentation references and phase summaries are synchronized.
+  - Phase 5 and Phase 6 feature implementation status remains unchanged; no feature branches were created by this documentation update.
+
+
+### 2026-11-21 - Phase 5 Image Adjustment module implementation
+- Status: Implemented; focused unit tests passed; browser and editor verification pending
+- Changes:
+  - Added the Image Adjuster module on `phase-5-adjustment` using the agreed sRGB ImageData representation and `applyImageAdjustments(imageData, adjustments)` API.
+  - Implemented brightness, contrast, saturation, grayscale, sepia, and Gaussian blur with the agreed ranges and defaults.
+  - Preserved source immutability, image dimensions, and alpha values. Blur uses premultiplied-alpha sampling and a rolling row cache.
+  - Added validation for ImageData, unknown options, invalid types, parameter ranges, and shared image limits.
+  - Added focused tests for each adjustment, combined operations, blur behavior, transparency, dimensions, and invalid inputs.
+  - Added `docs/PHASE_5_ADJUSTMENT.md` describing algorithms, options, errors, resource ownership, and verification.
+- Files changed:
+  - `src/js/core/image-adjuster.js`
+  - `tests/image-adjuster.test.js`
+  - `docs/PHASE_5_ADJUSTMENT.md`
+  - `docs/DEVELOPMENT_ROADMAP.md`
+  - `docs/DEVELOPMENT_LOG.md`
+  - `docs/TECHNICAL_SPECIFICATION.md`
+- Tests performed:
+  - Ran `node --test tests/image-adjuster.test.js` in a local Node test environment.
+  - Ran `node --check src/js/core/image-adjuster.js`.
+- Test results:
+  - All 16 focused Image Adjuster tests passed.
+  - Syntax validation passed.
+  - The full repository test suite and production build have not been run for this branch update.
+- Known issues:
+  - Real-image browser verification remains pending.
+  - Editor integration and the complete editing-to-conversion workflow remain pending.
+- Next steps:
+  - Verify the module with representative real images.
+  - Coordinate the integration handoff with the Editor UI branch.
+  - Run the full repository test suite and production build before preparing the Pull Request.
+
+
+### 2026-11-21 - Add Image Adjuster real-image browser harness
+- Status: Added; browser verification pending
+- Changes:
+  - Added `tests/browser-adjuster.html`, `tests/browser-adjuster.css`, and `tests/browser-adjuster.js`.
+  - The harness uses the existing image decoder, extracts sRGB ImageData, and displays original and adjusted previews.
+  - Added controls for brightness, contrast, saturation, blur, grayscale, and sepia, plus Reset.
+  - Kept the harness separate from the production editor and conversion flow.
+  - Releases the decoded image and temporary staging canvas after extracting source pixels.
+- Tests performed:
+  - Ran JavaScript syntax validation with `node --check` for the browser harness script in the local Node environment.
+  - The real-browser harness has not yet been run with user image files.
+- Next steps:
+  - Open `http://localhost:5173/tests/browser-adjuster.html` while `npm run dev` is running.
+  - Verify each adjustment and representative combinations using real local images.
+  - Confirm dimensions and alpha transparency remain unchanged.
+
+
+### 2026-11-21 - Phase 5 Image Adjustment verification and CI results
+- Status: Processing module tested; real-image browser verification and full repository CI passed (user-confirmed browser/local checks and GitHub Actions).
+- Verification:
+  - The user confirmed that all Image Adjustment features work correctly in the real-image browser harness.
+  - The user ran `npm test`: 50 tests passed, 0 failed, 0 cancelled, and 0 skipped.
+  - The user ran `npm run build`: Vite production build completed successfully.
+  - GitHub Actions for PR #2 completed successfully. Dependency installation, all 50 tests, and the production build passed.
+- Build note:
+  - Vite reports the existing HEIC-related chunks exceed the 500 kB advisory threshold. This is a bundle-size warning, not a build failure.
+- Verification boundaries:
+  - These results validate the standalone processing module and its browser harness. They do not validate the integrated editor or the complete editing-to-conversion workflow.
+- Remaining work:
+  - Integrate the Transformer and Adjuster modules through the Editor UI branch.
+  - Run end-to-end browser checks after editor integration.
+
+### 2026-11-21 - User verification of Image Adjuster in browser
+- Status: Real-image browser verification passed (user-confirmed); editor integration pending
+- User verification:
+  - The user reported that the Image Adjustment features are working well in the browser harness.
+  - This confirms the six adjustment controls and browser preview workflow at the feature level.
+- Documentation:
+  - Updated the Phase 5 roadmap to mark real-image browser verification complete for Image Adjustment.
+  - Updated the Image Adjustment phase document to record the user-confirmed browser result.
+- Verification boundaries:
+  - This entry does not claim a new full `npm test` run or production build for the latest branch state.
+  - Editor integration and the complete editing-to-conversion workflow remain pending.
+- Next steps:
+  - Run the full repository test suite and production build on the latest `phase-5-adjustment` branch.
+  - Coordinate the processing-module handoff and integration with the Editor UI branch.
