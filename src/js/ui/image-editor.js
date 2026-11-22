@@ -434,6 +434,8 @@ if (workspace) {
     if (selectedSource) {
       publishEditedImage(selectedSource.id, null);
       releaseProcessedPreview();
+      preview.onload = null;
+      preview.onerror = null;
       preview.src = selectedSource.url;
       preview.hidden = false;
       previewEmpty.hidden = true;
