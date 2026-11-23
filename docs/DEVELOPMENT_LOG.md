@@ -5,7 +5,7 @@ This file records actual repository progress. Update it after meaningful impleme
 ## Project status
 
 - Current stage: Phase 6 - Image Optimization and Export Workflow
-- Current phase status: Phase 5 has been merged into `main`. The project owner reports post-merge `npm test` and `npm run dev` passed on 2026-11-23; a separate post-merge `npm run build` result was not reported. Phase 6 is in progress. `andra-gs` has added the initial optimizer module and focused tests on `phase-6-optimization`; test/build/browser verification remains pending. `FarrelPtrv` owns Export Presets and UI Integration on `phase-6-export-ui`.
+- Current phase status: Phase 5 has been merged into `main`. The project owner reports post-merge `npm test` and `npm run dev` passed on 2026-11-23. For Phase 6, `andra-gs` has implemented the optimizer and focused tests on `phase-6-optimization`; the project owner reports `npm test` and `npm run build` both completed without errors on 2026-11-23. A dedicated browser harness has been added, but real-browser verification remains pending. `FarrelPtrv` owns Export Presets and UI Integration on `phase-6-export-ui`.
 - Latest release: None
 - Last updated: 2026-11-23
 
@@ -1601,3 +1601,24 @@ Only record work that actually happened in the repository. Do not mark a feature
   - PR #6, which approved the two-person Phase 6 plan, is merged: https://github.com/andra-gs/Images-Format-Converter/pull/6
   - PR #4 (`security/xanitizer-analysis`) remains separate from Phase 6 and is not changed by this work.
 - No application code was changed. No tests, browser checks, or production build were run as part of this documentation update.
+
+### 2026-11-23 - Phase 6 optimizer automated checks and browser harness
+
+- Status: Optimizer implementation and automated checks reported successful by the project owner; browser verification pending.
+- User-reported verification:
+  - `npm test` completed without errors.
+  - `npm run build` completed without errors.
+  - These checks were reported before the browser harness files in this entry were added. They must be rerun against the latest branch state.
+- Changes on `phase-6-optimization`:
+  - Added a standalone browser test page at `tests/browser-optimizer.html`.
+  - Added matching styles in `tests/browser-optimizer.css`.
+  - Added `tests/browser-optimizer.js`, which calls `optimizeImage()` directly and uses the existing `decodeImage()` pipeline to preview the returned output.
+  - The harness exposes output-format and optimization-mode selection, JPEG background selection, original/output previews, measured size metrics, target-size status, and output download.
+  - The harness is separate from the production UI and does not change Farrel's Export UI ownership.
+- Verification still required:
+  - Pull the latest `phase-6-optimization` branch.
+  - Rerun `npm test` and `npm run build` after adding the harness.
+  - Run `npm run dev` and open `http://localhost:5173/tests/browser-optimizer.html`.
+  - Test JPEG/WebP Low, Medium, and High presets; target-size reached and not reached; and `none` mode for PNG, BMP, TIFF, GIF, and SVG.
+  - Record browser, representative input files, actual output sizes, and any failures.
+- No real-browser result is claimed yet.
