@@ -1,0 +1,87 @@
+# Phase 6 — Export Presets and UI Integration
+
+## Ownership and branch
+
+- Owner: `FarrelPtrv`
+- Branch: `phase-6-export-ui`
+- Base: `main` at kickoff commit `eaa1c2db0361810aa0b522154c4ad522b4583cd2`
+- Main UI module: `src/js/ui/export-panel.js`
+- Stylesheet: `src/styles/export-panel.css`
+- Focused tests: `tests/export-panel.test.js`
+
+## Current status
+
+Planning and repository inspection started on 2026-11-23. No Export Settings UI or optimizer integration is claimed implemented yet.
+
+## Scope
+
+Implement the Export Settings interface and, after the optimizer contract and optimizer PR are integrated into `main`, connect it to individual downloads and ZIP export.
+
+The interface is expected to support:
+
+- Low, Medium, and High presets only where the selected output format has an agreed optimizer mapping.
+- Format-specific quality controls only where the selected encoder supports them.
+- Target output size only where the agreed optimizer contract supports iterative attempts.
+- Original source size, actual exported size, byte difference, and percentage reduction/increase.
+- Clear unavailable, loading, and per-file error states.
+- Light/dark themes, responsive layout, and keyboard accessibility.
+
+## Initial repository findings
+
+- The application uses Vanilla JavaScript ES modules, HTML, plain CSS, and Vite.
+- Existing conversion settings currently contain a single quality slider in `index.html`; `src/js/main.js` reads it and passes quality only to JPEG and WebP conversion.
+- Existing conversion orchestration is in `src/js/main.js`. It iterates selected queue entries and stores completed results in `conversionResults`.
+- Individual result rendering creates a download link from the already-generated result Blob.
+- ZIP export currently iterates successful `conversionResults` and adds their existing Blobs to JSZip. ZIP generation uses STORE compression and has per-archive error reporting.
+- The current conversion service exposes separate File-based and edited-ImageData conversion entry points and validates generated output. It is shared code and is outside the initial UI-only change boundary.
+- Existing theme tokens and responsive rules are defined in the shared stylesheets. New panel styles should use those tokens rather than introducing a separate theme system.
+- At kickoff, `src/js/ui/export-panel.js`, `src/styles/export-panel.css`, `tests/export-panel.test.js`, and `src/js/core/image-optimizer.js` are not present on `main`.
+
+## Integration boundaries
+
+- Do not create a competing optimizer API or infer the optimizer's input/output object shape.
+- A temporary mock contract may be used to build and test presentation behavior only. Keep it isolated from production conversion and download paths.
+- Do not integrate real optimization until `andra-gs`'s optimizer PR is merged into `main` and the API is agreed.
+- Do not modify `src/js/core/conversion-service.js`, queue orchestration, or ZIP orchestration without explicit coordination with the project owner.
+- After the optimizer is merged, update this branch from the latest `main` before implementing real individual-download and ZIP integration.
+- Preserve per-file failure isolation: an optimization failure for one file must not prevent other successful files from being exported.
+
+## Optimizer contract — pending agreement
+
+The following decisions must be agreed with `andra-gs` before the mock is treated as an integration contract:
+
+1. Optimizer function name, module export, and call signature.
+2. How the source is represented (original File, converted Blob/result, or edited image result).
+3. How output format and current conversion options are supplied.
+4. Preset identifiers and format-specific mapping/capability response.
+5. Quality control ranges and units for each supported encoder.
+6. Target-size units, supported formats, iteration limits, and behavior when the target cannot be reached.
+7. Result shape for the final Blob and actual source/output size metrics.
+8. Error types, cancellation behavior, and per-file failure semantics.
+9. Resource ownership and cleanup responsibilities.
+10. Whether optimization runs on the main thread or through the existing Worker path.
+
+Until these are agreed, the UI may use a local mock object solely for UI tests; no guessed optimizer API should be exported or used by production code.
+
+## Initial format expectations (subject to optimizer verification)
+
+The project roadmap currently identifies JPEG and WebP as candidates for lossy quality controls and feasible target-size attempts; PNG may expose lossless encoder-supported optimization; BMP and baseline TIFF currently have no meaningful quality control; GIF must follow verified encoder capabilities; SVG remains an embedded-PNG wrapper and must not be presented as vector optimization. Final controls must follow the merged optimizer capability matrix and browser checks.
+
+## Verification plan
+
+- Focused unit tests for preset selection, capability-dependent visibility, format-specific controls, size formatting and calculations, loading/error states, and keyboard-accessible interaction.
+- Integration tests after the optimizer is merged for individual downloads and ZIP export, including mixed-format batches and isolated per-file failures.
+- Browser checks in light and dark themes at desktop and mobile widths.
+- Regression checks for conversion queue, Editor Phase 5, individual downloads, ZIP extraction, and output integrity.
+- Run `npm test`, `npm run build`, and browser checks on the final integrated branch before opening a PR.
+
+## Progress log
+
+### 2026-11-23 — Phase 6 kickoff and repository inspection
+
+- Confirmed Phase 5 has been merged into `main`; project owner reports post-merge `npm test` and `npm run dev` checks passed. A separate post-merge production build result was not included in the kickoff report.
+- Read `AGENTS.md`, `docs/DEVELOPMENT_ROADMAP.md`, `docs/PROJECT_CONTEXT.md`, and `docs/TECHNICAL_SPECIFICATION.md` on `main`.
+- Inspected the existing conversion settings, per-file result/download flow, ZIP generation, shared styles, and current conversion-service entry points.
+- Created `phase-6-export-ui` from the latest `main` commit.
+- No application code, shared conversion/queue/ZIP files, or optimizer API have been changed.
+- Next: agree on the optimizer contract with `andra-gs`, then implement the Export Settings presentation against an isolated temporary mock.
