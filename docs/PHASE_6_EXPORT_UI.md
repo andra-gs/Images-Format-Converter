@@ -114,3 +114,11 @@ The project roadmap currently identifies JPEG and WebP as candidates for lossy q
 - Added responsive section styling using the existing theme tokens.
 - The controls do not affect conversion, individual downloads, or ZIP export in this stage.
 - Local automated tests, production build, and browser verification are still required after pulling the branch.
+
+
+### 2026-11-23 — Fix Export Optimization control UI
+
+- Grouped each field label with its corresponding input so the label no longer occupies a separate grid column from its control.
+- Refresh control visibility immediately after optimization mode changes. This fixes the preset/target-size field remaining hidden after selecting its mode.
+- Conversion, download, ZIP, and optimizer behavior remain unchanged.
+- Browser retest is required after pulling this update.
