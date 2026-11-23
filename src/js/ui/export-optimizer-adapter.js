@@ -1,5 +1,7 @@
 const OUTPUT_FORMATS = new Set(["png", "jpeg", "webp", "bmp", "tiff", "svg", "gif"]);
 const OPTIMIZABLE_FORMATS = new Set(["jpeg", "webp"]);
+const PRESETS = new Set(["low", "medium", "high"]);
+const MAX_TARGET_ATTEMPTS = 7;
 
 function getSourceFile(source) {
   if (source instanceof Blob) return source;
@@ -13,9 +15,7 @@ function getSourceFile(source) {
     source.imageData.width > 0 &&
     source.imageData.height > 0 &&
     source.imageData.data instanceof Uint8ClampedArray
-  ) {
-    return source.file;
-  }
+  ) return source.file;
   throw new TypeError("Optimizer source must be a File/Blob or an edited { file, imageData } source.");
 }
 
@@ -25,10 +25,48 @@ function assertFiniteNonNegative(value, name) {
   }
 }
 
+function validateOptimizationMetadata(metadata, requested) {
+  if (!metadata || metadata.mode !== requested.mode) {
+    throw new TypeError("Optimizer result has invalid optimization metadata mode.");
+  }
+
+  if (requested.mode === "none") {
+    if (metadata.preset !== null || metadata.quality !== null ||
+        metadata.targetBytes !== null || metadata.targetReached !== null ||
+        metadata.attempts !== 1) {
+      throw new TypeError("No-optimization metadata must contain null settings and exactly one attempt.");
+    }
+    return;
+  }
+
+  if (requested.mode === "preset") {
+    if (!PRESETS.has(requested.preset) || metadata.preset !== requested.preset ||
+        metadata.targetBytes !== null || metadata.targetReached !== null ||
+        !Number.isFinite(metadata.quality) || metadata.quality < 0 || metadata.quality > 1 ||
+        metadata.attempts !== 1) {
+      throw new TypeError("Optimizer result has invalid preset metadata.");
+    }
+    return;
+  }
+
+  if (requested.mode === "target-size") {
+    if (!Number.isFinite(requested.targetBytes) || requested.targetBytes <= 0 ||
+        metadata.preset !== null || metadata.targetBytes !== requested.targetBytes ||
+        typeof metadata.targetReached !== "boolean" ||
+        !Number.isFinite(metadata.quality) || metadata.quality < 0 || metadata.quality > 1 ||
+        !Number.isInteger(metadata.attempts) || metadata.attempts < 1 ||
+        metadata.attempts > MAX_TARGET_ATTEMPTS) {
+      throw new TypeError("Optimizer result has invalid target-size metadata.");
+    }
+    return;
+  }
+
+  throw new TypeError("Optimizer result has an unsupported optimization metadata mode.");
+}
+
 /**
  * UI-owned boundary around the agreed optimizeImage API.
- * It validates source/result ownership and measurements without duplicating
- * encoder, preset, or target-size policy.
+ * Validates handoff and result metadata without duplicating optimizer policy.
  */
 export async function runExportWithOptimizer(optimizer, source, options) {
   if (typeof optimizer !== "function") {
@@ -46,15 +84,9 @@ export async function runExportWithOptimizer(optimizer, source, options) {
   }
 
   const result = await optimizer(source, options);
-  if (!(result?.blob instanceof Blob)) {
-    throw new TypeError("Optimizer result is missing its output Blob.");
-  }
-  if (result.format !== options.format) {
-    throw new TypeError("Optimizer result format does not match the requested format.");
-  }
-  if (result.mimeType !== result.blob.type) {
-    throw new TypeError("Optimizer result MIME type does not match its output Blob.");
-  }
+  if (!(result?.blob instanceof Blob)) throw new TypeError("Optimizer result is missing its output Blob.");
+  if (result.format !== options.format) throw new TypeError("Optimizer result format does not match the requested format.");
+  if (result.mimeType !== result.blob.type) throw new TypeError("Optimizer result MIME type does not match its output Blob.");
   if (!Number.isInteger(result.width) || result.width <= 0 ||
       !Number.isInteger(result.height) || result.height <= 0) {
     throw new TypeError("Optimizer result is missing valid output dimensions.");
@@ -65,8 +97,10 @@ export async function runExportWithOptimizer(optimizer, source, options) {
 
   const size = result.size;
   if (!size) throw new TypeError("Optimizer result is missing actual size measurements.");
-  for (const key of ["sourceBytes", "outputBytes", "differenceBytes"]) {
-    assertFiniteNonNegative(key === "differenceBytes" ? Math.abs(size[key]) : size[key], key);
+  assertFiniteNonNegative(size.sourceBytes, "sourceBytes");
+  assertFiniteNonNegative(size.outputBytes, "outputBytes");
+  if (!Number.isFinite(size.differenceBytes)) {
+    throw new TypeError("Optimizer result has invalid differenceBytes.");
   }
   if (!Number.isFinite(size.reductionPercent)) {
     throw new TypeError("Optimizer result has invalid reductionPercent.");
@@ -77,6 +111,27 @@ export async function runExportWithOptimizer(optimizer, source, options) {
   if (size.differenceBytes !== size.sourceBytes - size.outputBytes) {
     throw new TypeError("Optimizer differenceBytes is inconsistent with measured sizes.");
   }
+  const expectedReduction = size.sourceBytes === 0
+    ? 0
+    : (size.differenceBytes / size.sourceBytes) * 100;
+  if (Math.abs(size.reductionPercent - expectedReduction) > 1e-9) {
+    throw new TypeError("Optimizer reductionPercent is inconsistent with measured sizes.");
+  }
 
+  validateOptimizationMetadata(result.optimization, options.optimization);
   return result;
+}
+
+/**
+ * Runs independent per-file exports. A rejected export is returned as that
+ * file's error and never rejects or prevents other files from completing.
+ */
+export async function runIndependentExports(items, optimizer) {
+  return Promise.all(items.map(async ({ id, source, options }) => {
+    try {
+      return { id, result: await runExportWithOptimizer(optimizer, source, options), error: null };
+    } catch (error) {
+      return { id, result: null, error };
+    }
+  }));
 }
