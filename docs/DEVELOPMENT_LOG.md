@@ -34,6 +34,14 @@ This file records actual repository progress. Update it after meaningful impleme
 
 Add newest entries first.
 
+## 2026-11-23 - Optimizer test failure analysis and corrections
+
+- The project owner ran `npm test` on `phase-6-optimization`: 121 passed, 2 failed, 0 skipped.
+- The edited-ImageData-to-GIF test exposed an error-wrapping bug. `convertSource()` correctly raised `UNSUPPORTED_OUTPUT_FORMAT`, but the outer optimizer catch converted it to `ENCODING_FAILED`. The optimizer now preserves typed `ImageOptimizationError` instances in both normal conversion and target-size candidate paths.
+- The SVG optimizer test failed because Node does not provide `DOMParser` and `XMLSerializer`. The test harness now supplies minimal SVG DOM shims for the optimizer conversion-flow test. This does not replace real browser SVG sanitization or browser verification.
+- The two corrections are committed on `phase-6-optimization`. The project owner must rerun `npm test` and `npm run build`; no passing result is claimed yet.
+
+
 ### 2026-11-23 - Phase 6 initial Image Optimization Engine implementation
 
 - Status: Initial implementation and focused test file added; runtime validation pending.
