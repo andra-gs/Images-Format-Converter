@@ -1,6 +1,6 @@
-# Phase 6 Image Optimization API Proposal
+# Phase 6 Image Optimization API Contract
 
-**Status:** Proposed shared contract, approved by the project owner for implementation planning.  
+**Status:** Shared contract approved by the project owner and used by the initial implementation.  
 **Owners:** `andra-gs` (optimizer), `FarrelPtrv` (export UI).  
 **Implementation status:** Initial implementation is present on `phase-6-optimization`; automated tests, production build, and browser verification are still pending.
 
