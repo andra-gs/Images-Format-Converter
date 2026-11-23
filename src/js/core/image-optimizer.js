@@ -265,7 +265,7 @@ async function encodeCandidate(file, imageData, format, quality, backgroundColor
     }
     return result;
   } catch (error) {
-    if (error?.code === "OUTPUT_VALIDATION_FAILED") throw error;
+    if (error?.name === "ImageOptimizationError" && error?.code) throw error;
     throw createOptimizerError(
       getConversionErrorCode(error),
       "Image encoding or output validation failed.",
@@ -377,7 +377,7 @@ export async function optimizeImage(source, options) {
   try {
     result = await convertSource(file, imageData, format, encoderOptions);
   } catch (error) {
-    if (error?.code === "OUTPUT_VALIDATION_FAILED") throw error;
+    if (error?.name === "ImageOptimizationError" && error?.code) throw error;
     throw createOptimizerError(
       getConversionErrorCode(error),
       "Image encoding or output validation failed.",
