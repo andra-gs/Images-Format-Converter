@@ -54,7 +54,7 @@ UI rules: presets and target-size are available only for JPEG/WebP; other output
 
 ## Optimizer contract — implementation gate
 
-The following decisions must be agreed with `andra-gs` before the mock is treated as an integration contract:
+The shared contract has been approved by the project owner and is the baseline for mock-based UI preparation. Any implementation evidence that requires changing it must be discussed with `andra-gs` before the contract is changed:
 
 1. Optimizer function name, module export, and call signature.
 2. How the source is represented (original File, converted Blob/result, or edited image result).
@@ -67,11 +67,11 @@ The following decisions must be agreed with `andra-gs` before the mock is treate
 9. Resource ownership and cleanup responsibilities.
 10. Whether optimization runs on the main thread or through the existing Worker path.
 
-The contract is now agreed. A mock optimizer is used only in focused tests to verify source/options handoff and result validation. It is not connected to production conversion, individual downloads, or ZIP export. Real integration remains gated on Andra’s optimizer PR being merged into `main`.
+The contract is agreed for mock-based preparation. A mock optimizer is used only in focused tests to verify source/options handoff and result validation. It is not connected to production conversion, individual downloads, or ZIP export. Real integration remains gated on Andra’s optimizer PR being merged into `main`.
 
 ## Initial format expectations (subject to optimizer verification)
 
-The project roadmap currently identifies JPEG and WebP as candidates for lossy quality controls and feasible target-size attempts; PNG may expose lossless encoder-supported optimization; BMP and baseline TIFF currently have no meaningful quality control; GIF must follow verified encoder capabilities; SVG remains an embedded-PNG wrapper and must not be presented as vector optimization. Final controls must follow the merged optimizer capability matrix and browser checks.
+The approved API contract currently supports JPEG/WebP presets and target-size attempts only. PNG, BMP, TIFF, GIF, and SVG use mode `none`. The UI must follow the approved contract and any later capability changes must be coordinated with the optimizer owner.
 
 ## Verification plan
 
@@ -134,3 +134,15 @@ The project roadmap currently identifies JPEG and WebP as candidates for lossy q
 - The existing Image Quality slider remains unresolved against the shared optimizer contract; no behavior or contract change was made. Confirm with `andra-gs` before production integration.
 - No changes were made to the shared conversion service, Editor, Queue, or ZIP orchestration.
 - Validation status: GitHub file changes were committed, but automated tests, production build, and browser checks have not been run in this environment. Local verification is required after pulling the branch.
+
+
+## Stage 2 — API preparation (2026-11-23)
+
+- Revalidated the UI adapter against the approved `optimizeImage(source, options)` contract on `main`.
+- Strengthened adapter checks for optimization metadata: requested mode, selected preset, target bytes, target-reached flag, quality bounds, and attempt count. Target-size attempts are bounded by the contract limit of seven.
+- Strengthened measured-size validation, including signed byte differences and consistency of percentage change with actual Blob sizes. Negative values remain valid when the output is larger.
+- Added `runIndependentExports()` as an isolated per-file orchestration helper. It returns an individual success or error record for each item; one failed image does not reject the batch helper or discard other results. This helper is not wired into the production Queue or ZIP flow.
+- Added tests for metadata mismatch, target attempt bounds, actual percentage consistency, per-image option independence, and isolated failure behavior.
+- **Legacy Image Quality compatibility:** the existing global 10–100% slider in `index.html` remains part of the current conversion path in `src/js/main.js`. The approved optimizer API has no manual-quality option; its preset values are optimizer-owned. Therefore this stage deliberately leaves the legacy slider and conversion behavior untouched and does not translate its value into a preset or undocumented API property. Before production integration replaces the old conversion path, Farrel and Andra must agree whether to extend the API with a manual-quality mode or explicitly retire the slider in favor of presets. No silent behavior change is allowed.
+- Production conversion, individual downloads, and ZIP export remain unchanged until the optimizer PR is merged and the UI branch is updated from latest `main`.
+- Local `npm test`, `npm run build`, and browser verification are pending after these changes are pulled.
