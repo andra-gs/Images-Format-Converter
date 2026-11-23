@@ -1,6 +1,6 @@
 # Phase 6 Image Optimization Engine
 
-Status: Encoder inspection and initial capability mapping completed on 2026-11-23. Initial optimizer implementation and focused automated tests have been added on `phase-6-optimization`. Tests, production build, and real-browser verification have not yet been run.
+Status: Initial optimizer implementation and focused automated tests are present on `phase-6-optimization`. On 2026-11-23, the project owner reported that `npm test` and `npm run build` both completed without errors. A dedicated real-browser harness has been added; browser verification is pending.
 
 ## 1. Scope
 
@@ -73,7 +73,7 @@ Target-size mode remains limited to JPEG and WebP, with the agreed initial bound
 
 All other implemented output formats accept only `optimization: { mode: "none" }`. HEIC and HEIF are rejected as output formats.
 
-## 5. Next implementation steps
+## 5. Initial implementation and automated verification
 
 1. Implement `src/js/core/image-optimizer.js` using the agreed API in [PHASE_6_OPTIMIZATION_API.md](./PHASE_6_OPTIMIZATION_API.md).
 2. Add focused tests for option validation, capability checks, preset mapping, target-size attempt bounds and selection, actual size metrics, source immutability, and output validation.
@@ -105,7 +105,27 @@ Focused tests were added in `tests/image-optimizer.test.js` for validation, capa
 
 Validation status:
 
-- `npm test`: not run in this environment.
-- `npm run build`: not run in this environment.
-- Real-browser tests with representative photos, graphics, and transparency: pending.
+- `npm test`: the project owner reported that the full test command completed without errors on 2026-11-23, before the browser harness files were added.
+- `npm run build`: the project owner reported that the production build completed without errors on 2026-11-23, before the browser harness files were added.
+- Browser harness added at `tests/browser-optimizer.html`, `tests/browser-optimizer.css`, and `tests/browser-optimizer.js`.
+- Real-browser tests with representative photos, graphics, and transparency: pending. The harness itself has not yet been run.
+- Rerun `npm test` and `npm run build` after pulling the latest harness commits to validate the current branch state.
 - The seven-candidate target-size search is a first bounded implementation. Its visual/size behavior and browser differences still require empirical verification.
+
+## 7. Browser test harness
+
+A standalone browser harness is available at:
+
+- `tests/browser-optimizer.html`
+- `tests/browser-optimizer.css`
+- `tests/browser-optimizer.js`
+
+The harness imports `optimizeImage()` directly. It does not depend on the production Export UI and does not change the application interface.
+
+It supports local source-file selection, output-format selection, capability-aware optimization mode selection, JPEG background selection, original/output previews, measured size metrics, target-size result reporting, and download of the validated output Blob. The preview decodes the returned Blob through the existing `decodeImage()` path. GIF preview displays the first frame; the downloaded Blob remains the complete output returned by the conversion service.
+
+Run `npm run dev` and open:
+
+`http://localhost:5173/tests/browser-optimizer.html`
+
+The harness has been added but has not yet been verified in a real browser.
