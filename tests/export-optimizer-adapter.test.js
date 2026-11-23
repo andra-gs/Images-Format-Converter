@@ -11,7 +11,11 @@ function validResult(source, format = "webp", mode = "preset") {
       differenceBytes: source.size - blob.size,
       reductionPercent: ((source.size - blob.size) / source.size) * 100
     },
-    optimization: mode === "none"\n      ? { mode, preset: null, quality: null, targetBytes: null, targetReached: null, attempts: 1 }\n      : mode === "target-size"\n        ? { mode, preset: null, quality: 0.75, targetBytes: 5000, targetReached: true, attempts: 3 }\n        : { mode, preset: "medium", quality: 0.75, targetBytes: null, targetReached: null, attempts: 1 },
+    optimization: mode === "none"
+      ? { mode, preset: null, quality: null, targetBytes: null, targetReached: null, attempts: 1 }
+      : mode === "target-size"
+        ? { mode, preset: null, quality: 0.75, targetBytes: 5000, targetReached: true, attempts: 3 }
+        : { mode, preset: "medium", quality: 0.75, targetBytes: null, targetReached: null, attempts: 1 },
     validation: { status: "passed" }
   };
 }
