@@ -4,10 +4,10 @@ This file records actual repository progress. Update it after meaningful impleme
 
 ## Project status
 
-- Current stage: Phase 5 - Image manipulation
-- Current phase status: Phase 4 is complete. On `phase-5-editor-ui`, the Editor is connected to the Decoder, Transformer, Adjuster, and edited-ImageData conversion path. The user most recently reported 98/98 automated tests passing after the HEIC/TIFF queue-thumbnail fix, a successful production build, and successful browser verification that Editor processing works and existing conversion features remain functional. Phase 5 is awaiting final branch review, Pull Request, merge, and post-merge verification. Phase 6 begins only after Phase 5 is integrated and verified.
+- Current stage: Phase 6 - Image Optimization and Export Workflow
+- Current phase status: Phase 5 has been merged into `main`. The project owner reported that post-merge `npm test` and `npm run dev` checks passed on 2026-11-23; a separate post-merge `npm run build` result has not been reported. Phase 6 has started with `andra-gs` owning the Image Optimization Engine and `FarrelPtrv` owning Export Presets and UI Integration. On `phase-6-export-ui`, repository inspection and initial planning documentation are complete. The optimizer API is pending agreement; no production UI or optimizer integration is implemented yet.
 - Latest release: None
-- Last updated: 2026-11-22
+- Last updated: 2026-11-23
 
 ## Status legend
 
@@ -26,13 +26,28 @@ This file records actual repository progress. Update it after meaningful impleme
 | Phase 2: Core conversion engine | Tested | PNG, JPEG, WebP, and BMP conversion paths are user-verified; user reports the requested automated tests and build checks passed |
 | Phase 3: Batch processing | Tested | User verified batch queue, worker execution, progress, cancellation, failure isolation, large-image responsiveness, cleanup, individual downloads, ZIP extraction, and image integrity |
 | Phase 4: Advanced formats | Tested | Completed; CI validation and user-run real-browser verification passed. Known format limitations remain documented |
-| Phase 5: Image manipulation | In progress | Editor, Decoder, Transformer, Adjuster, and edited-pixel conversion are integrated on `phase-5-editor-ui`; user-reported 98/98 tests, production build, and browser integration/regression checks passed; final PR review, merge, and post-merge verification remain |
-| Phase 6: Advanced export and image optimization | Not started | Image Optimization, Metadata Management, and Export Presets/UI. Starts after Phase 5 integration |
+| Phase 5: Image manipulation | Complete | Merged into `main`; project owner reports post-merge `npm test` and `npm run dev` checks passed on 2026-11-23. A separate post-merge production build result is not recorded |
+| Phase 6: Image optimization and export workflow | In progress | Kickoff authorized. `andra-gs`: Image Optimization Engine; `FarrelPtrv`: Export Presets and UI Integration. Metadata Management is deferred |
 | Phase 7: Testing, documentation, and release | Not started | Cross-browser QA, security review, documentation, production validation, and v1.0.0 readiness |
 
 ## Change log
 
 Add newest entries first.
+
+### 2026-11-23 - Phase 6 Export UI kickoff and repository inspection
+
+- Status: Planning and repository inspection complete; UI implementation not started.
+- Owner: `FarrelPtrv`
+- Branch: `phase-6-export-ui`
+- Base commit: `eaa1c2db0361810aa0b522154c4ad522b4583cd2` (`main` at kickoff).
+- Confirmed Phase 5 has been merged into `main`. The project owner reported post-merge `npm test` and `npm run dev` checks passed; no separate post-merge production build result was included.
+- Reviewed `AGENTS.md`, `docs/DEVELOPMENT_ROADMAP.md`, `docs/PROJECT_CONTEXT.md`, and `docs/TECHNICAL_SPECIFICATION.md`.
+- Inspected existing conversion settings, per-file conversion and download rendering, ZIP generation, shared theme tokens, responsive styles, and conversion-service entry points.
+- Existing conversion UI currently has a single JPEG/WebP quality slider. Individual download links use the generated result Blob. ZIP export currently packages successful result Blobs already stored in the result map.
+- Created `docs/PHASE_6_EXPORT_UI.md` with scope, repository findings, boundaries, pending API decisions, format expectations, and verification plan.
+- No production UI, optimizer API, conversion-service, queue, or ZIP code was changed.
+- API coordination with `andra-gs` is required before replacing the isolated UI mock with real optimizer integration.
+- Next: agree on the optimizer API and capability/result contract; then implement the Export Settings UI and focused tests using a temporary mock only.
 
 ### 2026-11-22 - Latest Phase 5 verification after HEIC/TIFF queue thumbnail fix
 
