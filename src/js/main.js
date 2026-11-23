@@ -22,6 +22,7 @@ import { createEditorQueueSnapshot } from "./core/editor-queue-events.js";
 import { decodeImage } from "./core/image-decoder.js";
 import { createImageThumbnail } from "./core/image-thumbnail.js";
 import { convertImageDataToFormat, convertImageToBmp, convertImageToGif, convertImageToJpeg, convertImageToPng, convertImageToSvg, convertImageToTiff, convertImageToWebp, disposeConversionWorker } from "./core/conversion-service.js";
+import { createExportSettingsControls } from "./ui/export-panel.js";
 
 const iconSet = {
   Images,
@@ -58,6 +59,7 @@ const fileFeedback = document.querySelector("#file-feedback");
 const clearButton = document.querySelector("#clear-button");
 const themeToggle = document.querySelector("#theme-toggle");
 const settingsPanel = document.querySelector("#settings-panel");
+const exportSettingsList = document.querySelector("#export-settings-list");
 const resultsPanel = document.querySelector("#results-panel");
 const formatSelect = document.querySelector("#format-select");
 const formatTrigger = document.querySelector("#output-format-trigger");
@@ -83,6 +85,8 @@ const zipStatus = document.querySelector("#zip-status");
 const selectedFiles = new Map();
 const conversionResults = new Map();
 const editedImages = new Map();
+const exportSettingsControls = new Map();
+const exportSettingsByFile = new Map();
 const queueThumbnailUrls = new Map();
 let nextFileId = 0;
 
@@ -150,6 +154,7 @@ const selectFormat = (option) => {
   });
   closeFormatMenu();
   updateQualityVisibility();
+  for (const control of exportSettingsControls.values()) control.updateFormat(selectedFormat);
   updateConvertButton();
   formatTrigger.focus();
 };
@@ -285,6 +290,21 @@ const renderFile = (entry) => {
   item.append(preview, details, removeButton);
   fileList.append(item);
   loadQueueThumbnail(entry, item, preview, image, fallback);
+};
+
+const renderExportSettings = (entry) => {
+  const settings = exportSettingsByFile.get(entry.id) || { mode: "preset", preset: "medium" };
+  const controls = createExportSettingsControls({
+    fileId: entry.id,
+    format: selectedFormat,
+    settings,
+    onChange: (fileId) => {
+      const current = exportSettingsControls.get(fileId);
+      if (current) exportSettingsByFile.set(fileId, current.getSettings());
+    }
+  });
+  exportSettingsControls.set(entry.id, controls);
+  exportSettingsList.append(controls.element);
 };
 
 const showFileFeedback = (messages, state = "info") => {
@@ -626,6 +646,7 @@ const addFiles = async (files) => {
 
     selectedFiles.set(entry.id, entry);
     renderFile(entry);
+    renderExportSettings(entry);
 
     for (const warning of validation.warnings) {
       warnings.push(`${file.name}: ${warning}`);
@@ -648,6 +669,9 @@ const removeFile = (id) => {
   releaseQueueThumbnail(id);
   selectedFiles.delete(id);
   editedImages.delete(id);
+  exportSettingsControls.delete(id);
+  exportSettingsByFile.delete(id);
+  exportSettingsList.querySelector(`[data-file-id="${id}"]`)?.remove();
   fileList.querySelector(`[data-file-id="${id}"]`)?.remove();
   removeConversionResult(id);
   updateQueueSummary();
@@ -662,6 +686,9 @@ const clearFiles = () => {
 
   selectedFiles.clear();
   editedImages.clear();
+  exportSettingsControls.clear();
+  exportSettingsByFile.clear();
+  exportSettingsList.replaceChildren();
   fileList.replaceChildren();
   clearConversionResults();
   fileInput.value = "";
