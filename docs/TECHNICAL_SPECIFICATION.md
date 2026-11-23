@@ -262,9 +262,9 @@ Before using this specification for implementation, read the root-level `AGENTS.
 
 The team consists of three developers. GitHub usernames are the canonical identifiers for task ownership:
 
-- `andra-gs`: Phase 5 Image Transformation; Phase 6 Image Optimization.
-- `Adit1945-web`: Phase 5 Image Adjustment; Phase 6 Metadata Management.
-- `FarrelPtrv`: Phase 5 Editor UI and Integration; Phase 6 Export Presets and UI.
+- `andra-gs`: Phase 5 Image Transformation; Phase 6 Image Optimization Engine.
+- `Adit1945-web`: Phase 5 Image Adjustment; no Phase 6 assignment.
+- `FarrelPtrv`: Phase 5 Editor UI and Integration; Phase 6 Export Presets and UI Integration. Metadata Management is deferred to a future backlog item.
 
 ### Phase 5 module boundaries
 
@@ -280,9 +280,8 @@ Transformation and adjustment modules must not depend on DOM UI state. They shou
 
 | Owner | Module | Responsibilities | Suggested files |
 |---|---|---|---|
-| `andra-gs` | Image Optimizer | Low/medium/high quality presets where supported, feasible target-size attempts, actual file-size measurement and comparison | `src/js/core/image-optimizer.js`, `tests/image-optimizer.test.js` |
-| `Adit1945-web` | Metadata Manager | Metadata availability detection, supported EXIF field extraction, metadata removal where output format permits | `src/js/core/metadata-manager.js`, `tests/metadata-manager.test.js` |
-| `FarrelPtrv` | Export UI and integration | Export controls, preset selection, metadata options, size reporting, individual-download and ZIP integration | `src/js/ui/export-panel.js`, `src/styles/export-panel.css`, `tests/export-panel.test.js` |
+| `andra-gs` | Image Optimizer | Format-aware quality presets, feasible target-size attempts, actual file-size measurement and comparison, output validation | `src/js/core/image-optimizer.js`, `tests/image-optimizer.test.js` |
+| `FarrelPtrv` | Export UI and integration | Capability-aware export controls, preset selection, size reporting, individual-download and ZIP integration | `src/js/ui/export-panel.js`, `src/styles/export-panel.css`, `tests/export-panel.test.js` |
 
 ### Agreed Phase 5 processing contract
 
@@ -352,7 +351,7 @@ Suggested branch names:
 | Phase | `andra-gs` | `Adit1945-web` | `FarrelPtrv` |
 |---|---|---|---|
 | Phase 5 | `phase-5-transformation` | `phase-5-adjustment` | `phase-5-editor-ui` |
-| Phase 6 | `phase-6-optimization` | `phase-6-metadata` | `phase-6-export-ui` |
+| Phase 6 | `phase-6-optimization` | Not applicable | `phase-6-export-ui` |
 
 These are naming conventions only. A branch is not considered created or implemented merely because it appears in this specification.
 
