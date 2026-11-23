@@ -140,6 +140,7 @@ export function createExportSettingsControls({
     const supported = supportsExportOptimization(currentFormat);
     modeSelect.disabled = !supported;
     modeSelect.value = supported ? (currentSettings.mode || "preset") : "none";
+    root.dataset.optimizationMode = modeSelect.value;
     presetGroup.hidden = !supported || modeSelect.value !== "preset";
     targetGroup.hidden = !supported || modeSelect.value !== "target-size";
     hint.textContent = supported
