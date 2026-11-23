@@ -266,7 +266,7 @@ Deliverable: an image editor that supports geometric transformation and visual a
 
 ## Phase 6: Image optimization and export workflow
 
-Status: Planned. The project owner approved a two-person team for this phase on 2026-11-22. Phase 6 begins after Phase 5 post-merge verification is complete. Metadata Management is removed from this phase and deferred to a future backlog item.
+Status: Kickoff authorized on 2026-11-23. Phase 5 has been merged into `main`; the project owner reports that `npm test` and `npm run dev` checks passed after the merge. A separate `npm run build` result was not reported in this update. Phase 6 implementation may begin with encoder capability inspection and API coordination. Run the production build before submitting the Phase 6 processing PR. Metadata Management remains deferred to a future backlog item.
 
 ### Team ownership
 
@@ -386,9 +386,9 @@ This matrix describes the initial investigation and intended behavior. Final ava
 
 ### Phase 6 integration order
 
-1. Complete Phase 5 post-merge verification on `main`. Do not begin Phase 6 feature implementation until that checkpoint passes.
+1. Phase 5 post-merge checks on `main`: the project owner reports `npm test` and `npm run dev` completed successfully on 2026-11-23. The production build result is not recorded in this checkpoint and must be run before the Phase 6 processing PR is submitted.
 2. Create `phase-6-optimization` and `phase-6-export-ui` from the latest `main`.
-3. Agree on optimizer API, preset mapping, supported-format matrix, error behavior, size-reporting shape, and resource ownership.
+3. Agree on the optimizer API, preset mapping, supported-format matrix, error behavior, size-reporting shape, and resource ownership before either implementation is integrated.
 4. `andra-gs` implements the optimizer and focused tests. Farrel may build the UI against a temporary mock contract, but must not invent a competing API.
 5. Review and merge the optimizer Pull Request into `main`.
 6. `FarrelPtrv` updates `phase-6-export-ui` from the newly updated `main`, then integrates the real optimizer with individual downloads and ZIP export.
