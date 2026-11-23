@@ -2,7 +2,8 @@ const PRESETS = ["low", "medium", "high"];
 const OPTIMIZABLE_FORMATS = new Set(["jpeg", "webp"]);
 
 function normalizeFormat(format) {
-  return String(format || "").toLowerCase().replace(/^image\//, "").replace("image/svg+xml", "svg");
+  const value = String(format || "").toLowerCase();
+  return value === "image/svg+xml" ? "svg" : value.replace(/^image\\//, "");
 }
 
 function createElement(documentRef, tag, className, text) {
