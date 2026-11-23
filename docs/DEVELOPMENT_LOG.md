@@ -5,7 +5,7 @@ This file records actual repository progress. Update it after meaningful impleme
 ## Project status
 
 - Current stage: Phase 6 - Image Optimization and Export Workflow
-- Current phase status: Phase 5 has been merged into `main`. The project owner reports post-merge `npm test` and `npm run dev` passed on 2026-11-23; a separate post-merge `npm run build` result was not reported. Phase 6 is in progress. `andra-gs` owns the Image Optimization Engine on `phase-6-optimization`; `FarrelPtrv` owns Export Presets and UI Integration on `phase-6-export-ui`.
+- Current phase status: Phase 5 has been merged into `main`. The project owner reports post-merge `npm test` and `npm run dev` passed on 2026-11-23; a separate post-merge `npm run build` result was not reported. Phase 6 is in progress. `andra-gs` has added the initial optimizer module and focused tests on `phase-6-optimization`; test/build/browser verification remains pending. `FarrelPtrv` owns Export Presets and UI Integration on `phase-6-export-ui`.
 - Latest release: None
 - Last updated: 2026-11-23
 
@@ -33,6 +33,21 @@ This file records actual repository progress. Update it after meaningful impleme
 ## Change log
 
 Add newest entries first.
+
+### 2026-11-23 - Phase 6 initial Image Optimization Engine implementation
+
+- Status: Initial implementation and focused test file added; runtime validation pending.
+- Owner: `andra-gs`
+- Branch: `phase-6-optimization`
+- Implemented `src/js/core/image-optimizer.js` with the agreed `optimizeImage(source, options)` API and exported frozen `IMAGE_OPTIMIZATION_CAPABILITIES`.
+- Supports original File/Blob sources and edited `{ file, imageData }` sources. Edited pixels use `convertImageDataToFormat()`; animated GIF remains on the original File-based conversion path.
+- Added JPEG/WebP Low/Medium/High mappings (0.55 / 0.75 / 0.90) and bounded target-size sampling with a maximum of seven attempts across quality values from 0.10 to 0.95.
+- Candidate outputs are measured by actual Blob size and are only considered after the existing conversion service validates the output. Failed candidates are skipped; all-candidate failure rejects the request.
+- Added actual source/output size metrics, byte difference, percentage reduction/increase, output MIME type, dimensions, optimization metadata, and validation status.
+- Added `tests/image-optimizer.test.js` covering source/options validation, capability gating, output formats in none mode, preset mapping, target-size selection and failure behavior, signature validation, edited ImageData immutability, and size reporting.
+- Updated `docs/PHASE_6_OPTIMIZATION_API.md`, `docs/PHASE_6_OPTIMIZATION.md`, and `docs/TECHNICAL_SPECIFICATION.md` with the implemented API and limitations.
+- `npm test`, `npm run build`, and real-browser checks have not been run in this environment. The implementation must not be treated as tested or complete until those checks pass.
+
 
 ### 2026-11-23 - Phase 6 encoder inspection and capability mapping
 
