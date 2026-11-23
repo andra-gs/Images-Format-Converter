@@ -122,3 +122,15 @@ The project roadmap currently identifies JPEG and WebP as candidates for lossy q
 - Refresh control visibility immediately after optimization mode changes. This fixes the preset/target-size field remaining hidden after selecting its mode.
 - Conversion, download, ZIP, and optimizer behavior remain unchanged.
 - Browser retest is required after pulling this update.
+
+
+### 2026-11-23 — Stage 2: API integration preparation
+
+- Re-read the approved shared API contract on `main`. It specifies `optimizeImage(source, options)`, File/Blob and edited `{ file, imageData }` sources, explicit optimization modes, validated Blob output, actual size metrics, and stable error codes.
+- Added `src/js/ui/export-optimizer-adapter.js` as a UI-owned boundary. It validates source shape, requested format/mode, returned Blob, format/MIME agreement, dimensions, validation status, and consistency of actual source/output byte measurements.
+- Added `tests/export-optimizer-adapter.test.js` for exact argument handoff, edited ImageData source handoff, invalid inputs, unsupported modes, mismatched results, size consistency, and negative size reduction.
+- Re-exported the adapter from `export-panel.js` so existing focused tests retain their import path.
+- The adapter does not import or implement the optimizer, encode images, map presets to quality values, perform target-size search, or connect to production conversion/download/ZIP flows.
+- The existing Image Quality slider remains unresolved against the shared optimizer contract; no behavior or contract change was made. Confirm with `andra-gs` before production integration.
+- No changes were made to the shared conversion service, Editor, Queue, or ZIP orchestration.
+- Validation status: GitHub file changes were committed, but automated tests, production build, and browser checks have not been run in this environment. Local verification is required after pulling the branch.
