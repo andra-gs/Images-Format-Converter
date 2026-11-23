@@ -1602,3 +1602,26 @@ Only record work that actually happened in the repository. Do not mark a feature
   - PR #6, which approved the two-person Phase 6 plan, is merged: https://github.com/andra-gs/Images-Format-Converter/pull/6
   - PR #4 (`security/xanitizer-analysis`) remains separate from Phase 6 and is not changed by this work.
 - No application code was changed. No tests, browser checks, or production build were run as part of this documentation update.
+
+
+### 2026-11-23 — Phase 6 Stage 2: Strengthen API adapter and per-file isolation
+
+- Status: Implemented on `phase-6-export-ui`; local automated tests, production build, and browser verification pending.
+- Changes:
+  - Strengthened `export-optimizer-adapter.js` to validate optimizer metadata against the requested optimization mode.
+  - Added checks for preset identity, quality range, target byte identity, target-reached boolean, and the seven-attempt target-size limit.
+  - Validated the percentage metric against actual source/output Blob sizes while preserving legitimate negative size differences and percentages.
+  - Added `runIndependentExports()`, a UI-owned helper that reports each file's success or failure independently without changing production Queue or ZIP orchestration.
+  - Expanded adapter tests for metadata mismatches, target-size attempt limits, percentage consistency, and one-file failure isolation.
+  - Added a per-image options test to ensure two images can carry different preset/target-size settings without one setting replacing the other.
+  - Reconciled Phase 6 UI documentation so the approved contract is the mock-preparation baseline and implementation changes require coordination.
+- Legacy Image Quality decision:
+  - Confirmed the existing global Image Quality slider remains in `index.html` and is still consumed by the current conversion flow in `src/js/main.js`.
+  - The approved optimizer contract does not currently expose manual quality. The slider and its current conversion behavior are therefore left unchanged; no manual value is translated into a preset or undocumented optimizer option.
+  - Before production integration, Farrel and Andra must decide whether to add an explicit manual-quality option to the shared contract or retire the slider in favor of presets. No silent behavior change is permitted.
+- Boundaries:
+  - No real optimizer integration, conversion-service changes, Queue changes, or ZIP orchestration changes were made.
+  - Individual downloads and ZIP export continue using the existing conversion results until the optimizer PR is merged and integration is authorized.
+- Validation:
+  - GitHub file updates were committed to the feature branch.
+  - `npm test`, `npm run build`, and browser checks have not yet been run for this updated branch state. The user must pull the latest branch and run local validation.
