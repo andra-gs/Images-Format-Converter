@@ -82,9 +82,15 @@ test("mock optimizer receives the original source and exact UI options", async (
   let received;
   const mockOptimizeImage = async (actualSource, actualOptions) => {
     received = { actualSource, actualOptions };
+    const blob = new Blob(["optimized"], { type: "image/webp" });
     return {
-      blob: new Blob(["optimized"], { type: "image/webp" }),
-      size: { sourceBytes: 6, outputBytes: 9, differenceBytes: -3, reductionPercent: -50 }
+      blob,
+      format: "webp",
+      mimeType: "image/webp",
+      width: 2,
+      height: 2,
+      validation: { status: "passed" },
+      size: { sourceBytes: 6, outputBytes: blob.size, differenceBytes: 6 - blob.size, reductionPercent: -50 }
     };
   };
   const result = await runExportWithOptimizer(mockOptimizeImage, source, options);
@@ -96,5 +102,10 @@ test("mock optimizer receives the original source and exact UI options", async (
 
 test("mock optimizer adapter rejects malformed results and missing functions", async () => {
   await assert.rejects(() => runExportWithOptimizer(null, new Blob(["x"]), {}), /compatible function/);
-  await assert.rejects(() => runExportWithOptimizer(async () => ({ blob: new Blob(["x"]) }), new Blob(["x"]), {}), /actual size measurements/);
+  const source = new Blob(["x"]);
+  const blob = new Blob(["x"], { type: "image/webp" });
+  await assert.rejects(() => runExportWithOptimizer(async () => ({
+    blob, format: "webp", mimeType: "image/webp", width: 1, height: 1,
+    validation: { status: "passed" }
+  }), source, { format: "webp", optimization: { mode: "none" } }), /actual size measurements/);
 });
