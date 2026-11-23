@@ -44,6 +44,7 @@ Add newest entries first.
 - Added JPEG/WebP Low/Medium/High mappings (0.55 / 0.75 / 0.90) and bounded target-size sampling with a maximum of seven attempts across quality values from 0.10 to 0.95.
 - Candidate outputs are measured by actual Blob size and are only considered after the existing conversion service validates the output. Failed candidates are skipped; all-candidate failure rejects the request.
 - Added actual source/output size metrics, byte difference, percentage reduction/increase, output MIME type, dimensions, optimization metadata, and validation status.
+- Refined error classification so GIF frame-count and loop-metadata verification failures are reported as output-validation failures.
 - Added `tests/image-optimizer.test.js` covering source/options validation, capability gating, output formats in none mode, preset mapping, target-size selection and failure behavior, signature validation, edited ImageData immutability, and size reporting.
 - Updated `docs/PHASE_6_OPTIMIZATION_API.md`, `docs/PHASE_6_OPTIMIZATION.md`, and `docs/TECHNICAL_SPECIFICATION.md` with the implemented API and limitations.
 - `npm test`, `npm run build`, and real-browser checks have not been run in this environment. The implementation must not be treated as tested or complete until those checks pass.
