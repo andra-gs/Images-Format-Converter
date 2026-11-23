@@ -32,6 +32,18 @@ This file records actual repository progress. Update it after meaningful impleme
 
 ## Change log
 
+### 2026-11-23 - Phase 6 API integration preparation
+
+- Status: Adapter and focused tests implemented; local verification pending.
+- Re-read the approved optimizer contract on `main`.
+- Added `src/js/ui/export-optimizer-adapter.js` to validate the UI-to-optimizer boundary without implementing optimization policy or connecting production conversion.
+- Added `tests/export-optimizer-adapter.test.js` for source handoff, edited ImageData input, contract validation, actual size consistency, and negative reduction.
+- Re-exported the adapter from `src/js/ui/export-panel.js` to preserve the existing test import path.
+- No changes to shared conversion service, Editor, Queue, or ZIP orchestration. Production conversion, individual downloads, and ZIP remain unchanged.
+- The legacy Image Quality slider still requires a decision with `andra-gs` before real integration.
+- `npm test`, `npm run build`, and browser checks have not been run in this environment; the user must run them locally after pulling the branch.
+
+
 Add newest entries first.
 
 ### 2026-11-23 - Phase 6 Export UI foundation
