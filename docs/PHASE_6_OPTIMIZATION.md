@@ -1,6 +1,6 @@
 # Phase 6 Image Optimization Engine
 
-Status: Encoder inspection and initial capability mapping completed on 2026-11-23. Optimizer implementation and runtime verification have not started.
+Status: Encoder inspection and initial capability mapping completed on 2026-11-23. Initial optimizer implementation and focused automated tests have been added on `phase-6-optimization`. Tests, production build, and real-browser verification have not yet been run.
 
 ## 1. Scope
 
@@ -82,3 +82,30 @@ All other implemented output formats accept only `optimization: { mode: "none" }
 5. Update this document with measured behavior and any browser-specific limitations.
 
 No application code or encoder behavior was changed during the inspection step.
+
+## 6. Initial implementation added
+
+The first implementation is in `src/js/core/image-optimizer.js`.
+
+Implemented behavior:
+
+- Public API: `optimizeImage(source, options)`.
+- Exported frozen capability/configuration snapshot: `IMAGE_OPTIMIZATION_CAPABILITIES`.
+- Accepts a non-empty File/Blob or `{ file, imageData }` for edited content.
+- Rejects unknown option keys, missing modes, invalid presets, invalid target sizes, unsupported output formats, and unsupported optimization modes with stable error codes.
+- Uses the existing File/Blob conversion service for original sources and `convertImageDataToFormat()` for edited ImageData.
+- Keeps GIF on the File-based path so animated GIF behavior remains intact. Edited ImageData to GIF is rejected rather than silently exporting the original pixels.
+- JPEG and WebP presets map to Low 0.55, Medium 0.75, and High 0.90.
+- Target-size mode measures seven independently encoded quality candidates in the 0.10–0.95 range. Each candidate is accepted only after the existing conversion service completes output validation. Failed candidates are skipped; all-candidate failure rejects the request.
+- Chooses the valid output closest to the requested target without exceeding it. If no candidate fits, returns the smallest valid candidate and sets `targetReached: false`.
+- Reports actual source/output Blob sizes, byte difference, percentage reduction/increase, MIME type, dimensions, attempts, and validation status.
+- Does not mutate the original File/Blob or edited ImageData.
+
+Focused tests were added in `tests/image-optimizer.test.js` for validation, capability policy, format conversion paths, preset mapping, target-size selection, failed candidates, output signature validation, edited ImageData immutability, and size metrics.
+
+Validation status:
+
+- `npm test`: not run in this environment.
+- `npm run build`: not run in this environment.
+- Real-browser tests with representative photos, graphics, and transparency: pending.
+- The seven-candidate target-size search is a first bounded implementation. Its visual/size behavior and browser differences still require empirical verification.
