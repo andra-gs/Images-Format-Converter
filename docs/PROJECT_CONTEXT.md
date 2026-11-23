@@ -159,7 +159,7 @@ A conversion is successful only when:
 
 ## 8. Current phase and out of scope for the initial MVP
 
-Phase 4 (Advanced Format Support) was completed on 2026-11-20 after automated CI validation and user-run real-browser verification. Phase 5 (Image Manipulation) is the next planned phase.
+Phase 4 (Advanced Format Support) was completed on 2026-11-20. Phase 5 (Image Manipulation) has been merged into `main`. On 2026-11-23, the project owner reported that `npm test` and `npm run dev` checks passed after the merge. A separate post-merge `npm run build` result has not been recorded here. Phase 6 (Image Optimization and Export Workflow) is now starting with a two-person team.
 
 - User accounts and authentication.
 - Cloud storage.
@@ -175,9 +175,9 @@ The project has three assigned developers. Their GitHub usernames identify their
 
 | GitHub username | Phase 5 | Phase 6 |
 |---|---|---|
-| `andra-gs` | Image Transformation: resize, aspect ratio, crop, rotate, horizontal flip, vertical flip | Image Optimization: quality presets, feasible target-size mode, output-size measurement and comparison |
-| `Adit1945-web` | Image Adjustment: brightness, contrast, saturation, grayscale, sepia, blur | Metadata Management: inspect supported EXIF fields and remove metadata where supported |
-| `FarrelPtrv` | Editor UI and Integration: editing workspace, preview, controls, reset/apply, connection to processing modules and conversion service | Export Presets and UI: export settings, optimization and metadata controls, size reporting, individual download and ZIP integration |
+| `andra-gs` | Image Transformation: resize, aspect ratio, crop, rotate, horizontal flip, vertical flip | Image Optimization Engine: format-aware quality presets, feasible target-size attempts, size measurement and output validation |
+| `Adit1945-web` | Image Adjustment: brightness, contrast, saturation, grayscale, sepia, blur | No Phase 6 assignment. Metadata Management is deferred to a future backlog item. |
+| `FarrelPtrv` | Editor UI and Integration: editing workspace, preview, controls, reset/apply, connection to processing modules and conversion service | Export Presets and UI Integration: capability-aware export controls, size reporting, individual download and ZIP integration |
 
 ### Phase 5 work boundaries
 
@@ -189,12 +189,12 @@ The project has three assigned developers. Their GitHub usernames identify their
 
 ### Phase 6 work boundaries
 
-- `andra-gs` owns `src/js/core/image-optimizer.js` and `tests/image-optimizer.test.js`. The module handles quality presets, feasible target-size attempts, and accurate source/output size measurements.
-- `Adit1945-web` owns `src/js/core/metadata-manager.js` and `tests/metadata-manager.test.js`. The module handles metadata detection, supported EXIF reading, and metadata removal where the selected output path supports it.
-- `FarrelPtrv` owns `src/js/ui/export-panel.js`, `src/styles/export-panel.css`, and `tests/export-panel.test.js`. The module connects export controls to the optimizer and metadata manager, then integrates the selected settings with individual and ZIP downloads.
-- Reading, removing, and preserving metadata are separate capabilities. Do not promise metadata preservation unless it has been verified for the selected output format and encoder.
-- Target output size is not guaranteed. If the encoder cannot reliably reach a requested size, show the actual achieved size and explain the limitation.
-- The exact optimizer and metadata API contracts must be agreed before UI integration.
+- `andra-gs` owns `src/js/core/image-optimizer.js`, `tests/image-optimizer.test.js`, and `docs/PHASE_6_OPTIMIZATION.md`. The module handles format-aware quality presets, feasible target-size attempts, actual source/output size measurement, and output validation.
+- `FarrelPtrv` owns `src/js/ui/export-panel.js`, `src/styles/export-panel.css`, `tests/export-panel.test.js`, and `docs/PHASE_6_EXPORT_UI.md`. The UI connects export controls to the optimizer and integrates the settings with individual and ZIP downloads.
+- Metadata Management is deferred to a future backlog item. It has no Phase 6 owner, branch, or API.
+- Reading, removing, and preserving metadata remain separate capabilities if Metadata Management is proposed later.
+- Target output size is not guaranteed. If the encoder cannot reach a requested size, show the actual achieved size and explain the limitation.
+- The optimizer API, capability matrix, error behavior, size-reporting shape, and resource ownership must be agreed before UI integration.
 
 ### Git and integration policy
 
@@ -203,9 +203,9 @@ Each member works on a separate branch created from the latest `main`:
 | Phase | `andra-gs` | `Adit1945-web` | `FarrelPtrv` |
 |---|---|---|---|
 | Phase 5 | `phase-5-transformation` | `phase-5-adjustment` | `phase-5-editor-ui` |
-| Phase 6 | `phase-6-optimization` | `phase-6-metadata` | `phase-6-export-ui` |
+| Phase 6 | `phase-6-optimization` | Not applicable | `phase-6-export-ui` |
 
-Do not push feature work directly to `main`. Submit a Pull Request to `main`, include automated tests, run `npm test` and `npm run build`, and perform relevant browser checks. Merge the two processing modules before the UI/integration branch. The UI owner must update their branch from the latest `main` before final integration. After all three Pull Requests are merged, run the full test suite, production build, and end-to-end browser checks again.
+Do not push feature work directly to `main`. Submit a Pull Request to `main`, include automated tests, run `npm test` and `npm run build`, and perform relevant browser checks. Merge the Image Optimization module before the Export UI integration branch. The UI owner must update their branch from the latest `main` before final integration. After both Phase 6 Pull Requests are merged, run the full test suite, production build, and end-to-end browser checks again.
 
 ### Instructions for ChatGPT used by team members
 
