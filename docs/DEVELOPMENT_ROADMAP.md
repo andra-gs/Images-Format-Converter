@@ -388,7 +388,7 @@ This matrix describes the initial investigation and intended behavior. Final ava
 
 1. Phase 5 post-merge checks on `main`: the project owner reports `npm test` and `npm run dev` completed successfully on 2026-11-23. The production build result is not recorded in this checkpoint and must be run before the Phase 6 processing PR is submitted.
 2. Create `phase-6-optimization` and `phase-6-export-ui` from the latest `main`.
-3. Agree on the optimizer API, preset mapping, supported-format matrix, error behavior, size-reporting shape, and resource ownership before either implementation is integrated.
+3. Agree on the optimizer API, preset mapping, supported-format matrix, error behavior, size-reporting shape, and resource ownership before either implementation is integrated. The agreed implementation baseline is documented in [PHASE_6_OPTIMIZATION_API.md](./PHASE_6_OPTIMIZATION_API.md); update that contract and notify the UI owner before changing shared API behavior.
 4. `andra-gs` implements the optimizer and focused tests. Farrel may build the UI against a temporary mock contract, but must not invent a competing API.
 5. Review and merge the optimizer Pull Request into `main`.
 6. `FarrelPtrv` updates `phase-6-export-ui` from the newly updated `main`, then integrates the real optimizer with individual downloads and ZIP export.
