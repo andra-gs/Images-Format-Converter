@@ -4,7 +4,8 @@ import {
   buildExportOptions,
   getExportSizeMetrics,
   supportsExportOptimization,
-  formatBytes
+  formatBytes,
+  runExportWithOptimizer
 } from "../src/js/ui/export-panel.js";
 
 test("only JPEG and WebP expose optimization capabilities", () => {
@@ -73,4 +74,27 @@ test("byte formatting handles B, KB, MB and invalid values", () => {
   assert.equal(formatBytes(2048), "2.0 KB");
   assert.equal(formatBytes(2 * 1024 * 1024), "2.00 MB");
   assert.equal(formatBytes(-1), "—");
+});
+
+test("mock optimizer receives the original source and exact UI options", async () => {
+  const source = new Blob(["source"]);
+  const options = { format: "webp", optimization: { mode: "preset", preset: "medium" } };
+  let received;
+  const mockOptimizeImage = async (actualSource, actualOptions) => {
+    received = { actualSource, actualOptions };
+    return {
+      blob: new Blob(["optimized"], { type: "image/webp" }),
+      size: { sourceBytes: 6, outputBytes: 9, differenceBytes: -3, reductionPercent: -50 }
+    };
+  };
+  const result = await runExportWithOptimizer(mockOptimizeImage, source, options);
+  assert.equal(received.actualSource, source);
+  assert.deepEqual(received.actualOptions, options);
+  assert.equal(result.size.outputBytes, 9);
+  assert.equal(result.size.reductionPercent, -50);
+});
+
+test("mock optimizer adapter rejects malformed results and missing functions", async () => {
+  await assert.rejects(() => runExportWithOptimizer(null, new Blob(["x"]), {}), /compatible function/);
+  await assert.rejects(() => runExportWithOptimizer(async () => ({ blob: new Blob(["x"]) }), new Blob(["x"]), {}), /actual size measurements/);
 });
