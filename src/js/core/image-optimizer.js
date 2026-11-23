@@ -234,7 +234,7 @@ function convertSource(file, imageData, format, encoderOptions) {
 
 function getConversionErrorCode(error) {
   const message = String(error?.message || "");
-  if (/signature validation|dimensions do not match|output validation|generated output.*validat/i.test(message)) {
+  if (/signature validation|dimensions do not match|output validation|generated (?:gif|output).*?(?:failed|did not pass)|dimension or frame-count verification|did not preserve.*loop/i.test(message)) {
     return "OUTPUT_VALIDATION_FAILED";
   }
   return "ENCODING_FAILED";
