@@ -11,7 +11,7 @@
 
 ## Current status
 
-The approved API contract has been read. An isolated Export Settings module, responsive styles, and focused contract tests have been added on this branch. The component is not mounted into the production conversion flow yet; real optimization/download/ZIP integration is intentionally waiting for Andra’s optimizer PR to merge.
+The approved API contract has been read. An isolated Export Settings module, responsive styles, and focused contract tests have been added on this branch. The Export Optimization panel is now mounted in Conversion Settings and creates independent controls for each queued file. Format changes refresh each control’s capability state. The controls currently store UI settings only; production conversion/download/ZIP behavior remains unchanged while real optimization waits for Andra’s optimizer PR to merge.
 
 ## Scope
 
@@ -102,3 +102,15 @@ The project roadmap currently identifies JPEG and WebP as candidates for lossy q
 - Mock optimizer use is test-only. The production conversion flow is not yet connected, and no encoder, compression, or preset quality mapping was added to the UI.
 - The optimizer branch/PR is not present in the repository branch search at the time of this check. Real API integration remains blocked until Andra’s optimizer PR is merged into `main`.
 - Automated tests and build have not been run in this environment; local validation is still required.
+
+
+### 2026-11-23 — Stage 1: Mount Export Optimization UI
+
+- Added an Export Optimization section to the Conversion Settings panel.
+- Mounted the existing per-file controls from `src/js/ui/export-panel.js` for every newly queued image.
+- Added independent maps for each file’s control instance and selected settings.
+- Updated each control when the global output format changes, so JPEG/WebP-only options remain unavailable for other formats.
+- Removed per-file control state and DOM when a file is removed; cleared all export controls when the queue is cleared.
+- Added responsive section styling using the existing theme tokens.
+- The controls do not affect conversion, individual downloads, or ZIP export in this stage.
+- Local automated tests, production build, and browser verification are still required after pulling the branch.
