@@ -89,6 +89,7 @@ test("mock optimizer receives the original source and exact UI options", async (
       mimeType: "image/webp",
       width: 2,
       height: 2,
+      optimization: { mode: "preset", preset: "medium", quality: 0.75, targetBytes: null, targetReached: null, attempts: 1 },
       validation: { status: "passed" },
       size: { sourceBytes: 6, outputBytes: blob.size, differenceBytes: 6 - blob.size, reductionPercent: -50 }
     };
