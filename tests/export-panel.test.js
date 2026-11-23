@@ -109,3 +109,16 @@ test("mock optimizer adapter rejects malformed results and missing functions", a
     validation: { status: "passed" }
   }), source, { format: "webp", optimization: { mode: "none" } }), /actual size measurements/);
 });
+
+
+test("each image builds and retains independent export options", () => {
+  const firstImageSettings = { mode: "preset", preset: "low" };
+  const secondImageSettings = { mode: "target-size", targetBytes: 256000 };
+  const firstOptions = buildExportOptions("webp", firstImageSettings);
+  const secondOptions = buildExportOptions("jpeg", secondImageSettings);
+
+  assert.deepEqual(firstOptions.optimization, { mode: "preset", preset: "low" });
+  assert.deepEqual(secondOptions.optimization, { mode: "target-size", targetBytes: 256000 });
+  assert.equal(firstImageSettings.preset, "low");
+  assert.equal(secondImageSettings.targetBytes, 256000);
+});
