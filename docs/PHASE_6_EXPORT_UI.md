@@ -11,7 +11,7 @@
 
 ## Current status
 
-Planning and repository inspection started on 2026-11-23. No Export Settings UI or optimizer integration is claimed implemented yet.
+The approved API contract has been read. An isolated Export Settings module, responsive styles, and focused contract tests have been added on this branch. The component is not mounted into the production conversion flow yet; real optimization/download/ZIP integration is intentionally waiting for Andra’s optimizer PR to merge.
 
 ## Scope
 
@@ -46,7 +46,13 @@ The interface is expected to support:
 - After the optimizer is merged, update this branch from the latest `main` before implementing real individual-download and ZIP integration.
 - Preserve per-file failure isolation: an optimization failure for one file must not prevent other successful files from being exported.
 
-## Optimizer contract — pending agreement
+## Approved optimizer contract
+
+The shared contract is documented in [`PHASE_6_OPTIMIZATION_API.md`](./PHASE_6_OPTIMIZATION_API.md) on `main` and was read on 2026-11-23. The required API is `optimizeImage(source, options)`. UI options use `{ format, optimization: { mode } }`, with `preset` values `low`, `medium`, `high` or `targetBytes` for `target-size`. Sources are `File`/`Blob` or `{ file, imageData }` for edited content. Successful results provide `blob`, `format`, `mimeType`, dimensions, actual `size` metrics, optimization metadata, and validation status.
+
+UI rules: presets and target-size are available only for JPEG/WebP; other output formats use `mode: "none"`. The UI must not duplicate encoder quality mapping or optimization algorithms. Result metrics must come from the optimizer’s actual `result.size` fields. GIF remains File-based so animation is preserved. Per-file settings must be retained for ZIP export, and each file’s failure must be isolated.
+
+## Optimizer contract — implementation gate
 
 The following decisions must be agreed with `andra-gs` before the mock is treated as an integration contract:
 
@@ -61,7 +67,7 @@ The following decisions must be agreed with `andra-gs` before the mock is treate
 9. Resource ownership and cleanup responsibilities.
 10. Whether optimization runs on the main thread or through the existing Worker path.
 
-Until these are agreed, the UI may use a local mock object solely for UI tests; no guessed optimizer API should be exported or used by production code.
+The contract is now agreed. A mock optimizer is used only in focused tests to verify source/options handoff and result validation. It is not connected to production conversion, individual downloads, or ZIP export. Real integration remains gated on Andra’s optimizer PR being merged into `main`.
 
 ## Initial format expectations (subject to optimizer verification)
 
@@ -85,3 +91,14 @@ The project roadmap currently identifies JPEG and WebP as candidates for lossy q
 - Created `phase-6-export-ui` from the latest `main` commit.
 - No application code, shared conversion/queue/ZIP files, or optimizer API have been changed.
 - Next: agree on the optimizer contract with `andra-gs`, then implement the Export Settings presentation against an isolated temporary mock.
+
+
+### 2026-11-23 — Approved API contract and isolated Export UI foundation
+
+- Read and adopted `docs/PHASE_6_OPTIMIZATION_API.md` from `main`.
+- Added `src/js/ui/export-panel.js` with per-file settings control construction, JPEG/WebP capability gating, agreed options mapping, and actual-result size metric validation.
+- Added `src/styles/export-panel.css` and imported it from the stylesheet entry point.
+- Added `tests/export-panel.test.js` covering preset identifiers, target-size bytes, unsupported formats, invalid settings, measured metrics, larger outputs, and a mock `optimizeImage(source, options)` handoff.
+- Mock optimizer use is test-only. The production conversion flow is not yet connected, and no encoder, compression, or preset quality mapping was added to the UI.
+- The optimizer branch/PR is not present in the repository branch search at the time of this check. Real API integration remains blocked until Andra’s optimizer PR is merged into `main`.
+- Automated tests and build have not been run in this environment; local validation is still required.
