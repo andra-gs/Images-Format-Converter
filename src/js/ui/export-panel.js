@@ -61,13 +61,7 @@ export function getExportSizeMetrics(result) {
   };
 }
 
-export async function runExportWithOptimizer(optimizer, source, options) {
-  if (typeof optimizer !== "function") throw new TypeError("An optimizeImage-compatible function is required.");
-  const result = await optimizer(source, options);
-  if (!(result?.blob instanceof Blob)) throw new TypeError("Optimizer result is missing its output Blob.");
-  getExportSizeMetrics(result);
-  return result;
-}
+export { runExportWithOptimizer } from "./export-optimizer-adapter.js";
 
 export function formatBytes(bytes) {
   if (!Number.isFinite(bytes) || bytes < 0) return "—";
