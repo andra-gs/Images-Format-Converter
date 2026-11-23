@@ -4,10 +4,10 @@ This file records actual repository progress. Update it after meaningful impleme
 
 ## Project status
 
-- Current stage: Phase 5 - Image manipulation
-- Current phase status: Phase 4 is complete. On `phase-5-editor-ui`, the Editor is connected to the Decoder, Transformer, Adjuster, and edited-ImageData conversion path. The user most recently reported 98/98 automated tests passing after the HEIC/TIFF queue-thumbnail fix, a successful production build, and successful browser verification that Editor processing works and existing conversion features remain functional. Phase 5 is awaiting final branch review, Pull Request, merge, and post-merge verification. Phase 6 begins only after Phase 5 is integrated and verified.
+- Current stage: Phase 6 - Image Optimization and Export Workflow
+- Current phase status: Phase 5 has been merged into `main`. The project owner reports post-merge `npm test` and `npm run dev` passed on 2026-11-23; a separate post-merge `npm run build` result was not reported. Phase 6 is in progress. `andra-gs` owns the Image Optimization Engine on `phase-6-optimization`; `FarrelPtrv` owns Export Presets and UI Integration on `phase-6-export-ui`.
 - Latest release: None
-- Last updated: 2026-11-22
+- Last updated: 2026-11-23
 
 ## Status legend
 
@@ -26,13 +26,27 @@ This file records actual repository progress. Update it after meaningful impleme
 | Phase 2: Core conversion engine | Tested | PNG, JPEG, WebP, and BMP conversion paths are user-verified; user reports the requested automated tests and build checks passed |
 | Phase 3: Batch processing | Tested | User verified batch queue, worker execution, progress, cancellation, failure isolation, large-image responsiveness, cleanup, individual downloads, ZIP extraction, and image integrity |
 | Phase 4: Advanced formats | Tested | Completed; CI validation and user-run real-browser verification passed. Known format limitations remain documented |
-| Phase 5: Image manipulation | In progress | Editor, Decoder, Transformer, Adjuster, and edited-pixel conversion are integrated on `phase-5-editor-ui`; user-reported 98/98 tests, production build, and browser integration/regression checks passed; final PR review, merge, and post-merge verification remain |
-| Phase 6: Advanced export and image optimization | Not started | Image Optimization, Metadata Management, and Export Presets/UI. Starts after Phase 5 integration |
+| Phase 5: Image manipulation | Complete | Merged into `main`; project owner reports post-merge `npm test` and `npm run dev` passed on 2026-11-23. A separate production build result is not recorded |
+| Phase 6: Image optimization and export workflow | In progress | Encoder capability inspection completed on `phase-6-optimization`; optimizer implementation and validation remain pending. Export UI foundation is on `phase-6-export-ui`. Metadata Management is deferred |
 | Phase 7: Testing, documentation, and release | Not started | Cross-browser QA, security review, documentation, production validation, and v1.0.0 readiness |
 
 ## Change log
 
 Add newest entries first.
+
+### 2026-11-23 - Phase 6 encoder inspection and capability mapping
+
+- Status: First Phase 6 task completed; optimizer implementation not started.
+- Owner: `andra-gs`
+- Branch: `phase-6-optimization`
+- Base commit: `247b803b824b68cabf59eb7a5cf019ab314135d2` (`main` at branch creation).
+- Inspected the existing image encoder, conversion service, capability registry, animated GIF path, and approved optimizer API contract.
+- Confirmed that JPEG and WebP accept meaningful quality values through the existing Canvas encoder. These are the only initial formats suitable for quality presets and repeated target-size attempts.
+- Confirmed PNG has no quality option; BMP uses a fixed 24-bit encoder; TIFF uses baseline uncompressed UTIF2 output; GIF uses the existing modern-gif path without a generic quality control; SVG wraps embedded PNG; HEIC/HEIF have no output encoder.
+- Confirmed that File/Blob and edited-ImageData conversion paths reuse existing output signature and decode/dimension validation. Animated GIF must remain on the File-based path.
+- Added `docs/PHASE_6_OPTIMIZATION.md` with the inspected capability matrix, service constraints, and next implementation steps.
+- No application code or encoder behavior was changed. No tests, production build, or browser checks were run during this documentation/inspection step.
+
 
 ### 2026-11-22 - Latest Phase 5 verification after HEIC/TIFF queue thumbnail fix
 
