@@ -290,8 +290,8 @@ Objective: implement the core optimization module and accurate file-size measure
 
 Tasks:
 
-- [ ] Inspect existing encoders and identify which formats expose meaningful optimization controls.
-- [ ] Define a supported-format and capability matrix for optimization.
+- [x] Inspect existing encoders and identify which formats expose meaningful optimization controls.
+- [x] Define a supported-format and capability matrix for optimization. Findings: [PHASE_6_OPTIMIZATION.md](./PHASE_6_OPTIMIZATION.md).
 - [ ] Implement `src/js/core/image-optimizer.js`.
 - [ ] Add Low, Medium, and High quality presets for formats where the encoder supports them.
 - [ ] Map presets to documented, format-specific encoder settings. Do not assume the same quality number produces equivalent results across formats.
