@@ -128,28 +128,13 @@ export function createExportSettingsControls({
   const hint = createElement(documentRef, "p", "export-control-hint");
   hint.setAttribute("role", "status");
 
+  const modeGroup = createElement(documentRef, "div", "export-control-group");
   const presetGroup = createElement(documentRef, "div", "export-control-group");
   const targetGroup = createElement(documentRef, "div", "export-control-group");
+  modeGroup.append(modeLabel, modeSelect);
   presetGroup.append(presetLabel, presetSelect);
   targetGroup.append(targetLabel, targetInput);
-  root.append(heading, modeLabel, modeSelect, presetGroup, targetGroup, hint);
-
-  const emitChange = () => {
-    currentSettings = {
-      mode: modeSelect.value,
-      preset: presetSelect.value,
-      targetBytes: Number(targetInput.value) * 1024
-    };
-    try {
-      const options = buildExportOptions(currentFormat, currentSettings);
-      hint.textContent = "Settings updated for this file.";
-      targetInput.removeAttribute("aria-invalid");
-      onChange(fileId, options);
-    } catch (error) {
-      hint.textContent = error.message;
-      targetInput.setAttribute("aria-invalid", "true");
-    }
-  };
+  root.append(heading, modeGroup, presetGroup, targetGroup, hint);
 
   const render = () => {
     const supported = supportsExportOptimization(currentFormat);
@@ -160,6 +145,24 @@ export function createExportSettingsControls({
     hint.textContent = supported
       ? "Preset and target-size controls are available for JPEG and WebP."
       : "This format uses the standard conversion path without optimization controls.";
+  };
+
+  const emitChange = () => {
+    currentSettings = {
+      mode: modeSelect.value,
+      preset: presetSelect.value,
+      targetBytes: Number(targetInput.value) * 1024
+    };
+    render();
+    try {
+      const options = buildExportOptions(currentFormat, currentSettings);
+      hint.textContent = "Settings updated for this file.";
+      targetInput.removeAttribute("aria-invalid");
+      onChange(fileId, options);
+    } catch (error) {
+      hint.textContent = error.message;
+      targetInput.setAttribute("aria-invalid", "true");
+    }
   };
 
   modeSelect.addEventListener("change", emitChange);
