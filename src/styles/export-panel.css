@@ -48,6 +48,12 @@
   min-width: 0;
 }
 
+/* Keep a lone Optimization control aligned across the full card.
+   When a secondary control is visible, the two controls share the row. */
+.export-file-settings[data-optimization-mode="none"] .export-control-group:first-of-type {
+  grid-column: 1 / -1;
+}
+
 .export-control-group[hidden] {
   display: none;
 }
