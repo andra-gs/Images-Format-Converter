@@ -34,7 +34,7 @@ test("adapter accepts edited File plus ImageData and measures original File", as
   const file = new Blob(["original file"]);
   const imageData = { width: 2, height: 2, data: new Uint8ClampedArray(16) };
   const source = { file, imageData };
-  const expected = validResult(file);
+  const expected = validResult(file, "webp", "none");
   let received;
   await runExportWithOptimizer(async (s) => { received = s; return expected; }, source, {
     format: "webp", optimization: { mode: "none" }
