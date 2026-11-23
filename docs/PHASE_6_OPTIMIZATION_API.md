@@ -2,7 +2,7 @@
 
 **Status:** Proposed shared contract, approved by the project owner for implementation planning.  
 **Owners:** `andra-gs` (optimizer), `FarrelPtrv` (export UI).  
-**Implementation status:** Not implemented. This document defines the contract to use before feature coding and integration.
+**Implementation status:** Initial implementation is present on `phase-6-optimization`; automated tests, production build, and browser verification are still pending.
 
 ## 1. Purpose and boundaries
 
@@ -31,11 +31,14 @@ Animated GIF must continue through the existing File-based GIF path. Do not rout
 
 ## 3. Public API
 
-Implement the following named export in `src/js/core/image-optimizer.js`:
+Implement the following named exports in `src/js/core/image-optimizer.js`:
 
 ```js
 export async function optimizeImage(source, options)
+export const IMAGE_OPTIMIZATION_CAPABILITIES
 ```
+
+`IMAGE_OPTIMIZATION_CAPABILITIES` is a frozen capability/configuration snapshot for UI gating and tests. JPEG and WebP expose presets and target-size mode; PNG, BMP, TIFF, GIF, and SVG expose neither. It also publishes the agreed preset values and target-size bounds. The UI must read capability data rather than inventing additional supported formats.
 
 ### 3.1 Source argument
 
@@ -220,7 +223,7 @@ Rules:
 
 ## 8. Error behavior
 
-The optimizer should reject invalid or unsupported requests with stable error codes:
+The optimizer rejects invalid or unsupported requests with stable error codes:
 
 | Code | Meaning |
 |---|---|
@@ -231,7 +234,7 @@ The optimizer should reject invalid or unsupported requests with stable error co
 | `ENCODING_FAILED` | Existing conversion/encoding path failed |
 | `OUTPUT_VALIDATION_FAILED` | Output validation failed |
 
-Preserve the original error as `cause` when wrapping an encoder or validation error. Do not turn a failed candidate into a successful result. If all target-size attempts fail validation or encoding, reject the call.
+Preserve the original error as `cause` when wrapping an encoder or validation error. Do not turn a failed candidate into a successful result. If all target-size attempts fail validation or encoding, reject the call. Conversion-service signature or dimension validation failures map to `OUTPUT_VALIDATION_FAILED`; other conversion failures map to `ENCODING_FAILED`.
 
 The current conversion service does not expose AbortSignal cancellation for its active conversion requests. Do not advertise full cancellation support in this API until the service/Worker contract is extended. A later implementation may check cancellation between target-size attempts, but that does not cancel an encoding already in progress.
 
