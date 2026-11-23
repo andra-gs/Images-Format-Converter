@@ -5,7 +5,7 @@ This file records actual repository progress. Update it after meaningful impleme
 ## Project status
 
 - Current stage: Phase 6 - Image Optimization and Export Workflow
-- Current phase status: Phase 5 has been merged into `main`. The project owner reported that post-merge `npm test` and `npm run dev` checks passed on 2026-11-23; a separate post-merge `npm run build` result has not been reported. Phase 6 has started with `andra-gs` owning the Image Optimization Engine and `FarrelPtrv` owning Export Presets and UI Integration. On `phase-6-export-ui`, repository inspection and initial planning documentation are complete. The optimizer API is pending agreement; no production UI or optimizer integration is implemented yet.
+- Current phase status: Phase 5 has been merged into `main`. Phase 6 is in progress: `andra-gs` owns the Image Optimization Engine and `FarrelPtrv` owns Export Presets and UI Integration. The approved optimizer API contract has been read. An isolated Export UI module, styles, and mock-contract tests are committed on `phase-6-export-ui`; production conversion/download/ZIP integration is waiting for the optimizer PR to merge.
 - Latest release: None
 - Last updated: 2026-11-23
 
@@ -33,6 +33,18 @@ This file records actual repository progress. Update it after meaningful impleme
 ## Change log
 
 Add newest entries first.
+
+### 2026-11-23 - Phase 6 Export UI foundation
+
+- Status: UI module foundation implemented; production integration and validation pending.
+- Read the approved `docs/PHASE_6_OPTIMIZATION_API.md` contract from `main`.
+- Added `src/js/ui/export-panel.js`, `src/styles/export-panel.css`, and `tests/export-panel.test.js` on `phase-6-export-ui`.
+- Added per-file settings control primitives, JPEG/WebP-only preset and target-size options, explicit `mode: "none"` for unsupported formats, and validation of actual optimizer size metrics.
+- Added a test-only mock optimizer handoff matching `optimizeImage(source, options)`; it does not replace or duplicate the real optimizer.
+- Imported the new stylesheet from `src/styles/main.css`.
+- The production conversion flow, individual downloads, and ZIP orchestration have not yet been changed. Wait for Andra’s optimizer PR to merge, then sync this branch and integrate the real API.
+- `npm test` and `npm run build` have not been run in this environment.
+
 
 ### 2026-11-23 - Phase 6 Export UI kickoff and repository inspection
 
