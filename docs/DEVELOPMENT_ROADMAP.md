@@ -266,7 +266,7 @@ Deliverable: an image editor that supports geometric transformation and visual a
 
 ## Phase 6: Image optimization and export workflow
 
-Status: Kickoff authorized on 2026-11-23. Phase 5 has been merged into `main`; the project owner reports that `npm test` and `npm run dev` checks passed after the merge. A separate `npm run build` result was not reported in this update. Phase 6 implementation may begin with encoder capability inspection and API coordination. Run the production build before submitting the Phase 6 processing PR. Metadata Management remains deferred to a future backlog item.
+Status: In progress as of 2026-11-23. Encoder capability inspection is complete and the initial optimizer module plus focused tests are present on `phase-6-optimization`. Automated tests, production build, and browser verification remain pending. Phase 5 post-merge `npm test` and `npm run dev` were reported successful; a separate post-merge build result was not reported. Metadata Management remains deferred.
 
 ### Team ownership
 
@@ -314,7 +314,7 @@ tests/image-optimizer.test.js
 docs/PHASE_6_OPTIMIZATION.md
 ```
 
-Expected API contract: agree with Farrel before implementation. The contract should accept the source image/result and an explicit optimization configuration, use the existing conversion/encoder path, and return the generated Blob plus actual source/output size information. Final names and shapes must be documented before UI integration.
+The API contract is approved and documented in [PHASE_6_OPTIMIZATION_API.md](./PHASE_6_OPTIMIZATION_API.md). Initial implementation is present on `phase-6-optimization`; do not integrate the UI until the optimizer passes tests, build, and browser verification and its PR is merged into `main`.
 
 Completion criteria:
 
@@ -372,17 +372,17 @@ Completion criteria:
 
 ### Supported-format planning matrix
 
-This matrix describes the initial investigation and intended behavior. Final availability must be based on the actual encoder capabilities and browser verification.
+This matrix reflects the inspected encoder capabilities. Optimizer controls are implemented for JPEG/WebP, but final availability remains subject to automated and real-browser verification.
 
 | Output format | Initial optimization plan |
 |---|---|
-| JPEG | Quality control; evaluate iterative quality adjustment for target-size attempts |
-| WebP | Quality control; evaluate iterative quality adjustment for target-size attempts |
-| PNG | Lossless output and encoder-supported optimization; no lossy quality preset unless explicitly implemented |
-| BMP | No quality control in the current baseline encoder; report optimization as unavailable unless a real optimization path is added |
-| TIFF | Follow the current baseline uncompressed encoder; no quality control or compression selection is promised |
-| GIF | Follow the current GIF encoder capabilities; do not expose generic quality presets without a verified mapping |
-| SVG | No raster quality control. Preserve the existing embedded-PNG wrapper behavior and do not describe it as vector optimization |
+| JPEG | Presets and best-effort target-size sampling using Canvas quality control |
+| WebP | Presets and best-effort target-size sampling using Canvas quality control |
+| PNG | Existing encoder only; no quality preset or target-size mode |
+| BMP | Existing 24-bit encoder only; no quality preset or target-size mode |
+| TIFF | Existing baseline uncompressed encoder only; no quality preset or target-size mode |
+| GIF | Existing frame-aware encoder only; no generic quality preset or target-size mode |
+| SVG | Existing embedded-PNG wrapper only; no SVG quality preset or target-size mode |
 
 ### Phase 6 integration order
 
