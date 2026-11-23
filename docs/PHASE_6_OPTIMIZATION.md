@@ -1,0 +1,84 @@
+# Phase 6 Image Optimization Engine
+
+Status: Encoder inspection and initial capability mapping completed on 2026-11-23. Optimizer implementation and runtime verification have not started.
+
+## 1. Scope
+
+The optimizer must reuse `conversion-service.js` and `image-encoder.js`. It must not introduce a second decoder, encoder, or validation pipeline. Processing remains local in the browser.
+
+Inspected on `main` at commit `247b803b824b68cabf59eb7a5cf019ab314135d2`:
+
+- `src/js/core/image-encoder.js`
+- `src/js/core/conversion-service.js`
+- `src/js/core/capability-registry.js`
+- `src/js/core/animated-gif.js`
+- `docs/PHASE_6_OPTIMIZATION_API.md`
+
+## 2. Confirmed encoder capabilities
+
+| Output format | Existing encoder path | Meaningful quality setting | Target-size attempts | Decision |
+|---|---|---:|---:|---|
+| JPEG | Canvas `toBlob()` / OffscreenCanvas `convertToBlob()` | Yes, quality 0–1 | Feasible through repeated quality encoding | Presets and best-effort target-size |
+| WebP | Canvas `toBlob()` / OffscreenCanvas `convertToBlob()` | Yes, quality 0–1 | Feasible through repeated quality encoding | Presets and best-effort target-size |
+| PNG | Canvas encoder | No. The encoder does not pass a quality option for PNG | No | Mode `none` |
+| BMP | Dedicated 24-bit encoder, bottom-up BGR rows with 4-byte alignment | No | No | Mode `none` |
+| TIFF | UTIF2 `encodeImage()`, baseline uncompressed RGBA output | No compression/quality option is exposed | No | Mode `none` |
+| GIF | `modern-gif` encoder; current path uses `maxColors: 255` and preserves frame timing/loop metadata where available | No generic quality option is exposed by the conversion service | No | Mode `none` |
+| SVG | SVG wrapper containing an embedded PNG data resource | No SVG quality option; embedded PNG is generated through the PNG path | No | Mode `none` |
+| HEIC / HEIF | No output encoder in the current capability registry | Not applicable | Not applicable | Input only; reject as output |
+
+The JPEG and WebP encoder validates the returned Blob MIME type against the requested type. If the browser cannot produce the requested MIME type, encoding fails rather than silently returning a different format.
+
+JPEG composites transparent pixels against the configured background color. BMP composites transparency onto white. PNG and WebP retain alpha through their existing paths. TIFF currently writes uncompressed RGBA pixels. GIF behavior is frame-aware and must remain on the existing File-based path for animated sources.
+
+## 3. Existing service interfaces and constraints
+
+The conversion service exposes:
+
+- `convertImageToJpeg(file, { quality, backgroundColor })`
+- `convertImageToWebp(file, { quality })`
+- `convertImageToPng(file)`
+- `convertImageToBmp(file)`
+- `convertImageToTiff(file)`
+- `convertImageToSvg(file)`
+- `convertImageToGif(file)`
+- `convertImageDataToFormat(imageData, format, options)` for edited ImageData in PNG, JPEG, WebP, BMP, TIFF, and SVG.
+
+The File/Blob conversion service runs the existing decode → encode → signature check → decode output → dimension check sequence. The edited-ImageData entry point reuses the same encoder and validation sequence, and is main-thread-only.
+
+Important constraints:
+
+- Animated GIF must use the File-based GIF conversion path. The edited-ImageData conversion entry point does not support GIF.
+- GIF conversion does not accept quality options.
+- JPEG and WebP quality values are passed to the browser encoder; their scales are format-specific and must not be described as visually equivalent.
+- The conversion service does not expose AbortSignal cancellation for an active conversion or Worker request.
+- The optimizer must measure actual `Blob.size` values and return the validated Blob and service-reported dimensions.
+- A target-size result is best-effort. Browser encoders may produce non-monotonic size changes across quality values, so each candidate must be measured and validated.
+
+## 4. Initial capability policy
+
+Only JPEG and WebP support `preset` and `target-size` modes in the first implementation.
+
+Preset mapping remains the approved proposal:
+
+| Preset | JPEG quality | WebP quality |
+|---|---:|---:|
+| Low | 0.55 | 0.55 |
+| Medium | 0.75 | 0.75 |
+| High | 0.90 | 0.90 |
+
+These are initial encoder quality values, not a guarantee that JPEG and WebP produce equivalent visual quality at the same number.
+
+Target-size mode remains limited to JPEG and WebP, with the agreed initial bounds of quality 0.10–0.95 and at most 7 encoding attempts. The algorithm must prefer the valid candidate closest to the requested size without exceeding it. If no candidate fits, it returns the smallest valid candidate and reports `targetReached: false`. Exact target size is not guaranteed.
+
+All other implemented output formats accept only `optimization: { mode: "none" }`. HEIC and HEIF are rejected as output formats.
+
+## 5. Next implementation steps
+
+1. Implement `src/js/core/image-optimizer.js` using the agreed API in [PHASE_6_OPTIMIZATION_API.md](./PHASE_6_OPTIMIZATION_API.md).
+2. Add focused tests for option validation, capability checks, preset mapping, target-size attempt bounds and selection, actual size metrics, source immutability, and output validation.
+3. Test JPEG and WebP output using representative photos, graphics, and transparency cases in supported browsers.
+4. Run `npm test`, `npm run build`, and browser checks before opening the processing PR.
+5. Update this document with measured behavior and any browser-specific limitations.
+
+No application code or encoder behavior was changed during the inspection step.
