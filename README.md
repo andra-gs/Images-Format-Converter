@@ -2,7 +2,7 @@
 
 A local-first image format conversion web application. Image files are processed in the user's browser and are not uploaded to a remote server.
 
-> Project status: Phase 4 - Advanced format support (completed; user-verified)
+> Project status: Phase 5 - Image Manipulation (merged; post-merge checks user-reported as passing); Phase 6 - Image Optimization & Export Workflow (kickoff)
 > Stack: Vanilla JavaScript + Vite + plain CSS
 > Icons: Lucide via NPM
 > Architecture: Client-side, modular, hybrid processing
@@ -101,13 +101,10 @@ npm run preview
 ## Documentation
 
 - [Agent instructions](AGENTS.md)
-
 - [Project context](docs/PROJECT_CONTEXT.md)
 - [Technical specification](docs/TECHNICAL_SPECIFICATION.md)
 - [Development roadmap](docs/DEVELOPMENT_ROADMAP.md)
 - [Development log](docs/DEVELOPMENT_LOG.md)
-- [Agent instructions](AGENTS.md)
-- [Starter prompt](docs/STARTER_PROMPT.md)
 - [Starter prompt](docs/STARTER_PROMPT.md)
 
 ## Development principles
@@ -127,10 +124,10 @@ The project is developed by three contributors. Task ownership is tied to GitHub
 
 | GitHub username | Phase 5 | Phase 6 |
 |---|---|---|
-| `andra-gs` | Image Transformation: resize, aspect ratio, crop, rotate, flip | Image Optimization: quality presets, feasible target-size attempts, file-size measurement |
-| `Adit1945-web` | Image Adjustment: brightness, contrast, saturation, grayscale, sepia, blur | Metadata Management: inspect supported EXIF fields and remove metadata where supported |
-| `FarrelPtrv` | Editor UI and Integration: editing workspace, preview, controls, and conversion handoff | Export Presets and UI: optimization and metadata controls, size reporting, individual and ZIP export |
+| `andra-gs` | Image Transformation: resize, aspect ratio, crop, rotate, flip | Image Optimization Engine: format-aware presets, feasible target-size attempts, file-size measurement and output validation |
+| `Adit1945-web` | Image Adjustment: brightness, contrast, saturation, grayscale, sepia, blur | No Phase 6 assignment. Metadata Management is deferred to a future backlog item. |
+| `FarrelPtrv` | Editor UI and Integration: editing workspace, preview, controls, and conversion handoff | Export Presets and UI Integration: capability-aware controls, size reporting, individual and ZIP export |
 
-Each contributor must use their assigned feature branch, create it from the latest `main`, add tests, and submit a Pull Request to `main`. Processing-module Pull Requests are merged before the UI/integration Pull Request. After all three are merged, the team runs the full test suite, production build, and end-to-end browser checks.
+Phase 5 has been merged into `main`. On 2026-11-23, the project owner reported that `npm test` and `npm run dev` checks passed after the merge. Phase 6 now has two active contributors. Create the assigned branches from the latest `main`, agree on the optimizer API and format capability matrix before integration, merge the processing module first, then merge the export UI. Run the full test suite, production build, and browser regression checks after integration.
 
 See [Development Roadmap](docs/DEVELOPMENT_ROADMAP.md), [Project Context](docs/PROJECT_CONTEXT.md), [Technical Specification](docs/TECHNICAL_SPECIFICATION.md), and [AGENTS.md](AGENTS.md) for the task ownership, branch rules, integration order, and instructions for ChatGPT sessions assisting each contributor. Use [Starter Prompt](docs/STARTER_PROMPT.md) to initialize a new development session.
