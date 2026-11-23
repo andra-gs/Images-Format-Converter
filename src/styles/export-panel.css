@@ -65,3 +65,27 @@
     grid-template-columns: 1fr;
   }
 }
+
+.export-settings-section {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.export-settings-heading h3 {
+  margin: 0 0 4px;
+  color: var(--color-text);
+  font-size: 0.9rem;
+}
+
+.export-settings-heading p {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 0.74rem;
+  line-height: 1.5;
+}
+
+.export-settings-list {
+  display: grid;
+  gap: 10px;
+}
