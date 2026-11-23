@@ -44,6 +44,49 @@ function createEncodedBlob(type, requestedSize = 256, { invalidSignature = false
   return new Blob([bytes], { type });
 }
 
+function createSvgDomParserMock() {
+  return class {
+    parseFromString(source) {
+      const rootMatch = source.match(/<svg\b([^>]*)>/i);
+      const attributes = [];
+      if (rootMatch) {
+        for (const match of rootMatch[1].matchAll(/([^\s=]+)\s*=\s*(["'])(.*?)\2/g)) {
+          attributes.push({ name: match[1], value: match[3] });
+        }
+      }
+      const root = {
+        localName: "svg",
+        namespaceURI: "http://www.w3.org/2000/svg",
+        attributes,
+        childNodes: [],
+        getAttribute(name) { return attributes.find((attribute) => attribute.name === name)?.value ?? null; },
+        setAttribute(name, value) {
+          const existing = attributes.find((attribute) => attribute.name === name);
+          if (existing) existing.value = String(value);
+          else attributes.push({ name, value: String(value) });
+        },
+        removeAttribute(name) {
+          const index = attributes.findIndex((attribute) => attribute.name === name);
+          if (index >= 0) attributes.splice(index, 1);
+        },
+        removeAttributeNode(attribute) {
+          const index = attributes.indexOf(attribute);
+          if (index >= 0) attributes.splice(index, 1);
+        }
+      };
+      return { documentElement: root, querySelector() { return null; } };
+    }
+  };
+}
+
+function createSvgXmlSerializerMock() {
+  return class {
+    serializeToString(root) {
+      return '<svg xmlns="http://www.w3.org/2000/svg" width="' + root.getAttribute("width") + '" height="' + root.getAttribute("height") + '"></svg>';
+    }
+  };
+}
+
 function setupBrowserMocks(t, { sizeForQuality, invalidSignature = false } = {}) {
   const encodeCalls = [];
   const bitmaps = [];
@@ -84,6 +127,10 @@ function setupBrowserMocks(t, { sizeForQuality, invalidSignature = false } = {})
   }
 
   mockGlobal(t, "OffscreenCanvas", FakeOffscreenCanvas);
+  // Minimal SVG DOM shims exercise the optimizer flow in Node. Real SVG parsing
+  // and sanitization remain covered by browser validation.
+  mockGlobal(t, "DOMParser", createSvgDomParserMock());
+  mockGlobal(t, "XMLSerializer", createSvgXmlSerializerMock());
   mockGlobal(t, "createImageBitmap", async () => {
     const bitmap = {
       width: 2,
