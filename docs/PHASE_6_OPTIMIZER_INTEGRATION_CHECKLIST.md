@@ -70,34 +70,35 @@ Preset mapping belongs to the optimizer. The Export UI and adapter must not inde
 
 ## 6. Export workflow and regression
 
-- [ ] Individual download applies the selected file's settings.
-- [ ] Edited images export the current edited ImageData.
-- [ ] Unedited images export the original File/Blob source.
-- [ ] Per-file settings remain independent.
-- [ ] ZIP export applies each file's own settings.
-- [ ] One image failure does not prevent other images from exporting.
-- [ ] Existing JPEG-to-PNG conversion still works.
-- [ ] Existing PNG-to-JPEG conversion still works.
-- [ ] Existing WebP-to-PNG conversion still works.
-- [ ] Batch conversion still works.
-- [ ] Editor open/edit workflow still works.
-- [ ] Existing individual download and ZIP behavior remains intact.
+- [x] Individual download applies the selected file's settings (existing regression check).
+- [x] Edited images export the current edited ImageData (existing regression check).
+- [x] Unedited images export the original File/Blob source (existing regression check).
+- [x] Per-file settings remain independent (existing browser UI check).
+- [x] ZIP export applies each file's own settings (existing regression check).
+- [x] One image failure does not prevent other images from exporting (existing regression check).
+- [x] Existing JPEG-to-PNG conversion still works.
+- [x] Existing PNG-to-JPEG conversion still works.
+- [x] Existing WebP-to-PNG conversion still works.
+- [x] Batch conversion still works.
+- [x] Editor open/edit workflow still works.
+- [x] Existing individual download and ZIP behavior remains intact.
 
 ## 7. Mock harness scope (pre-integration)
 
 The separate Export UI mock harness checks adapter/UI behavior only. It does not verify the optimizer's internal encoder, candidate search algorithm, or real conversion-service validation.
 
-The browser mock harness currently contains 11 scenarios:
-- Exact source/options forwarding.
-- Low, Medium, and High preset metadata.
-- Rejection of mismatched preset metadata.
-- Target Size quality boundaries and out-of-range rejection.
-- Best-effort metadata when target is not reached.
-- Unsupported format fallback to None.
-- Propagation of an optimizer encoding error.
-- Isolation when every file in an independent batch fails.
-- Reopening a valid returned PNG Blob with the browser image decoder.
-- Isolation when one file fails and another succeeds.
+The browser mock harness currently contains 11 scenarios. User-reported latest local browser run: all 11 passed.
+- [x] Exact source/options forwarding.
+- [x] Low, Medium, and High preset metadata.
+- [x] Rejection of mismatched preset metadata.
+- [x] Target Size quality boundaries and out-of-range rejection.
+- [x] Best-effort metadata when target is not reached.
+- [x] Unsupported format fallback to None.
+- [x] Propagation of an optimizer encoding error.
+- [x] Isolation when every file in an independent batch fails.
+- [x] Reopening a valid returned PNG Blob with the browser image decoder.
+- [x] Isolation when one file fails and another succeeds.
+- [x] UI control behavior and format switching.
 
 When the real optimizer is available, separately verify its internal candidate behavior:
 - [ ] A candidate encoding failure does not become a successful candidate.
@@ -115,11 +116,17 @@ npm run build
 npm run dev
 ```
 
-- [ ] Automated tests pass; record the actual test count.
-- [ ] Production build succeeds; record any warnings separately.
+Latest user-reported local verification on the Export UI branch:
+- [x] `npm test` passed (test count not recorded).
+- [x] `npm run build` succeeded.
+- [x] Browser mock harness opened and all 11 scenarios passed.
+- [x] Browser Console had no unexplained errors after the favicon 404 was identified as a missing non-critical resource.
+- [x] Manual regression checklist completed.
+
+For the real optimizer integration, still required:
+- [ ] Automated tests rerun after optimizer merge and integration.
+- [ ] Production build rerun after optimizer merge and integration.
 - [ ] Real-browser tests run against the actual optimizer, not the mock.
-- [ ] Browser Console has no unexplained errors.
-- [ ] Manual regression checklist is completed.
 - [ ] Results and any deviations are recorded in the Phase 6 development log.
 
 ## 9. Scope boundaries
