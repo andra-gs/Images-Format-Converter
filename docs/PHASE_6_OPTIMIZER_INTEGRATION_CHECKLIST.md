@@ -123,12 +123,14 @@ npm run build
 npm run dev
 ```
 
-Latest user-reported local verification on the Export UI branch:
-- [x] `npm test` passed (test count not recorded).
+Latest user-reported local verification on the Export UI branch (2026-11-24):
+- [x] `npm test` passed: **131/131 tests passed, 0 failed**.
 - [x] `npm run build` succeeded.
-- [x] Browser mock harness opened and all 11 scenarios passed.
-- [x] Browser Console had no unexplained errors after the favicon 404 was identified as a missing non-critical resource.
-- [x] Manual regression checklist completed.
+- [x] Browser mock harness opened and all 11 scenarios passed (earlier recorded run).
+- [x] Browser Console had no unexplained errors after the favicon 404 was identified as a missing non-critical resource (earlier recorded run).
+- [x] Manual regression checklist completed (earlier recorded run).
+
+The 131/131 result includes the metadata validation regression tests after the adapter error-message correction in commit `be0530d`. These are user-reported local results; the repository changes were not executed by GitHub during documentation updates.
 
 For the real optimizer integration, still required:
 - [ ] Automated tests rerun after optimizer merge and integration.
