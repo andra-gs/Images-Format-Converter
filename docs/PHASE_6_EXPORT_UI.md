@@ -132,7 +132,7 @@ The approved API contract currently supports JPEG/WebP presets and target-size a
 - Added `tests/export-optimizer-adapter.test.js` for exact argument handoff, edited ImageData source handoff, invalid inputs, unsupported modes, mismatched results, size consistency, and negative size reduction.
 - Re-exported the adapter from `export-panel.js` so existing focused tests retain their import path.
 - The adapter does not import or implement the optimizer, encode images, map presets to quality values, perform target-size search, or connect to production conversion/download/ZIP flows.
-- The existing Image Quality slider remains unresolved against the shared optimizer contract; no behavior or contract change was made. Confirm with `andra-gs` before production integration.
+- Historical note (2026-11-23): the Image Quality slider was initially left unchanged pending owner direction. This was superseded by the approved 2026-11-24 decision recorded below.
 - No changes were made to the shared conversion service, Editor, Queue, or ZIP orchestration.
 - Validation status: GitHub file changes were committed, but automated tests, production build, and browser checks have not been run in this environment. Local verification is required after pulling the branch.
 
