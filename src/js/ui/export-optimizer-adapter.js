@@ -1,6 +1,7 @@
 const OUTPUT_FORMATS = new Set(["png", "jpeg", "webp", "bmp", "tiff", "svg", "gif"]);
 const OPTIMIZABLE_FORMATS = new Set(["jpeg", "webp"]);
 const PRESETS = new Set(["low", "medium", "high"]);
+const OPTIMIZATION_MODES = new Set(["none", "preset", "target-size"]);
 const MAX_TARGET_ATTEMPTS = 7;
 
 function getSourceFile(source) {
@@ -25,21 +26,25 @@ function assertFiniteNonNegative(value, name) {
   }
 }
 
-function validateOptimizationMetadata(metadata, requested) {
-  if (!metadata || metadata.mode !== requested.mode) {
+function validateOptimizationMetadata(metadata, requested, format) {
+  if (!metadata || !OPTIMIZATION_MODES.has(metadata.mode) || metadata.mode !== requested.mode) {
     throw new TypeError("Optimizer result has invalid optimization metadata mode.");
   }
 
-  if (requested.mode === "none") {
+  if (!OPTIMIZABLE_FORMATS.has(format) && metadata.mode !== "none") {
+    throw new TypeError("Optimizer metadata requests optimization for an unsupported output format.");
+  }
+
+  if (metadata.mode === "none") {
     if (metadata.preset !== null || metadata.quality !== null ||
         metadata.targetBytes !== null || metadata.targetReached !== null ||
         metadata.attempts !== 1) {
-      throw new TypeError("No-optimization metadata must contain null settings and exactly one attempt.");
+      throw new TypeError("No-optimization metadata must use null settings and exactly one attempt.");
     }
     return;
   }
 
-  if (requested.mode === "preset") {
+  if (metadata.mode === "preset") {
     if (!PRESETS.has(requested.preset) || metadata.preset !== requested.preset ||
         metadata.targetBytes !== null || metadata.targetReached !== null ||
         !Number.isFinite(metadata.quality) || metadata.quality < 0 || metadata.quality > 1 ||
@@ -49,7 +54,7 @@ function validateOptimizationMetadata(metadata, requested) {
     return;
   }
 
-  if (requested.mode === "target-size") {
+  if (metadata.mode === "target-size") {
     if (!Number.isFinite(requested.targetBytes) || requested.targetBytes <= 0 ||
         metadata.preset !== null || metadata.targetBytes !== requested.targetBytes ||
         typeof metadata.targetReached !== "boolean" ||
@@ -60,8 +65,6 @@ function validateOptimizationMetadata(metadata, requested) {
     }
     return;
   }
-
-  throw new TypeError("Optimizer result has an unsupported optimization metadata mode.");
 }
 
 /**
@@ -76,8 +79,8 @@ export async function runExportWithOptimizer(optimizer, source, options) {
   if (!options || typeof options !== "object" || !OUTPUT_FORMATS.has(options.format)) {
     throw new TypeError("A supported output format is required.");
   }
-  if (!options.optimization || !["none", "preset", "target-size"].includes(options.optimization.mode)) {
-    throw new TypeError("An explicit optimization mode is required.");
+  if (!options.optimization || !OPTIMIZATION_MODES.has(options.optimization.mode)) {
+    throw new TypeError("An explicit supported optimization mode is required.");
   }
   if (options.optimization.mode !== "none" && !OPTIMIZABLE_FORMATS.has(options.format)) {
     throw new TypeError("Optimization modes are supported only for JPEG and WebP.");
@@ -118,7 +121,7 @@ export async function runExportWithOptimizer(optimizer, source, options) {
     throw new TypeError("Optimizer reductionPercent is inconsistent with measured sizes.");
   }
 
-  validateOptimizationMetadata(result.optimization, options.optimization);
+  validateOptimizationMetadata(result.optimization, options.optimization, result.format);
   return result;
 }
 
