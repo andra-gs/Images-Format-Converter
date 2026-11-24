@@ -82,6 +82,25 @@ The approved API contract currently supports JPEG/WebP presets and target-size a
 - Regression checks for conversion queue, Editor Phase 5, individual downloads, ZIP extraction, and output integrity.
 - Run `npm test`, `npm run build`, and browser checks on the final integrated branch before opening a PR.
 
+## Verification results
+
+### 2026-11-24 — Stage 1 UI and Stage 2 adapter verification
+
+- User reported that `npm test` completed successfully after the adapter metadata validation fix. The exact passing test count was not included in the report.
+- User reported that `npm run build` completed successfully.
+- User confirmed all requested browser checks passed:
+  - Export Optimization panel appears after adding an image.
+  - JPEG and WebP controls display the appropriate optimization options.
+  - PNG, BMP, TIFF, GIF, and SVG expose only No Optimization.
+  - Changing output format refreshes the available controls.
+  - Each image retains independent optimization settings.
+  - Changing the first image's settings does not change the second image's settings.
+  - Removing one image does not affect the remaining images.
+  - Light and dark themes display correctly.
+  - No JavaScript errors were observed in the browser Console while using the panel.
+- These checks verify the current UI and adapter preparation only. They do not verify optimized output from the production conversion path, individual-download optimization, or per-file ZIP optimization; those remain gated on integrating Andra's optimizer.
+- The production build completed with the existing non-fatal Vite chunk-size advisory for the HEIC-related bundle. No claim is made that this warning was introduced by Phase 6.
+
 ## Progress log
 
 ### 2026-11-23 — Phase 6 kickoff and repository inspection
