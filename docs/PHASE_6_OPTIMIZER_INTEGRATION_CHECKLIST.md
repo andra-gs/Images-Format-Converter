@@ -28,6 +28,11 @@ Do not connect the production UI to an unmerged optimizer branch.
 - [ ] Optimizer does not mutate caller-owned File, Blob, or ImageData.
 - [ ] Result includes a non-empty Blob, format, MIME type, dimensions, size metrics, optimization metadata, and passed validation status.
 - [ ] Stable error codes match the agreed contract.
+- [ ] Adapter requires all six optimization metadata fields as own properties and rejects non-object/incomplete metadata.
+- [ ] Adapter validates mode, preset, quality, targetBytes, targetReached, and attempts types/ranges against the requested mode.
+- [ ] Adapter accepts preset quality only as a finite 0–1 number without duplicating Low/Medium/High mapping.
+- [ ] Adapter validates target-size quality within 0.10–0.95 and attempts within 1–7.
+- [ ] Adapter rejects optimization modes for output formats other than JPEG/WebP.
 - [ ] Adapter validates actual optimizer metadata without duplicating preset mapping or target-size search.
 
 ## 3. Format and preset scenarios
