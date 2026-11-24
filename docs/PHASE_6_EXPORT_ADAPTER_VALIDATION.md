@@ -42,4 +42,11 @@ New automated coverage added:
 
 Existing adapter tests continue to cover mode/preset consistency, quality ranges, target-size bounds, attempt limits, format restrictions, and independent per-file failures.
 
-**Execution status:** The code and test changes have been committed remotely. Local `npm test` and `npm run build` have not yet been rerun against these latest commits.
+## Latest local verification (2026-11-24)
+
+User-reported results after the adapter error-message correction (commit `be0530d`):
+
+- [x] `npm test`: **131/131 tests passed, 0 failed**.
+- [x] `npm run build`: succeeded.
+
+The previously failing metadata validation tests now pass with the adapter's incomplete-metadata message matching the test expectations. These results were reported by the user after running the commands locally; this documentation update does not itself execute the test suite or build.
