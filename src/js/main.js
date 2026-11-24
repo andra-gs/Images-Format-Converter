@@ -67,9 +67,6 @@ const formatValue = document.querySelector("#output-format-value");
 const formatMenu = document.querySelector("#output-format-menu");
 const formatOptions = [...formatMenu.querySelectorAll('[role="option"]')];
 let selectedFormat = "image/png";
-const qualityField = document.querySelector("#quality-field");
-const outputQuality = document.querySelector("#output-quality");
-const qualityValue = document.querySelector("#quality-value");
 const convertButton = document.querySelector("#convert-button");
 const cancelButton = document.querySelector("#cancel-button");
 const batchProgress = document.querySelector("#batch-progress");
@@ -125,11 +122,6 @@ const updateQueueSummary = () => {
   updateConvertButton();
 };
 
-const updateQualityVisibility = () => {
-  const usesQuality = ["image/jpeg", "image/webp"].includes(selectedFormat);
-  qualityField.hidden = !usesQuality;
-};
-
 const closeFormatMenu = (returnFocus = false) => {
   formatMenu.hidden = true;
   formatTrigger.setAttribute("aria-expanded", "false");
@@ -153,7 +145,6 @@ const selectFormat = (option) => {
     item.classList.toggle("is-selected", isSelected);
   });
   closeFormatMenu();
-  updateQualityVisibility();
   for (const control of exportSettingsControls.values()) control.updateFormat(selectedFormat);
   updateConvertButton();
   formatTrigger.focus();
@@ -547,7 +538,6 @@ const runConversion = async () => {
     renderConversionStatus(entry, "processing", `Converting to ${selectedFormat.replace("image/", "").toUpperCase()}...`);
 
     try {
-      const quality = Number(outputQuality.value) / 100;
       const editedImageData = editedImages.get(entry.id);
       let result;
 
@@ -559,15 +549,12 @@ const runConversion = async () => {
         const outputFormat = selectedFormat === "image/svg+xml"
           ? "svg"
           : selectedFormat.replace("image/", "");
-        const options = ["image/jpeg", "image/webp"].includes(selectedFormat)
-          ? { quality }
-          : {};
-        result = await convertImageDataToFormat(editedImageData, outputFormat, options);
+        result = await convertImageDataToFormat(editedImageData, outputFormat);
       } else {
         result = selectedFormat === "image/jpeg"
-          ? await convertImageToJpeg(entry.file, { quality })
+          ? await convertImageToJpeg(entry.file)
           : selectedFormat === "image/webp"
-            ? await convertImageToWebp(entry.file, { quality })
+            ? await convertImageToWebp(entry.file)
             : selectedFormat === "image/bmp"
               ? await convertImageToBmp(entry.file)
               : selectedFormat === "image/tiff"
@@ -735,11 +722,6 @@ dropzone.addEventListener("drop", (event) => {
 
 clearButton.addEventListener("click", clearFiles);
 
-outputQuality.addEventListener("input", () => {
-  qualityValue.value = `${outputQuality.value}%`;
-  qualityValue.textContent = `${outputQuality.value}%`;
-});
-
 convertButton.addEventListener("click", runConversion);
 
 const savedTheme = localStorage.getItem("ifc-theme");
@@ -760,7 +742,6 @@ const applyTheme = (theme) => {
 };
 
 applyTheme(savedTheme || preferredTheme);
-updateQualityVisibility();
 
 themeToggle.addEventListener("click", () => {
   const nextTheme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
