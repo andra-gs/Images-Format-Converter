@@ -265,3 +265,26 @@ test("preset metadata rejects a preset that differs from the requested preset", 
     format: "jpeg", optimization: { mode: "preset", preset: "high" }
   }), /invalid preset metadata/);
 });
+
+test("optimization metadata requires every own field to be present", async () => {
+  const source = new Blob(["source"]);
+  const fields = ["mode", "preset", "quality", "targetBytes", "targetReached", "attempts"];
+  for (const field of fields) {
+    const result = validResult(source);
+    delete result.optimization[field];
+    await assert.rejects(() => runExportWithOptimizer(async () => result, source, {
+      format: "webp", optimization: { mode: "preset", preset: "medium" }
+    }), /incomplete or invalid optimization metadata/);
+  }
+});
+
+test("optimization metadata rejects non-object values and arrays", async () => {
+  const source = new Blob(["source"]);
+  for (const metadata of [null, "preset", [], 42]) {
+    const result = validResult(source);
+    result.optimization = metadata;
+    await assert.rejects(() => runExportWithOptimizer(async () => result, source, {
+      format: "webp", optimization: { mode: "preset", preset: "medium" }
+    }), /incomplete or invalid optimization metadata/);
+  }
+});
