@@ -23,11 +23,12 @@ function makeResult(source, options, overrides = {}) {
     : mode === "preset"
       ? { mode, preset: options.optimization.preset, quality: presetQuality[options.optimization.preset], targetBytes: null, targetReached: null, attempts: 1 }
       : { mode, preset: null, quality: 0.75, targetBytes: options.optimization.targetBytes, targetReached: false, attempts: 7 };
+  const sourceBytes = source instanceof Blob ? source.size : source.file.size;
   const size = {
-    sourceBytes: source instanceof Blob ? source.size : source.file.size,
+    sourceBytes,
     outputBytes: blob.size,
-    differenceBytes: (source instanceof Blob ? source.size : source.file.size) - blob.size,
-    reductionPercent: ((source instanceof Blob ? source.size : source.file.size) - blob.size) / (source instanceof Blob ? source.size : source.file.size) * 100
+    differenceBytes: sourceBytes - blob.size,
+    reductionPercent: sourceBytes === 0 ? 0 : ((sourceBytes - blob.size) / sourceBytes) * 100
   };
   return { blob, format, mimeType: blob.type, width: 20, height: 10, size, optimization, validation: { status: "passed" }, ...overrides };
 }
@@ -46,7 +47,7 @@ function renderResults() {
   }
   const passed = results.filter(item => item.pass).length;
   summaryNode.textContent = `${passed}/${results.length} pengujian lulus`;
-  detailsNode.textContent = results.map(item => `${item.pass ? "PASS" : "FAIL"}: ${item.name}${item.error ? "\\n  " + item.error : ""}`).join("\\n");
+  detailsNode.textContent = results.map(item => `${item.pass ? "PASS" : "FAIL"}: ${item.name}${item.error ? "\n  " + item.error : ""}`).join("\n");
 }
 async function run() {
   results.length = 0;
@@ -95,6 +96,43 @@ async function run() {
     equal(options.optimization.mode, "none", "PNG must use none mode");
     const result = await runExportWithOptimizer(mockOptimizer, source, options);
     equal(result.optimization.mode, "none", "PNG result must use none metadata");
+  });
+  await check("Optimizer encoding errors are propagated to the caller", async () => {
+    const encodingError = Object.assign(new Error("mock encoding failed"), { code: "ENCODING_FAILED" });
+    await runExportWithOptimizer(async () => { throw encodingError; }, source, presetOptions("low"))
+      .then(() => { throw new Error("Expected optimizer error to reject"); }, error => {
+        equal(error, encodingError, "Adapter should preserve the optimizer error");
+        equal(error.code, "ENCODING_FAILED", "Stable error code should remain available");
+      });
+  });
+  await check("All failed files remain isolated in independent export results", async () => {
+    const outputs = await runIndependentExports([
+      { id: "first", source, options: presetOptions("low") },
+      { id: "second", source, options: presetOptions("high") }
+    ], async () => { throw Object.assign(new Error("mock encoding failed"), { code: "ENCODING_FAILED" }); });
+    equal(outputs.length, 2, "Every input should have a result record");
+    assert(outputs.every(item => item.result === null && item.error?.code === "ENCODING_FAILED"), "Each failed item should retain its own error");
+  });
+  await check("Returned Blob can be reopened as a browser image", async () => {
+    assert(typeof createImageBitmap === "function", "createImageBitmap is unavailable in this browser");
+    const pngBytes = Uint8Array.from(atob("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII="), char => char.charCodeAt(0));
+    const validBlob = new Blob([pngBytes], { type: "image/png" });
+    const result = await runExportWithOptimizer(async (s, o) => {
+      const sourceBytes = s.size;
+      return {
+        blob: validBlob, format: "png", mimeType: "image/png", width: 1, height: 1,
+        size: { sourceBytes, outputBytes: validBlob.size, differenceBytes: sourceBytes - validBlob.size, reductionPercent: ((sourceBytes - validBlob.size) / sourceBytes) * 100 },
+        optimization: { mode: "none", preset: null, quality: null, targetBytes: null, targetReached: null, attempts: 1 },
+        validation: { status: "passed" }
+      };
+    }, source, { format: "png", optimization: { mode: "none" } });
+    const bitmap = await createImageBitmap(result.blob);
+    try {
+      equal(bitmap.width, 1, "Reopened image width should be one pixel");
+      equal(bitmap.height, 1, "Reopened image height should be one pixel");
+    } finally {
+      bitmap.close();
+    }
   });
   await check("One failed image does not prevent another image export", async () => {
     const second = new Blob(["second-image"]);
