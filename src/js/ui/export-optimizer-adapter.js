@@ -62,7 +62,7 @@ function validateOptimizationMetadata(metadata, requested, format) {
     if (!Number.isFinite(requested.targetBytes) || requested.targetBytes <= 0 ||
         metadata.preset !== null || metadata.targetBytes !== requested.targetBytes ||
         typeof metadata.targetReached !== "boolean" ||
-        !Number.isFinite(metadata.quality) || metadata.quality < 0 || metadata.quality > 1 ||
+        !Number.isFinite(metadata.quality) || metadata.quality < 0.10 || metadata.quality > 0.95 ||
         !Number.isInteger(metadata.attempts) || metadata.attempts < 1 ||
         metadata.attempts > MAX_TARGET_ATTEMPTS) {
       throw new TypeError("Optimizer result has invalid target-size metadata.");
