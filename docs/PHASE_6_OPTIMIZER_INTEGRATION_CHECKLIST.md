@@ -35,6 +35,8 @@ Do not connect the production UI to an unmerged optimizer branch.
 - [ ] Adapter rejects optimization modes for output formats other than JPEG/WebP.
 - [ ] Adapter validates actual optimizer metadata without duplicating preset mapping or target-size search.
 
+Detailed Export UI metadata validation rules are recorded in [`PHASE_6_EXPORT_ADAPTER_VALIDATION.md`](./PHASE_6_EXPORT_ADAPTER_VALIDATION.md).
+
 ## 3. Format and preset scenarios
 
 - [ ] JPEG + None.
