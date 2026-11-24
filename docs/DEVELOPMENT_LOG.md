@@ -1625,3 +1625,15 @@ Only record work that actually happened in the repository. Do not mark a feature
 - Validation:
   - GitHub file updates were committed to the feature branch.
   - `npm test`, `npm run build`, and browser checks have not yet been run for this updated branch state. The user must pull the latest branch and run local validation.
+
+
+### 2026-11-24 — Owner decision: presets replace manual Image Quality
+
+- Decision from `andra-gs`: remove the global manual Image Quality slider; do not add a manual-quality field to the shared optimizer API.
+- Removed the slider markup and its JavaScript selectors, visibility handler, input listener, and manual quality arguments from the current conversion calls.
+- JPEG/WebP continue to expose per-image Low, Medium, High, and Target Size controls in Export Settings.
+- PNG/BMP/TIFF/GIF/SVG remain on `mode: "none"`; the controls are disabled and preset/target-size groups remain hidden.
+- Until the optimizer is integrated, JPEG/WebP conversion uses the conversion service's pre-existing default quality value of `0.85`. Preset selections are currently UI settings only and do not affect conversion output.
+- Tightened `result.optimization` validation to check the mode enum and match, mode-specific preset and quality values, target fields, attempts, and output-format compatibility. The adapter contains no quality mapping.
+- Added tests for invalid modes, mode-specific null/value requirements, quality bounds, attempt bounds, and unsupported output formats.
+- Validation status: changes are committed to `phase-6-export-ui`; local `npm test`, `npm run build`, and browser regression checks remain pending.
