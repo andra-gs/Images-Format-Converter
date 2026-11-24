@@ -19,8 +19,9 @@ Implement the Export Settings interface and, after the optimizer contract and op
 
 The interface is expected to support:
 
-- Low, Medium, and High presets only where the selected output format has an agreed optimizer mapping.
-- Format-specific quality controls only where the selected encoder supports them.
+- JPEG/WebP: Low, Medium, and High presets plus Target Size.
+- PNG, BMP, TIFF, GIF, and SVG: mode `none`, with no preset or Target Size controls.
+- No manual Image Quality slider; encoder-quality mapping belongs exclusively to the optimizer.
 - Target output size only where the agreed optimizer contract supports iterative attempts.
 - Original source size, actual exported size, byte difference, and percentage reduction/increase.
 - Clear unavailable, loading, and per-file error states.
@@ -29,7 +30,7 @@ The interface is expected to support:
 ## Initial repository findings
 
 - The application uses Vanilla JavaScript ES modules, HTML, plain CSS, and Vite.
-- Existing conversion settings currently contain a single quality slider in `index.html`; `src/js/main.js` reads it and passes quality only to JPEG and WebP conversion.
+- The legacy global Image Quality slider was removed from `index.html` and its event handling was removed from `src/js/main.js`. The current conversion path now uses the conversion service's default JPEG/WebP quality until the optimizer is integrated.
 - Existing conversion orchestration is in `src/js/main.js`. It iterates selected queue entries and stores completed results in `conversionResults`.
 - Individual result rendering creates a download link from the already-generated result Blob.
 - ZIP export currently iterates successful `conversionResults` and adds their existing Blobs to JSZip. ZIP generation uses STORE compression and has per-archive error reporting.
@@ -146,3 +147,17 @@ The approved API contract currently supports JPEG/WebP presets and target-size a
 - **Legacy Image Quality compatibility:** the existing global 10–100% slider in `index.html` remains part of the current conversion path in `src/js/main.js`. The approved optimizer API has no manual-quality option; its preset values are optimizer-owned. Therefore this stage deliberately leaves the legacy slider and conversion behavior untouched and does not translate its value into a preset or undocumented API property. Before production integration replaces the old conversion path, Farrel and Andra must agree whether to extend the API with a manual-quality mode or explicitly retire the slider in favor of presets. No silent behavior change is allowed.
 - Production conversion, individual downloads, and ZIP export remain unchanged until the optimizer PR is merged and the UI branch is updated from latest `main`.
 - Local `npm test`, `npm run build`, and browser verification are pending after these changes are pulled.
+
+
+> Historical note: the earlier Stage 2 entry said the Image Quality slider was being retained pending a decision. That decision was superseded by `andra-gs` on 2026-11-24: remove the slider and use optimizer-owned presets.
+
+
+### 2026-11-24 — Owner decision: presets replace manual Image Quality
+
+- Applied `andra-gs`'s decision: remove the global manual Image Quality slider and do not extend the API with manual quality.
+- Removed the slider markup from `index.html`, plus selector references, visibility logic, event handling, and manual quality arguments from `src/js/main.js`.
+- JPEG/WebP retain the per-file Low/Medium/High preset and Target Size controls. PNG, BMP, TIFF, GIF, and SVG remain mode `none` and do not expose preset or Target Size controls.
+- Until the optimizer is integrated, the existing conversion service default quality (`0.85`) is used for JPEG/WebP. Per-file preset/target settings remain presentation-only and do not affect production conversion yet.
+- Updated adapter metadata validation to enforce the approved return contract: valid mode; mode-specific preset, quality, target fields; positive bounded attempt counts; and no optimization metadata for unsupported output formats.
+- The adapter does not contain preset-to-quality mappings.
+- Automated tests, build, and browser regression checks are pending after pulling this branch update.
