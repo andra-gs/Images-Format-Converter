@@ -119,6 +119,10 @@ function mountControls() {
     onChange: (_id, options) => { optionsNode.textContent = JSON.stringify(options, null, 2); }
   });
   host.append(controls.element);
+  document.querySelector("#mock-format").addEventListener("change", event => {
+    controls.updateFormat(event.target.value);
+    optionsNode.textContent = JSON.stringify(controls.getOptions(), null, 2);
+  });
   optionsNode.textContent = JSON.stringify(controls.getOptions(), null, 2);
 }
 document.querySelector("#rerun").addEventListener("click", run);
