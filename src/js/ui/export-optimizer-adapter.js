@@ -34,7 +34,7 @@ function validateOptimizationMetadata(metadata, requested, format) {
     Array.isArray(metadata) ||
     requiredFields.some((field) => !Object.hasOwn(metadata, field))
   ) {
-    throw new TypeError("Optimizer result has incomplete optimization metadata.");
+    throw new TypeError("Optimizer result has incomplete or invalid optimization metadata.");
   }
 
   if (!OPTIMIZATION_MODES.has(metadata.mode)) {
