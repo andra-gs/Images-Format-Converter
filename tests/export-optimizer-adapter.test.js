@@ -146,3 +146,75 @@ test("independent exports isolate a failed image and retain each image's own opt
   assert.equal(results[1].error, null);
   assert.ok(results[1].result.blob instanceof Blob);
 });
+
+
+test("metadata mode must be one of the contract modes and match the request", async () => {
+  const source = new Blob(["source"]);
+  const result = validResult(source, "webp", "none");
+  result.optimization.mode = "manual";
+  await assert.rejects(() => runExportWithOptimizer(async () => result, source, {
+    format: "webp", optimization: { mode: "none" }
+  }), /invalid optimization metadata mode/);
+});
+
+test("none metadata requires null preset, quality, and target fields with one attempt", async () => {
+  const source = new Blob(["source"]);
+  for (const [key, value] of [["preset", "low"], ["quality", 0.8], ["targetBytes", 1000], ["targetReached", false], ["attempts", 2]]) {
+    const result = validResult(source, "png", "none");
+    result.optimization[key] = value;
+    await assert.rejects(() => runExportWithOptimizer(async () => result, source, {
+      format: "png", optimization: { mode: "none" }
+    }));
+  }
+});
+
+test("preset metadata requires a valid preset, numeric quality, null target fields, and one attempt", async () => {
+  const source = new Blob(["source"]);
+  const invalidValues = [
+    ["preset", "ultra"], ["quality", null], ["quality", 1.1],
+    ["targetBytes", 500], ["targetReached", false], ["attempts", 2]
+  ];
+  for (const [key, value] of invalidValues) {
+    const result = validResult(source);
+    result.optimization[key] = value;
+    await assert.rejects(() => runExportWithOptimizer(async () => result, source, {
+      format: "webp", optimization: { mode: "preset", preset: "medium" }
+    }));
+  }
+});
+
+test("target-size metadata requires positive target, boolean result, numeric quality, and bounded attempts", async () => {
+  const source = new Blob(["source"]);
+  const invalidValues = [
+    ["quality", null], ["quality", 2], ["targetBytes", null],
+    ["targetReached", null], ["attempts", 0], ["attempts", 7.5], ["attempts", 8],
+    ["preset", "low"]
+  ];
+  for (const [key, value] of invalidValues) {
+    const result = validResult(source, "jpeg", "target-size");
+    result.optimization[key] = value;
+    await assert.rejects(() => runExportWithOptimizer(async () => result, source, {
+      format: "jpeg", optimization: { mode: "target-size", targetBytes: 5000 }
+    }));
+  }
+});
+
+test("non-optimizable output formats accept only none metadata", async () => {
+  const source = new Blob(["source"]);
+  const result = validResult(source, "png", "none");
+  result.optimization.mode = "preset";
+  result.optimization.preset = "low";
+  result.optimization.quality = 0.5;
+  await assert.rejects(() => runExportWithOptimizer(async () => result, source, {
+    format: "png", optimization: { mode: "none" }
+  }), /unsupported output format/);
+});
+
+test("metadata attempts cannot exceed seven for target-size mode", async () => {
+  const source = new Blob(["source"]);
+  const result = validResult(source, "webp", "target-size");
+  result.optimization.attempts = 8;
+  await assert.rejects(() => runExportWithOptimizer(async () => result, source, {
+    format: "webp", optimization: { mode: "target-size", targetBytes: 5000 }
+  }), /invalid target-size metadata/);
+});
