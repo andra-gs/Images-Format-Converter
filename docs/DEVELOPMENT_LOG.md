@@ -4,10 +4,10 @@ This file records actual repository progress. Update it after meaningful impleme
 
 ## Project status
 
-- Current stage: Phase 5 - Image manipulation
-- Current phase status: Phase 4 is complete. On `phase-5-editor-ui`, the Editor is connected to the Decoder, Transformer, Adjuster, and edited-ImageData conversion path. The user most recently reported 98/98 automated tests passing after the HEIC/TIFF queue-thumbnail fix, a successful production build, and successful browser verification that Editor processing works and existing conversion features remain functional. Phase 5 is awaiting final branch review, Pull Request, merge, and post-merge verification. Phase 6 begins only after Phase 5 is integrated and verified.
+- Current stage: Phase 6 - Image Optimization and Export Workflow
+- Current phase status: Phase 5 has been merged into `main`. The project owner reports post-merge `npm test` and `npm run dev` passed on 2026-11-23. For Phase 6, `andra-gs` has implemented the optimizer and focused tests on `phase-6-optimization`; the project owner reports `npm test` and `npm run build` both completed without errors on 2026-11-23. A dedicated browser harness has been added, but real-browser verification remains pending. `FarrelPtrv` owns Export Presets and UI Integration on `phase-6-export-ui`.
 - Latest release: None
-- Last updated: 2026-11-22
+- Last updated: 2026-11-23
 
 ## Status legend
 
@@ -26,13 +26,51 @@ This file records actual repository progress. Update it after meaningful impleme
 | Phase 2: Core conversion engine | Tested | PNG, JPEG, WebP, and BMP conversion paths are user-verified; user reports the requested automated tests and build checks passed |
 | Phase 3: Batch processing | Tested | User verified batch queue, worker execution, progress, cancellation, failure isolation, large-image responsiveness, cleanup, individual downloads, ZIP extraction, and image integrity |
 | Phase 4: Advanced formats | Tested | Completed; CI validation and user-run real-browser verification passed. Known format limitations remain documented |
-| Phase 5: Image manipulation | In progress | Editor, Decoder, Transformer, Adjuster, and edited-pixel conversion are integrated on `phase-5-editor-ui`; user-reported 98/98 tests, production build, and browser integration/regression checks passed; final PR review, merge, and post-merge verification remain |
-| Phase 6: Advanced export and image optimization | Not started | Image Optimization, Metadata Management, and Export Presets/UI. Starts after Phase 5 integration |
+| Phase 5: Image manipulation | Complete | Merged into `main`; project owner reports post-merge `npm test` and `npm run dev` passed on 2026-11-23. A separate production build result is not recorded |
+| Phase 6: Image optimization and export workflow | In progress | Encoder capability inspection completed on `phase-6-optimization`; optimizer implementation and validation remain pending. Export UI foundation is on `phase-6-export-ui`. Metadata Management is deferred |
 | Phase 7: Testing, documentation, and release | Not started | Cross-browser QA, security review, documentation, production validation, and v1.0.0 readiness |
 
 ## Change log
 
 Add newest entries first.
+
+## 2026-11-23 - Optimizer test failure analysis and corrections
+
+- The project owner ran `npm test` on `phase-6-optimization`: 121 passed, 2 failed, 0 skipped.
+- The edited-ImageData-to-GIF test exposed an error-wrapping bug. `convertSource()` correctly raised `UNSUPPORTED_OUTPUT_FORMAT`, but the outer optimizer catch converted it to `ENCODING_FAILED`. The optimizer now preserves typed `ImageOptimizationError` instances in both normal conversion and target-size candidate paths.
+- The SVG optimizer test failed because Node does not provide `DOMParser` and `XMLSerializer`. The test harness now supplies minimal SVG DOM shims for the optimizer conversion-flow test. This does not replace real browser SVG sanitization or browser verification.
+- The two corrections are committed on `phase-6-optimization`. The project owner must rerun `npm test` and `npm run build`; no passing result is claimed yet.
+
+
+### 2026-11-23 - Phase 6 initial Image Optimization Engine implementation
+
+- Status: Initial implementation and focused test file added; runtime validation pending.
+- Owner: `andra-gs`
+- Branch: `phase-6-optimization`
+- Implemented `src/js/core/image-optimizer.js` with the agreed `optimizeImage(source, options)` API and exported frozen `IMAGE_OPTIMIZATION_CAPABILITIES`.
+- Supports original File/Blob sources and edited `{ file, imageData }` sources. Edited pixels use `convertImageDataToFormat()`; animated GIF remains on the original File-based conversion path.
+- Added JPEG/WebP Low/Medium/High mappings (0.55 / 0.75 / 0.90) and bounded target-size sampling with a maximum of seven attempts across quality values from 0.10 to 0.95.
+- Candidate outputs are measured by actual Blob size and are only considered after the existing conversion service validates the output. Failed candidates are skipped; all-candidate failure rejects the request.
+- Added actual source/output size metrics, byte difference, percentage reduction/increase, output MIME type, dimensions, optimization metadata, and validation status.
+- Refined error classification so GIF frame-count and loop-metadata verification failures are reported as output-validation failures.
+- Added `tests/image-optimizer.test.js` covering source/options validation, capability gating, output formats in none mode, preset mapping, target-size selection and failure behavior, signature validation, edited ImageData immutability, and size reporting.
+- Updated `docs/PHASE_6_OPTIMIZATION_API.md`, `docs/PHASE_6_OPTIMIZATION.md`, and `docs/TECHNICAL_SPECIFICATION.md` with the implemented API and limitations.
+- `npm test`, `npm run build`, and real-browser checks have not been run in this environment. The implementation must not be treated as tested or complete until those checks pass.
+
+
+### 2026-11-23 - Phase 6 encoder inspection and capability mapping
+
+- Status: First Phase 6 task completed; optimizer implementation not started.
+- Owner: `andra-gs`
+- Branch: `phase-6-optimization`
+- Base commit: `247b803b824b68cabf59eb7a5cf019ab314135d2` (`main` at branch creation).
+- Inspected the existing image encoder, conversion service, capability registry, animated GIF path, and approved optimizer API contract.
+- Confirmed that JPEG and WebP accept meaningful quality values through the existing Canvas encoder. These are the only initial formats suitable for quality presets and repeated target-size attempts.
+- Confirmed PNG has no quality option; BMP uses a fixed 24-bit encoder; TIFF uses baseline uncompressed UTIF2 output; GIF uses the existing modern-gif path without a generic quality control; SVG wraps embedded PNG; HEIC/HEIF have no output encoder.
+- Confirmed that File/Blob and edited-ImageData conversion paths reuse existing output signature and decode/dimension validation. Animated GIF must remain on the File-based path.
+- Added `docs/PHASE_6_OPTIMIZATION.md` with the inspected capability matrix, service constraints, and next implementation steps.
+- No application code or encoder behavior was changed. No tests, production build, or browser checks were run during this documentation/inspection step.
+
 
 ### 2026-11-22 - Latest Phase 5 verification after HEIC/TIFF queue thumbnail fix
 
@@ -1563,3 +1601,24 @@ Only record work that actually happened in the repository. Do not mark a feature
   - PR #6, which approved the two-person Phase 6 plan, is merged: https://github.com/andra-gs/Images-Format-Converter/pull/6
   - PR #4 (`security/xanitizer-analysis`) remains separate from Phase 6 and is not changed by this work.
 - No application code was changed. No tests, browser checks, or production build were run as part of this documentation update.
+
+### 2026-11-23 - Phase 6 optimizer automated checks and browser harness
+
+- Status: Optimizer implementation and automated checks reported successful by the project owner; browser verification pending.
+- User-reported verification:
+  - `npm test` completed without errors.
+  - `npm run build` completed without errors.
+  - These checks were reported before the browser harness files in this entry were added. They must be rerun against the latest branch state.
+- Changes on `phase-6-optimization`:
+  - Added a standalone browser test page at `tests/browser-optimizer.html`.
+  - Added matching styles in `tests/browser-optimizer.css`.
+  - Added `tests/browser-optimizer.js`, which calls `optimizeImage()` directly and uses the existing `decodeImage()` pipeline to preview the returned output.
+  - The harness exposes output-format and optimization-mode selection, JPEG background selection, original/output previews, measured size metrics, target-size status, and output download.
+  - The harness is separate from the production UI and does not change Farrel's Export UI ownership.
+- Verification still required:
+  - Pull the latest `phase-6-optimization` branch.
+  - Rerun `npm test` and `npm run build` after adding the harness.
+  - Run `npm run dev` and open `http://localhost:5173/tests/browser-optimizer.html`.
+  - Test JPEG/WebP Low, Medium, and High presets; target-size reached and not reached; and `none` mode for PNG, BMP, TIFF, GIF, and SVG.
+  - Record browser, representative input files, actual output sizes, and any failures.
+- No real-browser result is claimed yet.

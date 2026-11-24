@@ -505,3 +505,54 @@ Input semantics:
 - With aspect ratio unlocked, both positive dimensions are required before Apply; a missing dimension must not be sent to the Transformer as a valid resize request.
 
 Focused unit coverage is in `tests/editor-input-state.test.js`. Real-browser checks for HEIC, TIFF, PNG, JPEG, and WebP remain required for the integrated Editor; unit tests alone do not establish browser compatibility.
+
+
+## 29. Image Optimization Engine
+
+The Phase 6 optimizer is implemented in `src/js/core/image-optimizer.js` and reuses the existing conversion service. It does not introduce a second decoder, encoder, or validation pipeline.
+
+Public exports:
+
+```js
+optimizeImage(source, options)
+IMAGE_OPTIMIZATION_CAPABILITIES
+```
+
+Source input:
+
+- Original source: non-empty `File` or `Blob`.
+- Edited source: `{ file, imageData }`, where `file` is the original non-empty File/Blob and `imageData` is the current edited sRGB ImageData.
+- The original file supplies the source byte count even when edited pixels are encoded.
+- Inputs remain caller-owned and are not mutated.
+- Edited ImageData cannot be exported as GIF. GIF must use the original File-based conversion path to preserve animated frames.
+
+Supported optimization capabilities:
+
+| Output format | Presets | Target size | Existing conversion path |
+|---|---:|---:|---|
+| JPEG | Yes | Yes | Canvas encoder quality option |
+| WebP | Yes | Yes | Canvas encoder quality option |
+| PNG | No | No | Existing PNG encoder |
+| BMP | No | No | Existing 24-bit encoder |
+| TIFF | No | No | Existing uncompressed UTIF2 encoder |
+| GIF | No | No | Existing frame-aware GIF conversion |
+| SVG | No | No | Existing SVG wrapper with embedded PNG |
+
+HEIC and HEIF remain input-only formats.
+
+Preset values for JPEG and WebP are Low 0.55, Medium 0.75, and High 0.90. These values are encoder quality parameters, not cross-format visual-quality equivalence guarantees.
+
+Target-size mode accepts a positive finite byte count and is limited to JPEG/WebP. It samples at most seven quality values between 0.10 and 0.95, measures each returned Blob, and only considers candidates that pass the existing conversion service's output validation. Individual failed candidates do not stop the remaining attempts. The selected output is the valid candidate closest to the requested target without exceeding it. If no candidate fits, the smallest valid candidate is returned with `targetReached: false`. Exact target size is not guaranteed.
+
+Successful results include the validated Blob, output format and MIME type, dimensions, actual source/output byte counts, byte difference, percentage reduction/increase, optimization metadata, and `validation.status: "passed"`. Negative percentage reduction is valid when the output is larger than the source.
+
+Error codes:
+
+- `INVALID_OPTIMIZATION_OPTIONS`
+- `UNSUPPORTED_OPTIMIZATION`
+- `UNSUPPORTED_OUTPUT_FORMAT`
+- `TARGET_SIZE_INVALID`
+- `ENCODING_FAILED`
+- `OUTPUT_VALIDATION_FAILED`
+
+The conversion service does not expose cancellation for an active conversion request. The optimizer does not claim active-operation cancellation support.
