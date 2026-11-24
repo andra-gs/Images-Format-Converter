@@ -27,8 +27,15 @@ function assertFiniteNonNegative(value, name) {
 }
 
 function validateOptimizationMetadata(metadata, requested, format) {
-  if (!metadata || !OPTIMIZATION_MODES.has(metadata.mode)) {
-    throw new TypeError("Optimizer result has invalid optimization metadata mode.");
+  const requiredFields = ["mode", "preset", "quality", "targetBytes", "targetReached", "attempts"];
+  if (
+    !metadata ||
+    typeof metadata !== "object" ||
+    Array.isArray(metadata) ||
+    requiredFields.some((field) => !Object.hasOwn(metadata, field)) ||
+    !OPTIMIZATION_MODES.has(metadata.mode)
+  ) {
+    throw new TypeError("Optimizer result has incomplete or invalid optimization metadata.");
   }
 
   if (!OPTIMIZABLE_FORMATS.has(format) && metadata.mode !== "none") {
