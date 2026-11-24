@@ -32,10 +32,13 @@ function validateOptimizationMetadata(metadata, requested, format) {
     !metadata ||
     typeof metadata !== "object" ||
     Array.isArray(metadata) ||
-    requiredFields.some((field) => !Object.hasOwn(metadata, field)) ||
-    !OPTIMIZATION_MODES.has(metadata.mode)
+    requiredFields.some((field) => !Object.hasOwn(metadata, field))
   ) {
-    throw new TypeError("Optimizer result has incomplete or invalid optimization metadata.");
+    throw new TypeError("Optimizer result has incomplete optimization metadata.");
+  }
+
+  if (!OPTIMIZATION_MODES.has(metadata.mode)) {
+    throw new TypeError("Optimizer result has invalid optimization metadata mode.");
   }
 
   if (!OPTIMIZABLE_FORMATS.has(format) && metadata.mode !== "none") {
