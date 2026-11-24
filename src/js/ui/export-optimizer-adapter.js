@@ -27,12 +27,16 @@ function assertFiniteNonNegative(value, name) {
 }
 
 function validateOptimizationMetadata(metadata, requested, format) {
-  if (!metadata || !OPTIMIZATION_MODES.has(metadata.mode) || metadata.mode !== requested.mode) {
+  if (!metadata || !OPTIMIZATION_MODES.has(metadata.mode)) {
     throw new TypeError("Optimizer result has invalid optimization metadata mode.");
   }
 
   if (!OPTIMIZABLE_FORMATS.has(format) && metadata.mode !== "none") {
     throw new TypeError("Optimizer metadata requests optimization for an unsupported output format.");
+  }
+
+  if (metadata.mode !== requested.mode) {
+    throw new TypeError("Optimizer result has invalid optimization metadata mode.");
   }
 
   if (metadata.mode === "none") {
