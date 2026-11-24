@@ -218,3 +218,50 @@ test("metadata attempts cannot exceed seven for target-size mode", async () => {
     format: "webp", optimization: { mode: "target-size", targetBytes: 5000 }
   }), /invalid target-size metadata/);
 });
+
+
+test("target-size quality accepts inclusive 0.10 and 0.95 boundaries", async () => {
+  const source = new Blob(["source"]);
+  for (const quality of [0.10, 0.95]) {
+    const result = validResult(source, "jpeg", "target-size");
+    result.optimization.quality = quality;
+    const actual = await runExportWithOptimizer(async () => result, source, {
+      format: "jpeg", optimization: { mode: "target-size", targetBytes: 5000 }
+    });
+    assert.equal(actual.optimization.quality, quality);
+  }
+});
+
+test("target-size quality rejects values outside 0.10 through 0.95", async () => {
+  const source = new Blob(["source"]);
+  for (const quality of [0.0999, 0.9501, 0, 1, NaN, Infinity]) {
+    const result = validResult(source, "webp", "target-size");
+    result.optimization.quality = quality;
+    await assert.rejects(() => runExportWithOptimizer(async () => result, source, {
+      format: "webp", optimization: { mode: "target-size", targetBytes: 5000 }
+    }), /invalid target-size metadata/);
+  }
+});
+
+test("preset metadata accepts each requested preset with a finite in-range quality", async () => {
+  const source = new Blob(["source"]);
+  for (const preset of ["low", "medium", "high"]) {
+    const result = validResult(source, "webp", "preset");
+    result.optimization.preset = preset;
+    result.optimization.quality = 0.75;
+    const actual = await runExportWithOptimizer(async () => result, source, {
+      format: "webp", optimization: { mode: "preset", preset }
+    });
+    assert.equal(actual.optimization.preset, preset);
+    assert.equal(actual.optimization.quality, 0.75);
+  }
+});
+
+test("preset metadata rejects a preset that differs from the requested preset", async () => {
+  const source = new Blob(["source"]);
+  const result = validResult(source, "jpeg", "preset");
+  result.optimization.preset = "low";
+  await assert.rejects(() => runExportWithOptimizer(async () => result, source, {
+    format: "jpeg", optimization: { mode: "preset", preset: "high" }
+  }), /invalid preset metadata/);
+});
