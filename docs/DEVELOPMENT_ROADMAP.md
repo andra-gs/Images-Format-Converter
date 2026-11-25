@@ -513,3 +513,20 @@ This repository is developed by a three-person team overall. Phase 6 feature wor
 | Phase 6 | `phase-6-optimization` | Not applicable | `phase-6-export-ui` |
 
 Branch names are the agreed convention. The branches are created when the relevant phase begins; documenting a branch name does not mean that the branch already exists.
+
+
+## 2026-11-25 - Phase 6 optimizer synchronization update
+
+The Image Optimization Engine has been merged into `main` through PR #7 and its source, API contract, optimizer tests, and standalone browser harness have been synchronized onto `phase-6-export-ui`. Andra reports that real-browser verification has been completed. This report is owner-confirmed; the current branch still requires integrated application testing after Export UI production wiring.
+
+Completed synchronization items:
+- [x] Bring `src/js/core/image-optimizer.js` onto `phase-6-export-ui`.
+- [x] Bring the approved optimizer API contract and implementation notes onto `phase-6-export-ui`.
+- [x] Bring the optimizer automated test file and browser harness onto `phase-6-export-ui`.
+- [x] Preserve the existing Export UI, adapter, and branch-specific history.
+- [ ] Integrate the optimizer into the production conversion flow.
+- [ ] Apply per-file settings to individual downloads.
+- [ ] Apply per-file settings to ZIP exports while preserving per-file failure isolation.
+- [ ] Run the full automated suite, production build, and integrated browser regression checks.
+
+All synchronization commits are targeted at `phase-6-export-ui`. The `main` branch is not modified by this update.
