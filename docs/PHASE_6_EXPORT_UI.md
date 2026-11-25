@@ -55,7 +55,7 @@ UI rules: presets and target-size are available only for JPEG/WebP; other output
 
 ## Optimizer contract — implementation gate
 
-The shared contract has been approved by the project owner and is the baseline for mock-based UI preparation. Any implementation evidence that requires changing it must be discussed with `andra-gs` before the contract is changed:
+The shared contract was approved by the project owner and was used first for mock-based UI preparation, then for production integration. Any future change to the contract must be discussed with `andra-gs` before implementation:
 
 1. Optimizer function name, module export, and call signature.
 2. How the source is represented (original File, converted Blob/result, or edited image result).
@@ -68,11 +68,11 @@ The shared contract has been approved by the project owner and is the baseline f
 9. Resource ownership and cleanup responsibilities.
 10. Whether optimization runs on the main thread or through the existing Worker path.
 
-The contract is agreed for mock-based preparation. A mock optimizer is used only in focused tests to verify source/options handoff and result validation. It is not connected to production conversion, individual downloads, or ZIP export. Real integration remains gated on Andra’s optimizer PR being merged into `main`.
+Historical gate before PR #7: the mock optimizer was used only in focused tests and was not connected to production conversion, individual downloads, or ZIP export. This gate was satisfied when the optimizer was merged through PR #7 and the production integration was merged through PR #9.
 
-## Initial format expectations (subject to optimizer verification)
+## Verified format capabilities
 
-The approved API contract currently supports JPEG/WebP presets and target-size attempts only. PNG, BMP, TIFF, GIF, and SVG use mode `none`. The UI must follow the approved contract and any later capability changes must be coordinated with the optimizer owner.
+The merged implementation supports JPEG/WebP presets and best-effort Target Size. PNG, BMP, TIFF, GIF, and SVG use `mode: none`. HEIC/HEIF remain input-only because no output encoder is available in the current capability registry. Future capability changes must be coordinated with the optimizer owner.
 
 ## Verification plan
 
