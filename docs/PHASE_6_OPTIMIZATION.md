@@ -1,6 +1,6 @@
 # Phase 6 Image Optimization Engine
 
-Status: Complete and merged into `main` through PR #7. The optimizer is integrated into the production Export UI through PR #9. PR #9 reports 156/156 automated tests passing, a successful production build, passing GitHub Actions, and successful integrated browser checks. The standalone optimizer harness and the production export workflow have both been verified according to contributor reports.
+Status: Complete and merged into `main` through PR #7. The optimizer is integrated into the production Export UI through PR #9. PR #9 reports 156/156 automated tests passing, a successful production build, passing GitHub Actions, and successful integrated browser checks. Optimizer behavior and the production export workflow have been verified through contributor-reported real-browser checks. The standalone harness remains available for focused regression testing.
 
 ## 1. Scope
 
