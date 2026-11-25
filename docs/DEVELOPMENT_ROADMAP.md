@@ -266,7 +266,7 @@ Deliverable: an image editor that supports geometric transformation and visual a
 
 ## Phase 6: Image optimization and export workflow
 
-Status: Kickoff authorized on 2026-11-23. Phase 5 has been merged into `main`; the project owner reports that `npm test` and `npm run dev` checks passed after the merge. A separate `npm run build` result was not reported in this update. Phase 6 implementation may begin with encoder capability inspection and API coordination. Run the production build before submitting the Phase 6 processing PR. Metadata Management remains deferred to a future backlog item.
+Status: In progress. The optimizer PR is merged into `main`, and `phase-6-export-ui` is synchronized with the latest `main` ancestry. Production optimizer wiring is implemented on the Export UI branch; full automated, build, and integrated browser verification are pending. Metadata Management remains deferred to a future backlog item.
 
 ### Team ownership
 
@@ -391,7 +391,7 @@ This matrix describes the initial investigation and intended behavior. Final ava
 3. Agree on the optimizer API, preset mapping, supported-format matrix, error behavior, size-reporting shape, and resource ownership before either implementation is integrated.
 4. `andra-gs` implements the optimizer and focused tests. Farrel may build the UI against a temporary mock contract, but must not invent a competing API.
 5. Review and merge the optimizer Pull Request into `main`.
-6. `FarrelPtrv` updates `phase-6-export-ui` from the newly updated `main`, then integrates the real optimizer with individual downloads and ZIP export.
+6. `FarrelPtrv` updates `phase-6-export-ui` from the newly updated `main`, then integrates the real optimizer with individual downloads and ZIP export. The branch synchronization and production wiring have now been performed; verification remains.
 7. Review and merge the export UI Pull Request.
 8. Run the complete automated test suite and production build, then test representative real files in the browser, including individual downloads, mixed-format batches, and ZIP extraction/integrity.
 
@@ -530,3 +530,25 @@ Completed synchronization items:
 - [ ] Run the full automated suite, production build, and integrated browser regression checks.
 
 All synchronization commits are targeted at `phase-6-export-ui`. The `main` branch is not modified by this update.
+
+
+## 2026-11-25 - Export UI production optimizer wiring
+
+Current branch: `phase-6-export-ui` (head `ba40e1e` at this documentation checkpoint).
+
+Implementation now present:
+- `main.js` calls the real optimizer through the validated Export UI adapter.
+- Per-file optimization settings are passed independently, with original File or edited `{ file, imageData }` sources.
+- Unsupported optimization formats use `mode: "none"`.
+- The existing sequential queue, per-file error isolation, progress updates, and between-file cancellation checks are retained.
+- Individual downloads and ZIP export reuse the same optimizer result Blob; ZIP does not re-encode.
+- Result UI reports source/output sizes, byte and percentage change, MIME type, and Target Size status.
+
+Still required before PR:
+- [ ] Run `npm test` after production integration.
+- [ ] Run `npm run build` after production integration.
+- [ ] Test JPEG/WebP presets and Target Size reached/not-reached with real images.
+- [ ] Test PNG/BMP/TIFF/SVG no-optimization and animated GIF preservation.
+- [ ] Test edited ImageData, mixed-format batch, failure isolation, individual downloads, and ZIP Blob reuse.
+- [ ] Repeat existing conversion, Editor, queue progress, cancellation, and theme regression checks in a real browser.
+- [ ] Record actual results and limitations in the development log.
