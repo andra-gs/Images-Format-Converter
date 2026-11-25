@@ -1,6 +1,6 @@
 # Phase 6 Image Optimization Engine
 
-Status: Initial optimizer implementation and focused automated tests are present on `phase-6-optimization`. On 2026-11-23, the project owner reported that `npm test` and `npm run build` both completed without errors. A dedicated real-browser harness has been added; browser verification is pending.
+Status: Complete and merged into `main` through PR #7. The optimizer is integrated into the production Export UI through PR #9. PR #9 reports 156/156 automated tests passing, a successful production build, passing GitHub Actions, and successful integrated browser checks. Optimizer behavior and the production export workflow have been verified through contributor-reported real-browser checks. The standalone harness remains available for focused regression testing.
 
 ## 1. Scope
 
@@ -105,12 +105,12 @@ Focused tests were added in `tests/image-optimizer.test.js` for validation, capa
 
 Validation status:
 
-- `npm test`: the project owner reported that the full test command completed without errors on 2026-11-23, before the browser harness files were added.
-- `npm run build`: the project owner reported that the production build completed without errors on 2026-11-23, before the browser harness files were added.
-- Browser harness added at `tests/browser-optimizer.html`, `tests/browser-optimizer.css`, and `tests/browser-optimizer.js`.
-- Real-browser tests with representative photos, graphics, and transparency: pending. The harness itself has not yet been run.
-- Rerun `npm test` and `npm run build` after pulling the latest harness commits to validate the current branch state.
-- The seven-candidate target-size search is a first bounded implementation. Its visual/size behavior and browser differences still require empirical verification.
+- The optimizer implementation and focused tests were merged through PR #7.
+- PR #9 reports the integrated suite passed: 156/156 tests, 0 failures.
+- PR #9 reports a successful production build and passing GitHub Actions. Vite emitted its existing non-fatal chunk-size advisory for the HEIC-related bundles (~3.2 MB each).
+- Contributor-reported real-browser checks passed for JPEG/WebP presets, Target Size reached/not-reached, unsupported formats in `none` mode, animated GIF preservation, edited ImageData, mixed-format batches, per-file failures, individual downloads, ZIP Blob reuse, and existing conversion/Editor regressions.
+- The standalone harness remains available for future regression testing. The target-size search remains best-effort and uses actual validated Blob sizes; exact target size is not guaranteed.
+- These results were reported in PR #9 and were not independently rerun during this documentation-only update.
 
 ## 7. Browser test harness
 
@@ -128,4 +128,18 @@ Run `npm run dev` and open:
 
 `http://localhost:5173/tests/browser-optimizer.html`
 
-The harness has been added but has not yet been verified in a real browser.
+The harness was included in the merged optimizer implementation. The contributor reports that the optimizer and integrated browser scenarios were verified with real files. Continue using this harness for focused optimizer regression checks when the optimizer changes.
+
+## 8. Merged production integration and verification (2026-11-25)
+
+The optimizer was merged through PR #7. Farrel integrated it into the production export flow, and PR #9 merged that integration into `main`.
+
+The integrated application now:
+- Applies per-file Low/Medium/High presets and best-effort Target Size for JPEG/WebP.
+- Uses `mode: none` for PNG, BMP, TIFF, GIF, and SVG.
+- Passes edited images as `{ file, imageData }` and keeps animated GIF on the original File-based path.
+- Retains sequential queue processing, progress, between-file cancellation checks, and per-file failure isolation.
+- Stores the validated output Blob once and reuses it for individual download and ZIP export.
+- Displays actual source/output sizes, byte difference, percentage change, MIME type, and Target Size status.
+
+PR #9 verification report: 156/156 tests passed, production build succeeded, GitHub Actions passed, and integrated browser checks were completed successfully. The build still emits a non-fatal Vite chunk-size advisory for the HEIC-related bundles (~3.2 MB each).

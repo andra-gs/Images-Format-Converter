@@ -30,10 +30,12 @@ Gunakan dokumentasi terbaru dari branch `main`. Jangan mengandalkan salinan lama
 
 ## Status pengembangan
 
-- Phase 0 sampai Phase 4: selesai.
-- Phase 5: Image Manipulation, fase berikutnya dan belum dimulai.
-- Phase 6: Advanced Export and Image Optimization, dimulai setelah Phase 5 terintegrasi dan diverifikasi.
-- Phase 7: Testing, Documentation, and Release.
+- Phase 0 sampai Phase 6: selesai dan sudah terintegrasi ke branch `main`.
+- Phase 5: Image Manipulation, selesai melalui PR #5.
+- Phase 6: Image Optimization & Export Workflow, selesai melalui PR #7 dan PR #9. PR #9 melaporkan 156/156 automated tests lulus, production build berhasil, GitHub Actions lulus, dan integrated browser checks selesai.
+- Phase 7: Testing, Documentation, and Release, tahap berikutnya dan belum dimulai.
+- Known issue: startup skeleton terakhir dilaporkan selalu menggunakan tema terang, meskipun dark theme dipilih. Perlu diperbaiki dan diuji ulang.
+- Metadata Management tetap menjadi deferred backlog tanpa owner atau branch.
 
 Rincian tugas, file target, kriteria selesai, branch, dan urutan merge tersedia di `docs/DEVELOPMENT_ROADMAP.md`.
 

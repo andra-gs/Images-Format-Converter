@@ -46,7 +46,7 @@ Advanced format libraries remain subject to compatibility, bundle size, license,
 
 ## 4. Current project structure
 
-This reflects files already created. Add feature-specific modules when their phase begins.
+This is a representative view of the current structure after Phase 5 and Phase 6 integration. It lists the principal modules, not every test fixture or utility.
 
 ```text
 Images-Format-Converter/
@@ -59,23 +59,43 @@ Images-Format-Converter/
 │   │   ├── reset.css
 │   │   ├── layout.css
 │   │   ├── components.css
+│   │   ├── editor.css
+│   │   ├── export-panel.css
 │   │   └── themes.css
 │   └── js/
 │       ├── main.js
-│       └── core/
-│           ├── file-validator.js
-│           ├── format-detector.js
-│           ├── capability-registry.js
-│           ├── image-decoder.js
-│           ├── image-encoder.js
-│           └── conversion-service.js
+│       ├── core/
+│       │   ├── file-validator.js
+│       │   ├── format-detector.js
+│       │   ├── capability-registry.js
+│       │   ├── image-decoder.js
+│       │   ├── image-encoder.js
+│       │   ├── conversion-service.js
+│       │   ├── animated-gif.js
+│       │   ├── image-transformer.js
+│       │   ├── image-adjuster.js
+│       │   ├── image-processing-adapter.js
+│       │   ├── editor-input-state.js
+│       │   ├── editor-queue-events.js
+│       │   ├── image-thumbnail.js
+│       │   └── image-optimizer.js
+│       └── ui/
+│           ├── image-editor.js
+│           ├── export-panel.js
+│           └── export-optimizer-adapter.js
 ├── tests/
 │   ├── capability-registry.test.js
 │   ├── image-decoder.test.js
 │   ├── image-encoder.test.js
+│   ├── image-transformer.test.js
+│   ├── image-adjuster.test.js
+│   ├── image-optimizer.test.js
+│   ├── image-processing-adapter.test.js
+│   ├── export-panel.test.js
+│   ├── export-optimizer-adapter.test.js
 │   ├── browser-decoder.html
-│   ├── browser-decoder.css
-│   └── browser-decoder.js
+│   ├── browser-optimizer.html
+│   └── browser-export-optimizer.html
 ├── docs/
 ├── .github/
 ├── index.html
@@ -462,7 +482,7 @@ The shared validation routine is `encodeAndValidateImage()`; both direct File/Bl
 
 ## 27. Phase 5 Editor integration — current implementation status
 
-This section records the implementation state on the `phase-5-editor-ui` branch and supersedes the earlier planning-only statements in Section 25 that describe the adapter as waiting for module integration or the conversion service as accepting only File/Blob input.
+This section records the Phase 5 Editor implementation that was developed on `phase-5-editor-ui` and merged into `main` through PR #5. It supersedes the earlier planning-only statements in Section 25 that describe the adapter as waiting for module integration or the conversion service as accepting only File/Blob input.
 
 ### Implemented editor pipeline
 
@@ -487,7 +507,7 @@ The edited ImageData conversion path currently runs on the main thread. The esta
 - Browser integration: the user reports that the Editor successfully processes an image, displays the expected result, and leaves the existing conversion features working.
 - Queue preview selection was manually verified when switching between queued images.
 
-These results were recorded on the feature branch. Phase 5 remains subject to final branch review, pull-request review, merge approval, and post-merge verification before it is marked complete.
+PR #5 was merged into `main` on 2026-11-22. The PR reported 98 passing automated tests, a successful production build, and completed browser verification. The project owner also reported post-merge `npm test` and `npm run dev` checks passing on 2026-11-23. Phase 5 is complete.
 
 
 ## 28. Editor preview decoding and optional dimension inputs
@@ -504,7 +524,7 @@ Input semantics:
 - With resize aspect ratio locked, the user-entered dimension recalculates the opposite draft dimension. If one dimension is null at processing time, the Transformer derives it from the other dimension and the cropped source aspect ratio.
 - With aspect ratio unlocked, both positive dimensions are required before Apply; a missing dimension must not be sent to the Transformer as a valid resize request.
 
-Focused unit coverage is in `tests/editor-input-state.test.js`. Real-browser checks for HEIC, TIFF, PNG, JPEG, and WebP remain required for the integrated Editor; unit tests alone do not establish browser compatibility.
+Focused unit coverage is in `tests/editor-input-state.test.js`. The Phase 5 Editor UI document records user-reported browser verification for HEIC, TIFF, PNG, JPEG, and WebP, plus Apply behavior and queue thumbnail previews. Broader cross-browser and mobile checks remain part of Phase 7.
 
 
 ## Phase 6 - Image Optimization Engine
@@ -522,7 +542,7 @@ Optimization capabilities:
 
 The Export UI owns settings presentation, per-file orchestration, individual downloads, and ZIP export. The optimizer owns quality mapping and target-size search. The adapter validates the UI-to-optimizer contract and must not duplicate optimizer policy.
 
-Synchronization note (2026-11-25): the optimizer module, API contract, focused tests, and browser harness have been copied from `main` to `phase-6-export-ui`. This does not imply production Export UI integration is complete. The `main` branch was not changed by this synchronization.
+Integration status (2026-11-25): the optimizer module, API contract, focused tests, and browser harness were merged through PR #7. The production Export UI integration was subsequently merged through PR #9. Both are now part of `main`.
 
 
 ## Phase 6 production export integration (2026-11-25)
@@ -537,4 +557,16 @@ Synchronization note (2026-11-25): the optimizer module, API contract, focused t
 - Result cards display optimizer-reported original/output sizes, byte difference, percentage reduction or increase, output MIME type, and Target Size reached/not-reached status.
 - Animated GIF remains on the File-based optimizer path. Edited ImageData to GIF remains unsupported and is rejected before optimizer invocation.
 
-Validation status: implementation is present on `phase-6-export-ui`; automated tests, production build, and integrated real-browser verification after this wiring are pending. No change to the shared conversion service or ZIP encoder was made.
+Verification status: PR #9 merged the production integration into `main`. The PR reports `npm test` 156/156 passed, `npm run build` successful, GitHub Actions checks passing, and integrated real-browser checks completed. The production queue retains sequential processing, per-file error isolation, progress reporting, and cancellation checks between files. The validated Blob is reused by individual downloads and ZIP export. No new conversion service or second ZIP encoder was introduced. The build continues to emit a non-fatal Vite chunk-size advisory for HEIC-related bundles (~3.2 MB each).
+
+## Phase 6 verification record (2026-11-25)
+
+- Optimizer implementation: PR #7, merged into `main`.
+- Export UI and production integration: PR #9, merged into `main`.
+- Automated tests: 156/156 passed, as reported in PR #9.
+- Production build: successful, as reported in PR #9.
+- GitHub Actions: all checks passed.
+- Browser verification: contributor-reported successful checks covered JPEG/WebP presets, Target Size reached and not reached, unsupported-format `none` mode, animated GIF preservation, edited ImageData, mixed-format batches, per-file failure isolation, individual downloads, ZIP reuse, and existing conversion/Editor regressions.
+- Evidence: [PR #9](https://github.com/andra-gs/Images-Format-Converter/pull/9), merge commit `17bb59628660d31bad64bb16eebb5337d9bf44a6`.
+
+These verification results are contributor-reported in the Pull Request and were not independently rerun during this documentation update.

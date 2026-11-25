@@ -2,7 +2,7 @@
 
 **Status:** Shared contract approved by the project owner and used by the initial implementation.  
 **Owners:** `andra-gs` (optimizer), `FarrelPtrv` (export UI).  
-**Implementation status:** Initial implementation is present on `phase-6-optimization`; automated tests, production build, and browser verification are still pending.
+**Implementation status:** Implemented and merged through PR #7; integrated into production Export UI through PR #9. The merged integration reports 156/156 automated tests passing, a successful production build, passing GitHub Actions, and successful integrated browser checks.
 
 ## 1. Purpose and boundaries
 
@@ -286,12 +286,21 @@ The optimizer implementation must cover:
 
 Before opening the optimizer PR, run `npm test`, `npm run build`, and relevant real-browser tests. Record actual results; do not mark planned checks as complete.
 
-## 11. Decisions to confirm during implementation
+## 11. Final approved parameters
 
-The project owner has approved this proposal as the shared implementation baseline. The following values remain tunable based on test evidence:
+The following values are the implemented baseline in the merged optimizer:
 
-- Preset mapping: 0.55 / 0.75 / 0.90.
+- Preset mapping: Low 0.55, Medium 0.75, High 0.90 for JPEG and WebP.
 - Target-size quality range: 0.10–0.95.
 - Maximum target-size attempts: 7.
 
-If implementation evidence requires a change, update this document and notify the UI owner before changing the shared contract.
+Target-size remains best-effort. The optimizer measures and validates each candidate and reports the actual result; it does not guarantee an exact byte size.
+
+## 12. Integration and verification record (2026-11-25)
+
+- Optimizer merged through PR #7.
+- Production Export UI integration merged through PR #9.
+- PR #9 reports 156/156 automated tests passing, successful production build, passing GitHub Actions, and completed integrated browser checks.
+- Browser checks covered JPEG/WebP presets, Target Size reached/not reached, unsupported formats in `none` mode, animated GIF preservation, edited ImageData, mixed-format batches, failure isolation, individual downloads, ZIP Blob reuse, and existing conversion/Editor regressions.
+
+The verification results are contributor-reported in PR #9 and were not independently rerun during this documentation update.

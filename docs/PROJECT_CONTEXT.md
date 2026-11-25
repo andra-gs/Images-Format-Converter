@@ -159,7 +159,7 @@ A conversion is successful only when:
 
 ## 8. Current phase and out of scope for the initial MVP
 
-Phase 4 (Advanced Format Support) was completed on 2026-11-20. Phase 5 (Image Manipulation) has been merged into `main`. On 2026-11-23, the project owner reported that `npm test` and `npm run dev` checks passed after the merge. A separate post-merge `npm run build` result has not been recorded here. Phase 6 (Image Optimization and Export Workflow) is now starting with a two-person team.
+Phase 4 (Advanced Format Support) was completed on 2026-11-20. Phase 5 (Image Manipulation) was merged through PR #5 and its integrated Editor workflow was verified. Phase 6 (Image Optimization and Export Workflow) was completed through PR #7 and PR #9, both merged into `main` by 2026-11-25. PR #9 reports 156/156 automated tests passing, a successful production build, successful integrated browser checks, and passing GitHub Actions. Phase 7 (Testing, Documentation, and Release) is the next stage and has not started. A known UI issue remains: the startup skeleton was last reported to always use the light theme, even when dark theme is selected.
 
 - User accounts and authentication.
 - Cloud storage.
@@ -184,7 +184,7 @@ The project has three assigned developers. Their GitHub usernames identify their
 - `andra-gs` owns the transformation processing module in `src/js/core/image-transformer.js` and its tests in `tests/image-transformer.test.js`.
 - `Adit1945-web` owns the adjustment processing module in `src/js/core/image-adjuster.js` and its tests in `tests/image-adjuster.test.js`.
 - `FarrelPtrv` owns the editor interface in `src/js/ui/image-editor.js`, its stylesheet in `src/styles/editor.css`, and integration tests in `tests/image-editor.test.js`.
-- The exact function signatures and shared editing-state representation are not yet fixed. The three members must agree on them before implementation. Do not assume that the suggested filenames imply that files have already been created.
+- The shared sRGB ImageData representation and the public Transformer/Adjuster contracts are agreed and implemented. The Editor integration uses `createImageProcessingAdapter()` to apply transformations before adjustments and passes edited ImageData to the existing conversion service. See `docs/TECHNICAL_SPECIFICATION.md` and `docs/PHASE_5_EDITOR_UI.md`.
 - The editor must pass the final edited image to the existing conversion service. Do not replace or duplicate the established format decoders, encoders, batch queue, Worker orchestration, or ZIP exporter.
 
 ### Phase 6 work boundaries
@@ -194,7 +194,7 @@ The project has three assigned developers. Their GitHub usernames identify their
 - Metadata Management is deferred to a future backlog item. It has no Phase 6 owner, branch, or API.
 - Reading, removing, and preserving metadata remain separate capabilities if Metadata Management is proposed later.
 - Target output size is not guaranteed. If the encoder cannot reach a requested size, show the actual achieved size and explain the limitation.
-- The optimizer API, capability matrix, error behavior, size-reporting shape, and resource ownership must be agreed before UI integration.
+- The optimizer API and capability matrix are approved and implemented. JPEG/WebP support Low/Medium/High presets and best-effort Target Size; PNG, BMP, TIFF, GIF, and SVG use `mode: none`. The production Export UI integration is merged and verified through PR #9. Target Size remains best-effort and is never guaranteed.
 
 ### Git and integration policy
 
@@ -205,8 +205,17 @@ Each member works on a separate branch created from the latest `main`:
 | Phase 5 | `phase-5-transformation` | `phase-5-adjustment` | `phase-5-editor-ui` |
 | Phase 6 | `phase-6-optimization` | Not applicable | `phase-6-export-ui` |
 
-Do not push feature work directly to `main`. Submit a Pull Request to `main`, include automated tests, run `npm test` and `npm run build`, and perform relevant browser checks. Merge the Image Optimization module before the Export UI integration branch. The UI owner must update their branch from the latest `main` before final integration. After both Phase 6 Pull Requests are merged, run the full test suite, production build, and end-to-end browser checks again.
+Do not push feature work directly to `main`. Submit a Pull Request to `main`, include automated tests, run `npm test` and `npm run build`, and perform relevant browser checks. Phase 5 and Phase 6 integrations are complete. Phase 6 followed the required order: optimizer PR #7 merged first, then the Export UI branch was synchronized and production integration was merged through PR #9. The integrated test suite, production build, GitHub Actions, and browser checks were reported as passing in PR #9.
 
 ### Instructions for ChatGPT used by team members
 
 ChatGPT must read the root-level `AGENTS.md` first and identify the developer's GitHub username before selecting a task. If the username is unknown, ask for it. It must also read `docs/DEVELOPMENT_ROADMAP.md`, this file, and `docs/TECHNICAL_SPECIFICATION.md`, then work only within that member's assigned responsibility for the active phase. `docs/STARTER_PROMPT.md` may be used to start a session. It must not silently implement another member's work, change task ownership, or modify shared integration files without coordination. It must distinguish planned tasks from implemented and verified functionality.
+
+## 10. Current implementation status (2026-11-25)
+
+- Phases 0–6: complete and merged into `main`.
+- Phase 5: Image Transformer, Image Adjuster, and Editor integration are complete.
+- Phase 6: Image Optimization Engine and Export UI production integration are complete.
+- Phase 7: release-readiness work is next and has not started.
+- Deferred backlog: Metadata Management remains unassigned and outside Phase 6.
+- Known UI issue: the startup skeleton was last reported to always appear in the light theme. The application theme itself still switches between light and dark, and the no-unstyled-content-flash check passed.

@@ -40,7 +40,8 @@ Tasks:
 - [x] Verify settings/results visibility and custom format selection on desktop and mobile (user-confirmed).
 - [x] Verify quality slider visibility and value updates (user-confirmed).
 - [x] Verify custom dropdown mouse and keyboard interactions (user-confirmed).
-- [x] Verify startup skeleton appears, follows light/dark theme, and no unstyled flash occurs (user-confirmed).
+- [x] Verify startup skeleton prevents an unstyled-content flash (user-confirmed).
+- [ ] Verify startup skeleton follows the selected light/dark theme. The user's last reported test found that it always appears in the light theme; fix and retest are still required.
 - [x] Verify both panels disappear after clearing the file queue (user-confirmed).
 - [x] Run a fresh production build after the latest UI changes (user-confirmed).
 
@@ -110,7 +111,7 @@ Deliverable: tested advanced-format pipelines. Complete. Limitations remain docu
 
 ## Phase 5: Image manipulation
 
-Status: In progress — the initial implementation and user-reported local verification are complete. Review follow-up fixes for decoder-independent previews and empty Crop/Resize inputs have been committed to `phase-5-editor-ui`; the updated automated suite/build and real-browser format checks are pending before the reviewer is asked to re-review. The Editor is connected to the Decoder, Image Transformer, Image Adjuster, and edited-ImageData conversion service. The user reported 86/86 automated tests passing, a successful production build (2,166 modules transformed), and successful browser verification that Editor processing produces the expected result while existing conversion features continue working. Animated GIF remains on the original File-based conversion path to preserve animation. Phase 6 starts only after Phase 5 is merged and verified.
+Status: Complete. The Editor integration was merged into `main` through PR #5 on 2026-11-22. The PR reported 98/98 automated tests passing, a successful production build, and real-browser verification of the Editor, HEIC/TIFF previews, Apply behavior, and existing conversion regressions. The project owner also reported post-merge `npm test` and `npm run dev` checks passing on 2026-11-23. Animated GIF remains on the original File-based conversion path to preserve animation.
 
 ### Team ownership
 
@@ -165,7 +166,7 @@ Completion criteria:
 
 Objective: implement pixel appearance and color adjustments. These operations modify the visual appearance of the image without changing its geometric dimensions.
 
-Status: Processing module, focused unit tests, and real-image browser verification are complete on `phase-5-adjustment`. The full repository test suite and production build also pass. Editor integration and the complete editing-to-conversion workflow remain pending.
+Status: The standalone Image Adjuster, focused unit tests, and real-image browser verification were complete on `phase-5-adjustment`. The Editor integration and complete editing-to-conversion workflow were subsequently completed and merged through PR #5. The PR reported 98 passing automated tests and a successful production build.
 
 Tasks:
 
@@ -185,7 +186,7 @@ Tasks:
 - [x] Add automated tests for default values, boundary values, brightness, contrast, saturation, grayscale, sepia, blur, transparency, dimensions, combined adjustments, and invalid input.
 - [x] Document the module's public interface and the agreed input/output contract for the editor integration.
 - [x] Verify all adjustments with representative real image files in the browser test harness (user-confirmed).
-- [ ] Verify the Transform → Adjust pipeline through the integrated editor after both processing modules are merged.
+- [x] Verify the Transform → Adjust pipeline through the integrated editor after both processing modules are merged (PR #5 integration and browser checks reported complete).
 
 Primary implementation file:
 
@@ -212,28 +213,28 @@ Objective: build the image-editing workspace and connect the transformation and 
 
 Tasks:
 
-- [ ] Design and implement an editing workspace that fits the existing application layout and design system.
-- [ ] Add an image preview area for the currently selected image.
-- [ ] Add width and height controls for resizing.
-- [ ] Add an aspect-ratio lock/unlock control.
-- [ ] Add crop selection controls and a clear way to apply or cancel a crop.
-- [ ] Add rotation controls for 90, 180, and 270 degrees.
-- [ ] Add horizontal and vertical flip controls.
-- [ ] Add brightness, contrast, saturation, and blur controls.
-- [ ] Add grayscale and sepia controls.
-- [ ] Show the current values of numeric adjustment controls.
-- [ ] Update the preview when the user changes editing controls, while avoiding unnecessary repeated processing that would make the interface unresponsive.
-- [ ] Add a Reset action that restores the editing settings to their initial state.
-- [ ] Add an Apply action that confirms the edited result for subsequent conversion.
-- [ ] Define and coordinate the shared editing state and module contracts with `andra-gs` and `Adit1945-web` before connecting their modules.
-- [ ] Connect the editor to the transformation and adjustment modules after their interfaces are agreed.
-- [ ] Pass the resulting edited image into the existing conversion service without duplicating or replacing the established decoders and encoders.
-- [ ] Ensure the original uploaded file remains available for reset or re-editing according to the agreed editing-state design.
-- [ ] Handle processing, invalid input, and error states visibly.
-- [ ] Ensure the editor works in light and dark themes.
-- [ ] Ensure the editor is responsive on desktop and mobile.
-- [ ] Preserve keyboard accessibility, focus behavior, and clear control labels.
-- [ ] Add UI and integration tests for the editing workflow, reset, apply, preview updates, errors, themes, and conversion handoff.
+- [x] Design and implement an editing workspace that fits the existing application layout and design system.
+- [x] Add an image preview area for the currently selected image.
+- [x] Add width and height controls for resizing.
+- [x] Add an aspect-ratio lock/unlock control.
+- [x] Add crop selection controls and a clear way to apply or cancel a crop.
+- [x] Add rotation controls for 90, 180, and 270 degrees.
+- [x] Add horizontal and vertical flip controls.
+- [x] Add brightness, contrast, saturation, and blur controls.
+- [x] Add grayscale and sepia controls.
+- [x] Show the current values of numeric adjustment controls.
+- [x] Update the preview when the user changes editing controls, while avoiding unnecessary repeated processing that would make the interface unresponsive.
+- [x] Add a Reset action that restores the editing settings to their initial state.
+- [x] Add an Apply action that confirms the edited result for subsequent conversion.
+- [x] Define and coordinate the shared editing state and module contracts with `andra-gs` and `Adit1945-web` before connecting their modules.
+- [x] Connect the editor to the transformation and adjustment modules after their interfaces are agreed.
+- [x] Pass the resulting edited image into the existing conversion service without duplicating or replacing the established decoders and encoders.
+- [x] Ensure the original uploaded file remains available for reset or re-editing according to the agreed editing-state design.
+- [x] Handle processing, invalid input, and error states visibly.
+- [x] Ensure the editor works in light and dark themes.
+- [x] Ensure the editor is responsive on desktop and mobile.
+- [x] Preserve keyboard accessibility, focus behavior, and clear control labels.
+- [x] Add UI and integration tests for the editing workflow, reset, apply, preview updates, errors, themes, and conversion handoff.
 
 Primary implementation files:
 
@@ -266,7 +267,7 @@ Deliverable: an image editor that supports geometric transformation and visual a
 
 ## Phase 6: Image optimization and export workflow
 
-Status: In progress. The optimizer PR is merged into `main`, and `phase-6-export-ui` is synchronized with the latest `main` ancestry. Production optimizer wiring is implemented on the Export UI branch; full automated, build, and integrated browser verification are pending. Metadata Management remains deferred to a future backlog item.
+Status: Complete. The Image Optimization Engine was merged through PR #7 and the production Export UI integration was merged through PR #9 on 2026-11-25. PR #9 reports 156/156 automated tests passing, a successful production build, successful integrated browser checks, and passing GitHub Actions. The build retains a non-fatal Vite chunk-size advisory for the HEIC-related bundles (~3.2 MB each). Metadata Management remains deferred to a future backlog item.
 
 ### Team ownership
 
@@ -290,21 +291,21 @@ Objective: implement the core optimization module and accurate file-size measure
 
 Tasks:
 
-- [ ] Inspect existing encoders and identify which formats expose meaningful optimization controls.
-- [ ] Define a supported-format and capability matrix for optimization.
-- [ ] Implement `src/js/core/image-optimizer.js`.
-- [ ] Add Low, Medium, and High quality presets for formats where the encoder supports them.
-- [ ] Map presets to documented, format-specific encoder settings. Do not assume the same quality number produces equivalent results across formats.
-- [ ] Implement target-file-size behavior only for formats where repeated encoding and quality adjustment are technically feasible. Start with JPEG and WebP if the current encoder path supports the required controls.
-- [ ] Do not promise an exact target size. Return the achieved size and clearly report when the requested target cannot be reached.
-- [ ] Measure source and output sizes from actual File/Blob data.
-- [ ] Calculate byte difference and percentage reduction or increase accurately, including cases where output is larger.
-- [ ] Ensure optimization never silently changes the selected output format.
-- [ ] Validate output MIME type and file signature using the existing conversion validation path.
-- [ ] Reopen or decode generated output where the current pipeline supports that verification.
-- [ ] Test visual quality using representative photographs, graphics, and transparent images where supported.
-- [ ] Document format-specific behavior and unsupported optimization options.
-- [ ] Add automated tests for preset mapping, format capability checks, target-size iteration and failure behavior, actual size calculations, invalid values, and output validation.
+- [x] Inspect existing encoders and identify which formats expose meaningful optimization controls.
+- [x] Define a supported-format and capability matrix for optimization.
+- [x] Implement `src/js/core/image-optimizer.js`.
+- [x] Add Low, Medium, and High quality presets for formats where the encoder supports them.
+- [x] Map presets to documented, format-specific encoder settings. Do not assume the same quality number produces equivalent results across formats.
+- [x] Implement target-file-size behavior only for formats where repeated encoding and quality adjustment are technically feasible. Start with JPEG and WebP if the current encoder path supports the required controls.
+- [x] Do not promise an exact target size. Return the achieved size and clearly report when the requested target cannot be reached.
+- [x] Measure source and output sizes from actual File/Blob data.
+- [x] Calculate byte difference and percentage reduction or increase accurately, including cases where output is larger.
+- [x] Ensure optimization never silently changes the selected output format.
+- [x] Validate output MIME type and file signature using the existing conversion validation path.
+- [x] Reopen or decode generated output where the current pipeline supports that verification.
+- [x] Test visual quality using representative photographs, graphics, and transparent images where supported.
+- [x] Document format-specific behavior and unsupported optimization options.
+- [x] Add automated tests for preset mapping, format capability checks, target-size iteration and failure behavior, actual size calculations, invalid values, and output validation.
 
 Primary files:
 
@@ -314,7 +315,7 @@ tests/image-optimizer.test.js
 docs/PHASE_6_OPTIMIZATION.md
 ```
 
-Expected API contract: agree with Farrel before implementation. The contract should accept the source image/result and an explicit optimization configuration, use the existing conversion/encoder path, and return the generated Blob plus actual source/output size information. Final names and shapes must be documented before UI integration.
+Final API contract: approved and implemented in [`PHASE_6_OPTIMIZATION_API.md`](./PHASE_6_OPTIMIZATION_API.md). The public API is `optimizeImage(source, options)` with `IMAGE_OPTIMIZATION_CAPABILITIES`; it accepts File/Blob or `{ file, imageData }` sources and returns a validated Blob with actual size and optimization metadata.
 
 Completion criteria:
 
@@ -331,23 +332,23 @@ Objective: implement the export settings interface and connect it to the Image O
 
 Tasks:
 
-- [ ] Design an Export Settings panel consistent with the existing application design system.
-- [ ] Add Low, Medium, and High preset controls when supported by the selected output format.
-- [ ] Show format-specific quality controls only when the selected encoder supports them.
-- [ ] Add a target-file-size control only for formats supported by the agreed optimizer contract.
-- [ ] Display the actual source file size.
-- [ ] Display the actual generated output size.
-- [ ] Display the byte difference and percentage reduction or increase.
-- [ ] Make clear when optimization is unavailable for the selected format.
-- [ ] Integrate the panel with `image-optimizer.js` using the agreed API.
-- [ ] Apply the selected settings to individual downloads.
-- [ ] Apply the selected settings to ZIP export so each successful item uses its own selected output settings.
-- [ ] Keep per-file optimization failures isolated so one failed item does not unnecessarily cancel unrelated batch items.
-- [ ] Preserve existing conversion, validation, queue, Worker, and ZIP behavior.
-- [ ] Support light and dark themes.
-- [ ] Ensure responsive desktop/mobile layout and keyboard accessibility.
-- [ ] Add UI and integration tests for presets, capability-dependent controls, size reporting, individual downloads, ZIP export, error states, and theme behavior.
-- [ ] Document the UI behavior and integration contract in `docs/PHASE_6_EXPORT_UI.md`.
+- [x] Design an Export Settings panel consistent with the existing application design system.
+- [x] Add Low, Medium, and High preset controls when supported by the selected output format.
+- [x] Show format-specific quality controls only when the selected encoder supports them.
+- [x] Add a target-file-size control only for formats supported by the agreed optimizer contract.
+- [x] Display the actual source file size.
+- [x] Display the actual generated output size.
+- [x] Display the byte difference and percentage reduction or increase.
+- [x] Make clear when optimization is unavailable for the selected format.
+- [x] Integrate the panel with `image-optimizer.js` using the agreed API.
+- [x] Apply the selected settings to individual downloads.
+- [x] Apply the selected settings to ZIP export so each successful item uses its own selected output settings.
+- [x] Keep per-file optimization failures isolated so one failed item does not unnecessarily cancel unrelated batch items.
+- [x] Preserve existing conversion, validation, queue, Worker, and ZIP behavior.
+- [x] Support light and dark themes.
+- [x] Ensure responsive desktop/mobile layout and keyboard accessibility.
+- [x] Add UI and integration tests for presets, capability-dependent controls, size reporting, individual downloads, ZIP export, error states, and theme behavior.
+- [x] Document the UI behavior and integration contract in `docs/PHASE_6_EXPORT_UI.md`.
 
 Primary files:
 
@@ -370,32 +371,40 @@ Completion criteria:
 - Existing conversion and batch behavior remains functional.
 - Focused tests, full test suite, browser checks, and production build pass.
 
-### Supported-format planning matrix
+### Verified optimization capability matrix
 
-This matrix describes the initial investigation and intended behavior. Final availability must be based on the actual encoder capabilities and browser verification.
+The following behavior is implemented and covered by the merged optimizer and Export UI integration:
 
-| Output format | Initial optimization plan |
+| Output format | Verified export optimization behavior |
 |---|---|
-| JPEG | Quality control; evaluate iterative quality adjustment for target-size attempts |
-| WebP | Quality control; evaluate iterative quality adjustment for target-size attempts |
-| PNG | Lossless output and encoder-supported optimization; no lossy quality preset unless explicitly implemented |
-| BMP | No quality control in the current baseline encoder; report optimization as unavailable unless a real optimization path is added |
-| TIFF | Follow the current baseline uncompressed encoder; no quality control or compression selection is promised |
-| GIF | Follow the current GIF encoder capabilities; do not expose generic quality presets without a verified mapping |
-| SVG | No raster quality control. Preserve the existing embedded-PNG wrapper behavior and do not describe it as vector optimization |
+| JPEG | Low/Medium/High presets and best-effort Target Size; target search uses up to 7 validated candidates in the quality range 0.10–0.95 |
+| WebP | Low/Medium/High presets and best-effort Target Size; target search uses up to 7 validated candidates in the quality range 0.10–0.95 |
+| PNG | `mode: none`; existing PNG encoder path |
+| BMP | `mode: none`; existing dedicated 24-bit BMP encoder |
+| TIFF | `mode: none`; existing baseline uncompressed TIFF encoder |
+| GIF | `mode: none`; preserve animated GIF through the existing File-based path |
+| SVG | `mode: none`; SVG wrapper continues to embed PNG and is not vector optimization |
+| HEIC/HEIF | Input decoding only; no output encoder in the current capability registry |
 
-### Phase 6 integration order
+### Phase 6 integration order and completion evidence
 
-1. Phase 5 post-merge checks on `main`: the project owner reports `npm test` and `npm run dev` completed successfully on 2026-11-23. The production build result is not recorded in this checkpoint and must be run before the Phase 6 processing PR is submitted.
-2. Create `phase-6-optimization` and `phase-6-export-ui` from the latest `main`.
-3. Agree on the optimizer API, preset mapping, supported-format matrix, error behavior, size-reporting shape, and resource ownership before either implementation is integrated.
-4. `andra-gs` implements the optimizer and focused tests. Farrel may build the UI against a temporary mock contract, but must not invent a competing API.
-5. Review and merge the optimizer Pull Request into `main`.
-6. `FarrelPtrv` updates `phase-6-export-ui` from the newly updated `main`, then integrates the real optimizer with individual downloads and ZIP export. The branch synchronization and production wiring have now been performed; verification remains.
-7. Review and merge the export UI Pull Request.
-8. Run the complete automated test suite and production build, then test representative real files in the browser, including individual downloads, mixed-format batches, and ZIP extraction/integrity.
+1. [x] Complete Phase 5 post-merge checks before starting Phase 6.
+2. [x] Create `phase-6-optimization` and `phase-6-export-ui` from the appropriate `main` history.
+3. [x] Approve the shared optimizer API, preset mapping, capability matrix, error behavior, size-reporting shape, and resource ownership.
+4. [x] Implement and merge the Image Optimization Engine through [PR #7](https://github.com/andra-gs/Images-Format-Converter/pull/7).
+5. [x] Synchronize the Export UI branch with the merged optimizer and integrate the real optimizer into the production conversion flow.
+6. [x] Integrate per-file settings, edited ImageData handling, sequential queue behavior, individual downloads, and ZIP reuse.
+7. [x] Review and merge the production Export UI integration through [PR #9](https://github.com/andra-gs/Images-Format-Converter/pull/9) on 2026-11-25.
+8. [x] Run the integrated test suite and production build, then complete real-browser verification of presets, Target Size reached/not-reached, unsupported-format `none` mode, animated GIF, edited images, mixed batches, failure isolation, individual downloads, ZIP integrity, and existing conversion/Editor regressions.
 
-Deliverable: an export workflow with format-aware optimization presets, feasible target-size attempts, accurate file-size reporting, and integration with individual and ZIP downloads.
+Verification reported for PR #9:
+- `npm test`: 156/156 passed, 0 failed.
+- `npm run build`: successful.
+- GitHub Actions: all checks passed.
+- Integrated browser checks: contributor-reported as completed successfully.
+- Existing non-fatal Vite chunk-size advisory remains for HEIC-related bundles (~3.2 MB each).
+
+These results were reported in the PR and were not independently rerun during this documentation update.
 
 ### Deferred backlog: Metadata Management
 
@@ -417,7 +426,7 @@ No owner, branch, API, or delivery date is assigned to this deferred work yet.
 
 ## Phase 7: Testing, documentation, and release
 
-This phase contains the release-readiness work that was previously listed as Phase 6. It is intentionally separate from the newly agreed Phase 6 feature work.
+Status: Next phase; not started. Phase 0–6 feature development is complete. This phase contains the remaining project-wide release-readiness work.
 
 Tasks:
 
@@ -517,7 +526,9 @@ Branch names are the agreed convention. The branches are created when the releva
 
 ## 2026-11-25 - Phase 6 optimizer synchronization update
 
-The Image Optimization Engine has been merged into `main` through PR #7 and its source, API contract, optimizer tests, and standalone browser harness have been synchronized onto `phase-6-export-ui`. Andra reports that real-browser verification has been completed. This report is owner-confirmed; the current branch still requires integrated application testing after Export UI production wiring.
+Historical checkpoint before production Export UI wiring. Its pending integration items are superseded by the later PR #9 completion record below.
+
+The Image Optimization Engine has been merged into `main` through PR #7 and its source, API contract, optimizer tests, and standalone browser harness have been synchronized onto `phase-6-export-ui`. Andra reports that real-browser verification has been completed. This report is owner-confirmed; at that checkpoint, integrated application testing after Export UI production wiring was still required.
 
 Completed synchronization items:
 - [x] Bring `src/js/core/image-optimizer.js` onto `phase-6-export-ui`.
@@ -534,6 +545,8 @@ All synchronization commits are targeted at `phase-6-export-ui`. The `main` bran
 
 ## 2026-11-25 - Export UI production optimizer wiring
 
+Historical checkpoint before final PR review and merge. The pending verification items below were later completed and are superseded by the Phase 6 completion record at the end of this file.
+
 Current branch: `phase-6-export-ui` (head `ba40e1e` at this documentation checkpoint).
 
 Implementation now present:
@@ -544,7 +557,7 @@ Implementation now present:
 - Individual downloads and ZIP export reuse the same optimizer result Blob; ZIP does not re-encode.
 - Result UI reports source/output sizes, byte and percentage change, MIME type, and Target Size status.
 
-Still required before PR:
+Outstanding at this checkpoint before PR #9:
 - [ ] Run `npm test` after production integration.
 - [ ] Run `npm run build` after production integration.
 - [ ] Test JPEG/WebP presets and Target Size reached/not-reached with real images.
@@ -552,3 +565,11 @@ Still required before PR:
 - [ ] Test edited ImageData, mixed-format batch, failure isolation, individual downloads, and ZIP Blob reuse.
 - [ ] Repeat existing conversion, Editor, queue progress, cancellation, and theme regression checks in a real browser.
 - [ ] Record actual results and limitations in the development log.
+
+## 2026-11-25 - Phase 6 completion and documentation correction
+
+PR #9 merged the production Export UI integration into `main` after the Image Optimization Engine from PR #7 had already been merged. The latest Phase 6 integration report records 156/156 automated tests passing, a successful production build, successful integrated browser checks, and passing GitHub Actions.
+
+The current roadmap now marks Phase 5 and Phase 6 complete. Earlier Phase 6 checkpoints in this file that describe production integration or verification as pending are historical checkpoints and are superseded by this completion record.
+
+Known outstanding issue carried into Phase 7: the user's last reported UI check found that the startup skeleton always appears in the light theme, even when dark theme is selected. The no-unstyled-content-flash check passed. Theme matching still requires a fix and retest.

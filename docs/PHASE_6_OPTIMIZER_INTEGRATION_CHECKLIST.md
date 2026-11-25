@@ -3,7 +3,7 @@
 **Branch:** `phase-6-export-ui`  
 **UI owner:** `FarrelPtrv`  
 **Optimizer owner:** `andra-gs`  
-**Status:** Production wiring implemented on `phase-6-export-ui`; automated, build, and integrated browser verification are pending.
+**Status:** Complete and merged into `main` through PR #9. All integration checklist items below were reported as completed; PR #9 records 156/156 tests passing, a successful production build, passing GitHub Actions, and successful integrated browser checks.
 
 This checklist is the handoff and verification plan for connecting the Export UI adapter to the real Image Optimization Engine. It does not authorize changes to the shared conversion service, Queue orchestration, or ZIP exporter beyond the agreed Phase 6 scope.
 
@@ -19,60 +19,60 @@ Do not connect the production UI to an unmerged optimizer branch.
 
 ## 2. API and adapter compatibility
 
-- [ ] Named export `optimizeImage(source, options)` is available.
-- [ ] Named export `IMAGE_OPTIMIZATION_CAPABILITIES` is available if used for capability gating.
-- [ ] File and Blob sources are accepted.
-- [ ] Edited source shape `{ file, imageData }` uses the edited pixels.
-- [ ] Original File/Blob size remains the source of truth for `sourceBytes`.
-- [ ] Optimizer does not mutate caller-owned File, Blob, or ImageData.
-- [ ] Result includes a non-empty Blob, format, MIME type, dimensions, size metrics, optimization metadata, and passed validation status.
-- [ ] Stable error codes match the agreed contract.
-- [ ] Adapter requires all six optimization metadata fields as own properties and rejects non-object/incomplete metadata.
-- [ ] Adapter validates mode, preset, quality, targetBytes, targetReached, and attempts types/ranges against the requested mode.
-- [ ] Adapter accepts preset quality only as a finite 0–1 number without duplicating Low/Medium/High mapping.
-- [ ] Adapter validates target-size quality within 0.10–0.95 and attempts within 1–7.
-- [ ] Adapter rejects optimization modes for output formats other than JPEG/WebP.
-- [ ] Adapter validates actual optimizer metadata without duplicating preset mapping or target-size search.
+- [x] Named export `optimizeImage(source, options)` is available.
+- [x] Named export `IMAGE_OPTIMIZATION_CAPABILITIES` is available if used for capability gating.
+- [x] File and Blob sources are accepted.
+- [x] Edited source shape `{ file, imageData }` uses the edited pixels.
+- [x] Original File/Blob size remains the source of truth for `sourceBytes`.
+- [x] Optimizer does not mutate caller-owned File, Blob, or ImageData.
+- [x] Result includes a non-empty Blob, format, MIME type, dimensions, size metrics, optimization metadata, and passed validation status.
+- [x] Stable error codes match the agreed contract.
+- [x] Adapter requires all six optimization metadata fields as own properties and rejects non-object/incomplete metadata.
+- [x] Adapter validates mode, preset, quality, targetBytes, targetReached, and attempts types/ranges against the requested mode.
+- [x] Adapter accepts preset quality only as a finite 0–1 number without duplicating Low/Medium/High mapping.
+- [x] Adapter validates target-size quality within 0.10–0.95 and attempts within 1–7.
+- [x] Adapter rejects optimization modes for output formats other than JPEG/WebP.
+- [x] Adapter validates actual optimizer metadata without duplicating preset mapping or target-size search.
 
 Detailed Export UI metadata validation rules are recorded in [`PHASE_6_EXPORT_ADAPTER_VALIDATION.md`](./PHASE_6_EXPORT_ADAPTER_VALIDATION.md).
 
 ## 3. Format and preset scenarios
 
-- [ ] JPEG + None.
-- [ ] JPEG + Low preset (optimizer reports quality 0.55).
-- [ ] JPEG + Medium preset (optimizer reports quality 0.75).
-- [ ] JPEG + High preset (optimizer reports quality 0.90).
-- [ ] WebP + None.
-- [ ] WebP + Low preset (optimizer reports quality 0.55).
-- [ ] WebP + Medium preset (optimizer reports quality 0.75).
-- [ ] WebP + High preset (optimizer reports quality 0.90).
-- [ ] PNG, BMP, TIFF, GIF, and SVG accept only None mode.
-- [ ] Unsupported format/mode combinations return the expected stable error.
+- [x] JPEG + None.
+- [x] JPEG + Low preset (optimizer reports quality 0.55).
+- [x] JPEG + Medium preset (optimizer reports quality 0.75).
+- [x] JPEG + High preset (optimizer reports quality 0.90).
+- [x] WebP + None.
+- [x] WebP + Low preset (optimizer reports quality 0.55).
+- [x] WebP + Medium preset (optimizer reports quality 0.75).
+- [x] WebP + High preset (optimizer reports quality 0.90).
+- [x] PNG, BMP, TIFF, GIF, and SVG accept only None mode.
+- [x] Unsupported format/mode combinations return the expected stable error.
 
 Preset mapping belongs to the optimizer. The Export UI and adapter must not independently map Low/Medium/High to encoder quality.
 
 ## 4. Target Size scenarios
 
-- [ ] JPEG target-size request passes `targetBytes` in bytes.
-- [ ] WebP target-size request passes `targetBytes` in bytes.
-- [ ] Quality metadata is within 0.10–0.95.
-- [ ] Attempt count is an integer from 1 through 7.
-- [ ] Target reached is reported as a boolean.
-- [ ] Target reached successfully: UI reports actual output size and reached status.
-- [ ] Target not reached: valid best-effort output is still displayed with a clear not-reached status.
-- [ ] Invalid target values produce the agreed target-size error.
-- [ ] Unsupported formats reject target-size mode.
+- [x] JPEG target-size request passes `targetBytes` in bytes.
+- [x] WebP target-size request passes `targetBytes` in bytes.
+- [x] Quality metadata is within 0.10–0.95.
+- [x] Attempt count is an integer from 1 through 7.
+- [x] Target reached is reported as a boolean.
+- [x] Target reached successfully: UI reports actual output size and reached status.
+- [x] Target not reached: valid best-effort output is still displayed with a clear not-reached status.
+- [x] Invalid target values produce the agreed target-size error.
+- [x] Unsupported formats reject target-size mode.
 
 ## 5. Result metrics and output validation
 
-- [ ] `sourceBytes` equals the original source file/blob size.
-- [ ] `outputBytes` equals the returned Blob size.
-- [ ] `differenceBytes` equals source bytes minus output bytes.
-- [ ] `reductionPercent` matches the contract calculation.
-- [ ] Output growth (negative reduction) is displayed correctly.
-- [ ] Output format and MIME type match.
-- [ ] Width and height come from the optimizer result.
-- [ ] Invalid Blob, MIME, dimensions, size metrics, or validation metadata are rejected by the adapter.
+- [x] `sourceBytes` equals the original source file/blob size.
+- [x] `outputBytes` equals the returned Blob size.
+- [x] `differenceBytes` equals source bytes minus output bytes.
+- [x] `reductionPercent` matches the contract calculation.
+- [x] Output growth (negative reduction) is displayed correctly.
+- [x] Output format and MIME type match.
+- [x] Width and height come from the optimizer result.
+- [x] Invalid Blob, MIME, dimensions, size metrics, or validation metadata are rejected by the adapter.
 
 ## 6. Production integration implementation
 
@@ -91,16 +91,16 @@ The following wiring is now present in `src/js/main.js`:
 - [x] Display original size, output size, byte difference, percentage change, MIME type, and Target Size reached/not-reached status.
 - [x] Keep animated GIF on the original File-based optimizer path; edited ImageData to GIF remains unsupported.
 
-### Integrated regression verification — pending
-- [ ] Individual JPEG/WebP exports with each preset.
-- [ ] JPEG/WebP Target Size reached and not reached.
-- [ ] PNG, BMP, TIFF, SVG in None mode.
-- [ ] GIF-to-GIF retains animation.
-- [ ] Edited image exports use current edited pixels.
-- [ ] Mixed-format batch, per-file settings, and failure isolation.
-- [ ] Individual downloads open with the correct extension and MIME type.
-- [ ] ZIP contains the exact already-optimized Blobs, with no second optimization.
-- [ ] Existing conversion, Editor, queue progress, cancellation, and error states remain functional.
+### Integrated regression verification — completed (PR #9 report)
+- [x] Individual JPEG/WebP exports with each preset.
+- [x] JPEG/WebP Target Size reached and not reached.
+- [x] PNG, BMP, TIFF, SVG in None mode.
+- [x] GIF-to-GIF retains animation.
+- [x] Edited image exports use current edited pixels.
+- [x] Mixed-format batch, per-file settings, and failure isolation.
+- [x] Individual downloads open with the correct extension and MIME type.
+- [x] ZIP contains the exact already-optimized Blobs, with no second optimization.
+- [x] Existing conversion, Editor, queue progress, cancellation, and error states remain functional.
 
 ## 7. Mock harness scope (pre-integration)
 
@@ -120,10 +120,10 @@ The browser mock harness currently contains 11 scenarios. User-reported latest l
 - [x] UI control behavior and format switching.
 
 When the real optimizer is available, separately verify its internal candidate behavior:
-- [ ] A candidate encoding failure does not become a successful candidate.
-- [ ] If every target-size candidate fails, the optimizer rejects the request.
-- [ ] Target reached and target not reached behavior use actual encoded outputs.
-- [ ] Actual conversion output can be reopened and decoded by the browser.
+- [x] A candidate encoding failure does not become a successful candidate.
+- [x] If every target-size candidate fails, the optimizer rejects the request.
+- [x] Target reached and target not reached behavior use actual encoded outputs.
+- [x] Actual conversion output can be reopened and decoded by the browser.
 
 ## 8. Verification commands and evidence
 
@@ -144,11 +144,7 @@ Latest user-reported local verification on the Export UI branch (2026-11-24):
 
 The 131/131 result includes the metadata validation regression tests after the adapter error-message correction in commit `be0530d`. These are user-reported local results; the repository changes were not executed by GitHub during documentation updates.
 
-For the newly wired production integration, still required:
-- [ ] Automated tests rerun after optimizer merge and integration.
-- [ ] Production build rerun after optimizer merge and integration.
-- [ ] Real-browser tests run against the actual optimizer, not the mock.
-- [ ] Results and any deviations are recorded in the Phase 6 development log.
+Final integrated verification was reported in PR #9: `npm test` passed 156/156, `npm run build` succeeded, GitHub Actions passed, and the contributor completed real-browser checks against the actual optimizer and production Export UI. The earlier pending checklist is superseded by this final result. The build continues to emit a non-fatal Vite chunk-size advisory for HEIC-related bundles (~3.2 MB each).
 
 ## 9. Scope boundaries
 
@@ -158,3 +154,15 @@ For the newly wired production integration, still required:
 - Do not add a manual Image Quality slider.
 - Do not implement encoder quality mapping or target-size search in the UI.
 - Do not merge `phase-6-export-ui` into `main` without explicit approval.
+
+## 10. Final merge record — 2026-11-25
+
+- Optimizer PR #7: merged into `main`.
+- Export UI integration PR #9: merged into `main`.
+- Merge commit for PR #9: `17bb59628660d31bad64bb16eebb5337d9bf44a6`.
+- Automated tests: 156/156 passed, 0 failed.
+- Production build: successful.
+- GitHub Actions: all checks passed.
+- Browser verification: contributor-reported successful for all integrated scenarios listed in the checklist.
+
+The test/build/browser results were reported by the contributor in PR #9; they were not independently rerun during this documentation-only update.

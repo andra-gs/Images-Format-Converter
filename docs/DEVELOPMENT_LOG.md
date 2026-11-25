@@ -4,8 +4,8 @@ This file records actual repository progress. Update it after meaningful impleme
 
 ## Project status
 
-- Current stage: Phase 6 - Image Optimization and Export Workflow
-- Current phase status: Phase 5 and the Image Optimization Engine have been merged into `main`. The optimizer source and API are synchronized on `phase-6-export-ui`; production conversion, individual download, ZIP reuse, and result metrics are now wired through the existing sequential queue. Automated tests, production build, and integrated real-browser regression remain pending.
+- Current stage: Phase 7 - Testing, Documentation, and Release (next)
+- Current phase status: Phases 0–6 are complete and merged into `main`. Phase 7 release-readiness work has not started. Phase 1 retains one known UI issue: the user's last reported check found that the startup skeleton always appears in the light theme, even when dark theme is selected. The no-unstyled-content-flash check passed.
 - Latest release: None
 - Last updated: 2026-11-25
 
@@ -22,15 +22,28 @@ This file records actual repository progress. Update it after meaningful impleme
 | Phase | Status | Notes |
 |---|---|---|
 | Phase 0: Project foundation | Tested | User confirmed localhost works and `npm run build` succeeds; `package-lock.json` is present in the GitHub repository |
-| Phase 1: UI development | Tested | User confirmed the skeleton follows light/dark themes, theme persists after refresh, no unstyled flash appears, and `npm run build` succeeds |
+| Phase 1: UI development | Tested with known issue | User confirmed custom dropdown behavior, theme switching, and no unstyled flash. The user's last reported check found that the startup skeleton always appears in the light theme; theme matching remains unresolved and must be retested |
 | Phase 2: Core conversion engine | Tested | PNG, JPEG, WebP, and BMP conversion paths are user-verified; user reports the requested automated tests and build checks passed |
 | Phase 3: Batch processing | Tested | User verified batch queue, worker execution, progress, cancellation, failure isolation, large-image responsiveness, cleanup, individual downloads, ZIP extraction, and image integrity |
 | Phase 4: Advanced formats | Tested | Completed; CI validation and user-run real-browser verification passed. Known format limitations remain documented |
 | Phase 5: Image manipulation | Complete | Merged into `main`; project owner reports post-merge `npm test` and `npm run dev` checks passed on 2026-11-23. A separate post-merge production build result is not recorded |
-| Phase 6: Image optimization and export workflow | In progress | Kickoff authorized. `andra-gs`: Image Optimization Engine; `FarrelPtrv`: Export Presets and UI Integration. Metadata Management is deferred |
+| Phase 6: Image optimization and export workflow | Complete | Optimizer merged through PR #7; production Export UI integration merged through PR #9 on 2026-11-25. PR #9 reports 156/156 tests, successful build, successful integrated browser checks, and passing GitHub Actions. Metadata Management remains deferred |
 | Phase 7: Testing, documentation, and release | Not started | Cross-browser QA, security review, documentation, production validation, and v1.0.0 readiness |
 
 ## Change log
+
+### 2026-11-25 - Phase 6 merged and verified
+- Status: Complete; PR #9 merged the production Export UI integration into `main` after optimizer PR #7.
+- Integrated behavior: per-file JPEG/WebP Low/Medium/High presets and best-effort Target Size; `mode: none` for PNG, BMP, TIFF, GIF, and SVG; edited ImageData is passed to the optimizer without falling back to original pixels; animated GIF stays on the File-based path.
+- Export results: validated optimizer Blob is stored once and reused by individual download and ZIP export. ZIP does not run optimization again. Result cards show actual source/output sizes, byte difference, percentage change, MIME type, and Target Size status.
+- Verification reported in PR #9: `npm test` 156/156 passed; `npm run build` succeeded; integrated browser checks completed successfully; GitHub Actions checks passed.
+- Build note: Vite continues to emit a non-fatal chunk-size advisory for the HEIC-related bundles (~3.2 MB each). The build completed successfully.
+- Evidence: [PR #9](https://github.com/andra-gs/Images-Format-Converter/pull/9), merge commit `17bb59628660d31bad64bb16eebb5337d9bf44a6`.
+- Verification boundary: these test/build/browser results were reported by the contributor in the PR. They were not independently rerun during this documentation update.
+
+### 2026-11-25 - Documentation audit: outstanding UI issue
+- Reviewed the last user-reported Phase 1 browser checklist. Custom dropdown padding, option selection, keyboard navigation, outside-click dismissal, theme switching, and absence of unstyled-content flash passed.
+- The startup skeleton did not follow the selected theme and always appeared light. The roadmap and README previously overstated this as verified; the status is corrected and a fix/retest remains open for Phase 7.
 
 ### 2026-11-25 - Production Image Optimizer wiring
 
@@ -1236,3 +1249,8 @@ Add newest entries first.
 - Recorded light and dark themes, hybrid processing, and phased MVP development.
 - No application features had been implemented or tested at this point.
 
+### 2026-11-25 - Documentation synchronization after Phase 6 merge
+- Reconciled README, roadmap, project context, technical specification, Phase 5 and Phase 6 implementation notes, API contract, integration checklist, and starter prompt with the merged PR #9 state.
+- Marked Phase 5 and Phase 6 complete based on merged PRs and reported verification evidence.
+- Preserved earlier development-log entries as historical checkpoints. Their pending states are superseded by this entry and the PR #9 merge.
+- No application code was changed and no tests or production build were run as part of this documentation-only update.
