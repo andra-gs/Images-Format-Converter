@@ -59,6 +59,8 @@ Images-Format-Converter/
 │   │   ├── reset.css
 │   │   ├── layout.css
 │   │   ├── components.css
+│   │   ├── editor.css
+│   │   ├── export-panel.css
 │   │   └── themes.css
 │   └── js/
 │       ├── main.js
