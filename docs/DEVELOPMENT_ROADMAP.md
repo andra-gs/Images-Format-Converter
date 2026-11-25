@@ -166,7 +166,7 @@ Completion criteria:
 
 Objective: implement pixel appearance and color adjustments. These operations modify the visual appearance of the image without changing its geometric dimensions.
 
-Status: Processing module, focused unit tests, and real-image browser verification are complete on `phase-5-adjustment`. The full repository test suite and production build also pass. Editor integration and the complete editing-to-conversion workflow remain pending.
+Status: The standalone Image Adjuster, focused unit tests, and real-image browser verification were complete on `phase-5-adjustment`. The Editor integration and complete editing-to-conversion workflow were subsequently completed and merged through PR #5. The PR reported 98 passing automated tests and a successful production build.
 
 Tasks:
 
