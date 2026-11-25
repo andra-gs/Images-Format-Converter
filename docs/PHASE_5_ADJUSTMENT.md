@@ -88,3 +88,7 @@ node --test tests/image-adjuster.test.js
 A real-image browser harness is available at `/tests/browser-adjuster.html`. It decodes a selected local image with the existing decoder, copies its pixels into sRGB ImageData, applies the selected adjustments, and displays original and adjusted previews. It also exposes Reset and releases the temporary decoder and staging-canvas resources.
 
 The focused tests passed locally in the Node test environment. The user has now confirmed that the adjustment features work correctly in the real-image browser harness. Editor integration and the complete editing-to-conversion workflow remain pending. Do not mark the full Image Adjustment task complete until the integrated editor workflow is verified.
+
+## Integrated Phase 5 status (2026-11-25)
+
+The Image Adjuster was integrated with the Image Transformer and Editor through PR #5, merged into `main` on 2026-11-22. The PR reported 98 passing automated tests, a successful production build, and real-browser verification of the integrated Editor flow. The project owner also reported post-merge `npm test` and `npm run dev` checks passing on 2026-11-23. The standalone adjustment module and its editor integration are complete. Broader cross-browser and release QA remain in Phase 7.
