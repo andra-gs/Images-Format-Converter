@@ -84,7 +84,7 @@ These are user-reported manual results; they were not independently executed in 
 
 The Editor processing and edited-image conversion workflow is implemented and has passed the user's reported local automated tests, production build, and browser integration/regression checks on this feature branch.
 
-Phase 5 is ready for final branch review and a Pull Request to `main`. It is not considered officially complete until the PR is reviewed and merged, followed by the agreed post-merge verification. Phase 6 must not begin before that integration is complete.
+Historical status at the time of this checkpoint: Phase 5 was awaiting final review and merge. PR #5 was subsequently merged into `main` on 2026-11-22, and Phase 5 is complete. The final merge and verification evidence is recorded at the end of this document.
 
 ## Known limitations and follow-up
 
