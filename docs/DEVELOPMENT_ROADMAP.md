@@ -186,7 +186,7 @@ Tasks:
 - [x] Add automated tests for default values, boundary values, brightness, contrast, saturation, grayscale, sepia, blur, transparency, dimensions, combined adjustments, and invalid input.
 - [x] Document the module's public interface and the agreed input/output contract for the editor integration.
 - [x] Verify all adjustments with representative real image files in the browser test harness (user-confirmed).
-- [ ] Verify the Transform → Adjust pipeline through the integrated editor after both processing modules are merged.
+- [x] Verify the Transform → Adjust pipeline through the integrated editor after both processing modules are merged (PR #5 integration and browser checks reported complete).
 
 Primary implementation file:
 
