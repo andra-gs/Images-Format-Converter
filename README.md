@@ -345,4 +345,4 @@ The application is under active development. Contributions, bug reports, and sug
 
 ## License
 
-No repository license has been declared yet. Until a license is added to the repository, do not assume that the source code is available for unrestricted reuse.
+The package metadata declares the ISC license, but the repository does not yet include a `LICENSE` file. The licensing information is incomplete. Check with the project owner before redistributing or reusing the source code.
