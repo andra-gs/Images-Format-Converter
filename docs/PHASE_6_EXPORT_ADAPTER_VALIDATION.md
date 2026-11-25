@@ -2,7 +2,7 @@
 
 **Branch:** `phase-6-export-ui`  
 **Owner:** `FarrelPtrv`  
-**Boundary:** Export UI adapter only. The Image Optimization Engine and production integration are not modified.
+**Boundary:** This document specifies the Export UI adapter's validation responsibilities. The adapter is now used by the merged production integration from PR #9; it validates the UI-to-optimizer handoff and does not own encoding or optimization policy.
 
 ## Required metadata
 
@@ -50,3 +50,9 @@ User-reported results after the adapter error-message correction (commit `be0530
 - [x] `npm run build`: succeeded.
 
 The previously failing metadata validation tests now pass with the adapter's incomplete-metadata message matching the test expectations. These results were reported by the user after running the commands locally; this documentation update does not itself execute the test suite or build.
+
+## Production integration status (2026-11-25)
+
+The adapter is integrated into the production export flow through PR #9. The merged integration reports 156/156 automated tests passing, successful production build, passing GitHub Actions, and successful integrated browser checks. Per-file optimizer results are validated before storage in `conversionResults`; individual download and ZIP export reuse the validated Blob.
+
+These results were reported in PR #9 and were not independently rerun during this documentation update.
