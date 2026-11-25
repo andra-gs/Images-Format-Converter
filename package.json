@@ -20,17 +20,22 @@
   "devDependencies": {
     "vite": "^7.3.8"
   },
-  "description": "A local-first image format conversion web application. Image files are processed in the user's browser and are not uploaded to a remote server.",
-  "main": "vite.config.js",
-  "directories": {
-    "doc": "docs"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/andra-gs/Images-Format-Converter.git"
-  },
-  "keywords": [],
-  "author": "",
+  "description": "Browser-based image conversion, editing, and optimization with local processing.",
+  "keywords": [
+    "image-converter",
+    "image-format-converter",
+    "image-optimization",
+    "browser-based",
+    "client-side",
+    "javascript",
+    "vite",
+    "web-workers",
+    "heic",
+    "tiff",
+    "webp",
+    "gif"
+  ],
+  "author": "Andra",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/andra-gs/Images-Format-Converter/issues"
