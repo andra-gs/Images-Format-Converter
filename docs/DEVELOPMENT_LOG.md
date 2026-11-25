@@ -5,7 +5,7 @@ This file records actual repository progress. Update it after meaningful impleme
 ## Project status
 
 - Current stage: Phase 6 - Image Optimization and Export Workflow
-- Current phase status: Phase 5 has been merged into `main`. Phase 6 is in progress: `andra-gs` owns the Image Optimization Engine and `FarrelPtrv` owns Export Presets and UI Integration. The approved optimizer API contract has been read. An isolated Export UI module, styles, and mock-contract tests are committed on `phase-6-export-ui`; production conversion/download/ZIP integration is waiting for the optimizer PR to merge.
+- Current phase status: Phase 5 and the Image Optimization Engine have been merged into `main`. The optimizer source, API contract, focused tests, and browser harness have now been synchronized onto `phase-6-export-ui` without modifying `main`. Andra reports real-browser verification completed. Export UI production integration, individual downloads, and per-file ZIP integration remain in progress.
 - Latest release: None
 - Last updated: 2026-11-24
 
@@ -31,6 +31,15 @@ This file records actual repository progress. Update it after meaningful impleme
 | Phase 7: Testing, documentation, and release | Not started | Cross-browser QA, security review, documentation, production validation, and v1.0.0 readiness |
 
 ## Change log
+
+### 2026-11-25 - Optimizer synchronization and conflict-resolution checkpoint
+
+- Status: Optimizer implementation files and API contract synchronized from `main` onto `phase-6-export-ui` through separate commits on the target branch.
+- Added the exact optimizer module, API contract, optimizer documentation, automated test file, and three browser-harness files from the merged `main` state.
+- Existing Export UI work, adapter, tests, and branch-specific development history were preserved.
+- The three shared documentation files require manual reconciliation because both branches contain independent Phase 6 history. The branch's existing log and roadmap content is retained; optimizer status and implementation details are added without replacing the Export UI history.
+- Andra reports real-browser verification of the optimizer is complete. This is recorded as owner-reported, not as a test executed by this contributor.
+- No changes were made to `main`. Production integration in `main.js`, individual downloads, and ZIP per-file optimization are not yet completed.
 
 ### 2026-11-24 - Phase 6 Export UI and adapter verification
 
