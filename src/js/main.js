@@ -21,8 +21,9 @@ import { validateImageFile } from "./core/file-validator.js";
 import { createEditorQueueSnapshot } from "./core/editor-queue-events.js";
 import { decodeImage } from "./core/image-decoder.js";
 import { createImageThumbnail } from "./core/image-thumbnail.js";
-import { convertImageDataToFormat, convertImageToBmp, convertImageToGif, convertImageToJpeg, convertImageToPng, convertImageToSvg, convertImageToTiff, convertImageToWebp, disposeConversionWorker } from "./core/conversion-service.js";
-import { createExportSettingsControls } from "./ui/export-panel.js";
+import { disposeConversionWorker } from "./core/conversion-service.js";
+import { optimizeImage } from "./core/image-optimizer.js";
+import { buildExportOptions, createExportSettingsControls, runExportWithOptimizer } from "./ui/export-panel.js";
 
 const iconSet = {
   Images,
@@ -393,7 +394,30 @@ const renderConversionResult = (entry, result) => {
 
   const detail = document.createElement("div");
   detail.className = "result-detail";
-  detail.textContent = `${formatLabel} · ${result.width} × ${result.height} · ${formatBytes(result.blob.size)}`;
+  detail.textContent = `${formatLabel} · ${result.width} × ${result.height} · ${result.mimeType}`;
+
+  const metrics = document.createElement("dl");
+  metrics.className = "result-metrics";
+  const addMetric = (label, value) => {
+    const row = document.createElement("div");
+    const term = document.createElement("dt");
+    term.textContent = label;
+    const description = document.createElement("dd");
+    description.textContent = value;
+    row.append(term, description);
+    metrics.append(row);
+  };
+  const size = result.size;
+  const difference = size.differenceBytes;
+  const changeText = difference === 0
+    ? "No size change (0%)"
+    : `${difference > 0 ? "−" : "+"}${formatBytes(Math.abs(difference))} (${Math.abs(size.reductionPercent).toFixed(1)}% ${difference > 0 ? "smaller" : "larger"})`;
+  addMetric("Original size", formatBytes(size.sourceBytes));
+  addMetric("Exported size", formatBytes(size.outputBytes));
+  addMetric("Size difference", changeText);
+  if (result.optimization.mode === "target-size") {
+    addMetric("Target size", result.optimization.targetReached ? "Reached" : "Not reached — best valid result returned");
+  }
 
   const download = document.createElement("a");
   download.className = "result-download";
@@ -405,7 +429,7 @@ const renderConversionResult = (entry, result) => {
   status.className = "result-status result-status-completed";
   status.textContent = "Completed";
 
-  item.append(heading, status, detail, download);
+  item.append(heading, status, detail, metrics, download);
   resultsList.append(item);
   updateResultsVisibility();
 };
@@ -539,32 +563,19 @@ const runConversion = async () => {
 
     try {
       const editedImageData = editedImages.get(entry.id);
-      let result;
+      const source = editedImageData
+        ? { file: entry.file, imageData: editedImageData }
+        : entry.file;
+      const settings = exportSettingsByFile.get(entry.id)
+        || exportSettingsControls.get(entry.id)?.getSettings()
+        || { mode: "preset", preset: "medium" };
+      const options = buildExportOptions(selectedFormat, settings);
 
-      if (editedImageData) {
-        if (selectedFormat === "image/gif") {
-          throw new Error("Edited images cannot be exported as GIF yet. Choose PNG, JPEG, WebP, BMP, TIFF, or SVG, or reset the edits to convert the original file as GIF.");
-        }
-
-        const outputFormat = selectedFormat === "image/svg+xml"
-          ? "svg"
-          : selectedFormat.replace("image/", "");
-        result = await convertImageDataToFormat(editedImageData, outputFormat);
-      } else {
-        result = selectedFormat === "image/jpeg"
-          ? await convertImageToJpeg(entry.file)
-          : selectedFormat === "image/webp"
-            ? await convertImageToWebp(entry.file)
-            : selectedFormat === "image/bmp"
-              ? await convertImageToBmp(entry.file)
-              : selectedFormat === "image/tiff"
-                ? await convertImageToTiff(entry.file)
-                : selectedFormat === "image/svg+xml"
-                  ? await convertImageToSvg(entry.file)
-                  : selectedFormat === "image/gif"
-                    ? await convertImageToGif(entry.file)
-                    : await convertImageToPng(entry.file);
+      if (editedImageData && options.format === "gif") {
+        throw new Error("Edited images cannot be exported as GIF yet. Choose PNG, JPEG, WebP, BMP, TIFF, or SVG, or reset the edits to convert the original file as GIF.");
       }
+
+      const result = await runExportWithOptimizer(optimizeImage, source, options);
 
       if (selectedFiles.has(entry.id)) {
         renderConversionResult(entry, result);
