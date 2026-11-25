@@ -480,7 +480,7 @@ The shared validation routine is `encodeAndValidateImage()`; both direct File/Bl
 
 ## 27. Phase 5 Editor integration — current implementation status
 
-This section records the implementation state on the `phase-5-editor-ui` branch and supersedes the earlier planning-only statements in Section 25 that describe the adapter as waiting for module integration or the conversion service as accepting only File/Blob input.
+This section records the Phase 5 Editor implementation that was developed on `phase-5-editor-ui` and merged into `main` through PR #5. It supersedes the earlier planning-only statements in Section 25 that describe the adapter as waiting for module integration or the conversion service as accepting only File/Blob input.
 
 ### Implemented editor pipeline
 
