@@ -11,11 +11,11 @@
 
 ## Current status
 
-The approved API contract has been read. An isolated Export Settings module, responsive styles, and focused contract tests have been added on this branch. The Export Optimization panel is now mounted in Conversion Settings and creates independent controls for each queued file. Format changes refresh each control’s capability state. The controls currently store UI settings only; production conversion/download/ZIP behavior remains unchanged while real optimization waits for Andra’s optimizer PR to merge.
+The Export Settings module, adapter, and production optimizer integration are complete and merged into `main` through PR #9. Per-file JPEG/WebP presets and Target Size settings reach the real optimizer. Unsupported output formats use `mode: none`. Validated output Blobs are reused by individual downloads and ZIP export. PR #9 reports 156/156 automated tests passing, a successful production build, passing GitHub Actions, and successful integrated browser checks.
 
 ## Scope
 
-Implement the Export Settings interface and, after the optimizer contract and optimizer PR are integrated into `main`, connect it to individual downloads and ZIP export.
+Implement the Export Settings interface and connect the approved optimizer to the production conversion, individual-download, and ZIP-export workflow. This scope is complete and merged through PR #9.
 
 The interface is expected to support:
 
@@ -42,9 +42,9 @@ The interface is expected to support:
 
 - Do not create a competing optimizer API or infer the optimizer's input/output object shape.
 - A temporary mock contract may be used to build and test presentation behavior only. Keep it isolated from production conversion and download paths.
-- Do not integrate real optimization until `andra-gs`'s optimizer PR is merged into `main` and the API is agreed.
-- Do not modify `src/js/core/conversion-service.js`, queue orchestration, or ZIP orchestration without explicit coordination with the project owner.
-- After the optimizer is merged, update this branch from the latest `main` before implementing real individual-download and ZIP integration.
+- The optimizer PR #7 has been merged and the API contract is approved.
+- The Export UI branch was synchronized with the optimizer before production integration.
+- Production optimizer integration, individual downloads, and ZIP reuse were merged through PR #9. The implementation did not create a second conversion service or ZIP encoder.
 - Preserve per-file failure isolation: an optimization failure for one file must not prevent other successful files from being exported.
 
 ## Approved optimizer contract
@@ -180,3 +180,25 @@ The approved API contract currently supports JPEG/WebP presets and target-size a
 - Updated adapter metadata validation to enforce the approved return contract: valid mode; mode-specific preset, quality, target fields; positive bounded attempt counts; and no optimization metadata for unsupported output formats.
 - The adapter does not contain preset-to-quality mappings.
 - Automated tests, build, and browser regression checks are pending after pulling this branch update.
+
+## Final integration and verification — 2026-11-25
+
+PR #9 merged the production Export UI integration into `main`.
+
+Implemented production behavior:
+- Each queued image retains independent export settings.
+- JPEG and WebP expose Low, Medium, High, and best-effort Target Size controls.
+- PNG, BMP, TIFF, GIF, and SVG use `mode: none`.
+- Unedited images pass the original File; edited images pass `{ file, imageData }`.
+- The existing sequential queue, progress reporting, cancellation checks between files, and per-file failure isolation are preserved.
+- The validated optimizer Blob is stored in `conversionResults`. Individual download and ZIP export reuse that Blob without a second optimization pass.
+- Result cards display source/output size, byte difference, percentage change, MIME type, and Target Size status.
+
+Verification reported in PR #9:
+- `npm test`: 156/156 passed, 0 failed.
+- `npm run build`: successful.
+- GitHub Actions: all checks passed.
+- Integrated browser checks: contributor-reported successful for presets, Target Size reached/not reached, unsupported formats, animated GIF, edited images, mixed batches, per-file failures, individual downloads, ZIP export, and existing conversion/Editor regressions.
+- The build retains a non-fatal Vite chunk-size advisory for HEIC-related bundles (~3.2 MB each).
+
+These results are reported evidence from PR #9 and were not independently rerun during this documentation update.
