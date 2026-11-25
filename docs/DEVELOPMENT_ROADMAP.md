@@ -526,7 +526,9 @@ Branch names are the agreed convention. The branches are created when the releva
 
 ## 2026-11-25 - Phase 6 optimizer synchronization update
 
-The Image Optimization Engine has been merged into `main` through PR #7 and its source, API contract, optimizer tests, and standalone browser harness have been synchronized onto `phase-6-export-ui`. Andra reports that real-browser verification has been completed. This report is owner-confirmed; the current branch still requires integrated application testing after Export UI production wiring.
+Historical checkpoint before production Export UI wiring. Its pending integration items are superseded by the later PR #9 completion record below.
+
+The Image Optimization Engine has been merged into `main` through PR #7 and its source, API contract, optimizer tests, and standalone browser harness have been synchronized onto `phase-6-export-ui`. Andra reports that real-browser verification has been completed. This report is owner-confirmed; at that checkpoint, integrated application testing after Export UI production wiring was still required.
 
 Completed synchronization items:
 - [x] Bring `src/js/core/image-optimizer.js` onto `phase-6-export-ui`.
@@ -543,6 +545,8 @@ All synchronization commits are targeted at `phase-6-export-ui`. The `main` bran
 
 ## 2026-11-25 - Export UI production optimizer wiring
 
+Historical checkpoint before final PR review and merge. The pending verification items below were later completed and are superseded by the Phase 6 completion record at the end of this file.
+
 Current branch: `phase-6-export-ui` (head `ba40e1e` at this documentation checkpoint).
 
 Implementation now present:
@@ -553,7 +557,7 @@ Implementation now present:
 - Individual downloads and ZIP export reuse the same optimizer result Blob; ZIP does not re-encode.
 - Result UI reports source/output sizes, byte and percentage change, MIME type, and Target Size status.
 
-Still required before PR:
+Outstanding at this checkpoint before PR #9:
 - [ ] Run `npm test` after production integration.
 - [ ] Run `npm run build` after production integration.
 - [ ] Test JPEG/WebP presets and Target Size reached/not-reached with real images.
