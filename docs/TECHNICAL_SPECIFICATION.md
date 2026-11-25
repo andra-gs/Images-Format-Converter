@@ -505,3 +505,21 @@ Input semantics:
 - With aspect ratio unlocked, both positive dimensions are required before Apply; a missing dimension must not be sent to the Transformer as a valid resize request.
 
 Focused unit coverage is in `tests/editor-input-state.test.js`. Real-browser checks for HEIC, TIFF, PNG, JPEG, and WebP remain required for the integrated Editor; unit tests alone do not establish browser compatibility.
+
+
+## Phase 6 - Image Optimization Engine
+
+The optimizer is implemented in `src/js/core/image-optimizer.js` and exposes:
+- `optimizeImage(source, options)`
+- `IMAGE_OPTIMIZATION_CAPABILITIES`
+
+The module reuses the existing conversion service and encoder paths. It accepts a File/Blob source or an edited-image source object containing the original file and ImageData. Animated GIF remains on the original File-based path; edited ImageData is not silently discarded for GIF export.
+
+Optimization capabilities:
+- JPEG and WebP: Low, Medium, and High presets; best-effort target-size mode with bounded attempts.
+- PNG, BMP, TIFF, GIF, and SVG: existing conversion path only, with optimization mode `none`.
+- Results report actual source/output byte sizes, byte difference, percentage reduction or increase, output format/MIME type, dimensions, optimization metadata, and output-validation status.
+
+The Export UI owns settings presentation, per-file orchestration, individual downloads, and ZIP export. The optimizer owns quality mapping and target-size search. The adapter validates the UI-to-optimizer contract and must not duplicate optimizer policy.
+
+Synchronization note (2026-11-25): the optimizer module, API contract, focused tests, and browser harness have been copied from `main` to `phase-6-export-ui`. This does not imply production Export UI integration is complete. The `main` branch was not changed by this synchronization.
