@@ -523,3 +523,18 @@ Optimization capabilities:
 The Export UI owns settings presentation, per-file orchestration, individual downloads, and ZIP export. The optimizer owns quality mapping and target-size search. The adapter validates the UI-to-optimizer contract and must not duplicate optimizer policy.
 
 Synchronization note (2026-11-25): the optimizer module, API contract, focused tests, and browser harness have been copied from `main` to `phase-6-export-ui`. This does not imply production Export UI integration is complete. The `main` branch was not changed by this synchronization.
+
+
+## Phase 6 production export integration (2026-11-25)
+
+`src/js/main.js` now uses the Phase 6 optimizer for the production conversion queue:
+
+- Import `optimizeImage()` from `src/js/core/image-optimizer.js` and call it through `runExportWithOptimizer()` from the Export UI adapter.
+- Build optimizer options from each queue entry's own `exportSettingsByFile` state. Unsupported output formats are normalized to `mode: "none"` by `buildExportOptions()`.
+- Unedited entries pass the original `entry.file`. Edited entries pass `{ file: entry.file, imageData }`, preserving the edited-pixel source while retaining the original file size as the source metric.
+- The existing sequential `for...of` loop, per-entry `try/catch`, progress accounting, and cancellation checks between entries remain in place. The production queue does not use `runIndependentExports()` or `Promise.all()`.
+- The validated optimizer result Blob is stored in `conversionResults`; individual download links and ZIP generation consume this stored Blob. ZIP generation does not call the optimizer again.
+- Result cards display optimizer-reported original/output sizes, byte difference, percentage reduction or increase, output MIME type, and Target Size reached/not-reached status.
+- Animated GIF remains on the File-based optimizer path. Edited ImageData to GIF remains unsupported and is rejected before optimizer invocation.
+
+Validation status: implementation is present on `phase-6-export-ui`; automated tests, production build, and integrated real-browser verification after this wiring are pending. No change to the shared conversion service or ZIP encoder was made.
