@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Export Optimizer Browser Harness</title>
+  <style>
+    :root{font-family:system-ui,sans-serif;color:#18202d;background:#f5f7fb}
+    body{max-width:900px;margin:32px auto;padding:0 18px}
+    main{background:white;border:1px solid #d9dfeb;border-radius:14px;padding:22px}
+    .intro{color:#526078}.test-list{padding:0;list-style:none}
+    .test-list li{padding:10px 12px;border-bottom:1px solid #e8ebf1}
+    .pass{color:#147d43}.fail{color:#b42318}
+    #export-controls{margin:18px 0}.summary{font-weight:700;margin:14px 0}
+    button{padding:9px 14px;border:1px solid #aeb8c8;border-radius:8px;background:#fff;cursor:pointer}
+    pre{white-space:pre-wrap;background:#f3f5f8;padding:12px;border-radius:8px}
+  </style>
+</head>
+<body>
+<main>
+  <h1>Export UI + Mock Optimizer</h1>
+  <p class="intro">Harness pengujian browser terpisah. Tidak memanggil optimizer produksi dan tidak mengubah alur konversi utama.</p>
+  <h2>Kontrol Export UI</h2>
+  <label for="mock-format">Mock output format</label>\n  <select id="mock-format"><option value="webp">WebP</option><option value="jpeg">JPEG</option><option value="png">PNG</option><option value="gif">GIF</option><option value="svg">SVG</option></select>\n  <div id="export-controls"></div>
+  <p id="selected-options" aria-live="polite">Pilih mode atau preset untuk melihat opsi API.</p>
+  <h2>Hasil pengujian otomatis</h2>
+  <p id="summary" class="summary" role="status">Menjalankan pengujian…</p>
+  <ul id="results" class="test-list"></ul>
+  <button id="rerun" type="button">Jalankan ulang pengujian</button>
+  <h2>Detail</h2>
+  <pre id="details">Menunggu hasil…</pre>
+</main>
+<script type="module" src="./browser-export-optimizer.js"></script>
+</body>
+</html>

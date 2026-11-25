@@ -834,3 +834,33 @@
     width: 100%;
   }
 }
+
+
+.result-metrics {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 10px 12px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  font-size: 0.7rem;
+}
+
+.result-metrics > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.result-metrics dt {
+  color: var(--color-muted);
+}
+
+.result-metrics dd {
+  margin: 0;
+  color: var(--color-text);
+  font-weight: 650;
+  text-align: right;
+  overflow-wrap: anywhere;
+}

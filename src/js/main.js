@@ -21,7 +21,9 @@ import { validateImageFile } from "./core/file-validator.js";
 import { createEditorQueueSnapshot } from "./core/editor-queue-events.js";
 import { decodeImage } from "./core/image-decoder.js";
 import { createImageThumbnail } from "./core/image-thumbnail.js";
-import { convertImageDataToFormat, convertImageToBmp, convertImageToGif, convertImageToJpeg, convertImageToPng, convertImageToSvg, convertImageToTiff, convertImageToWebp, disposeConversionWorker } from "./core/conversion-service.js";
+import { disposeConversionWorker } from "./core/conversion-service.js";
+import { optimizeImage } from "./core/image-optimizer.js";
+import { buildExportOptions, createExportSettingsControls, runExportWithOptimizer } from "./ui/export-panel.js";
 
 const iconSet = {
   Images,
@@ -58,6 +60,7 @@ const fileFeedback = document.querySelector("#file-feedback");
 const clearButton = document.querySelector("#clear-button");
 const themeToggle = document.querySelector("#theme-toggle");
 const settingsPanel = document.querySelector("#settings-panel");
+const exportSettingsList = document.querySelector("#export-settings-list");
 const resultsPanel = document.querySelector("#results-panel");
 const formatSelect = document.querySelector("#format-select");
 const formatTrigger = document.querySelector("#output-format-trigger");
@@ -65,9 +68,6 @@ const formatValue = document.querySelector("#output-format-value");
 const formatMenu = document.querySelector("#output-format-menu");
 const formatOptions = [...formatMenu.querySelectorAll('[role="option"]')];
 let selectedFormat = "image/png";
-const qualityField = document.querySelector("#quality-field");
-const outputQuality = document.querySelector("#output-quality");
-const qualityValue = document.querySelector("#quality-value");
 const convertButton = document.querySelector("#convert-button");
 const cancelButton = document.querySelector("#cancel-button");
 const batchProgress = document.querySelector("#batch-progress");
@@ -83,6 +83,8 @@ const zipStatus = document.querySelector("#zip-status");
 const selectedFiles = new Map();
 const conversionResults = new Map();
 const editedImages = new Map();
+const exportSettingsControls = new Map();
+const exportSettingsByFile = new Map();
 const queueThumbnailUrls = new Map();
 let nextFileId = 0;
 
@@ -121,11 +123,6 @@ const updateQueueSummary = () => {
   updateConvertButton();
 };
 
-const updateQualityVisibility = () => {
-  const usesQuality = ["image/jpeg", "image/webp"].includes(selectedFormat);
-  qualityField.hidden = !usesQuality;
-};
-
 const closeFormatMenu = (returnFocus = false) => {
   formatMenu.hidden = true;
   formatTrigger.setAttribute("aria-expanded", "false");
@@ -149,7 +146,7 @@ const selectFormat = (option) => {
     item.classList.toggle("is-selected", isSelected);
   });
   closeFormatMenu();
-  updateQualityVisibility();
+  for (const control of exportSettingsControls.values()) control.updateFormat(selectedFormat);
   updateConvertButton();
   formatTrigger.focus();
 };
@@ -287,6 +284,21 @@ const renderFile = (entry) => {
   loadQueueThumbnail(entry, item, preview, image, fallback);
 };
 
+const renderExportSettings = (entry) => {
+  const settings = exportSettingsByFile.get(entry.id) || { mode: "preset", preset: "medium" };
+  const controls = createExportSettingsControls({
+    fileId: entry.id,
+    format: selectedFormat,
+    settings,
+    onChange: (fileId) => {
+      const current = exportSettingsControls.get(fileId);
+      if (current) exportSettingsByFile.set(fileId, current.getSettings());
+    }
+  });
+  exportSettingsControls.set(entry.id, controls);
+  exportSettingsList.append(controls.element);
+};
+
 const showFileFeedback = (messages, state = "info") => {
   fileFeedback.hidden = messages.length === 0;
   fileFeedback.dataset.state = state;
@@ -382,7 +394,30 @@ const renderConversionResult = (entry, result) => {
 
   const detail = document.createElement("div");
   detail.className = "result-detail";
-  detail.textContent = `${formatLabel} · ${result.width} × ${result.height} · ${formatBytes(result.blob.size)}`;
+  detail.textContent = `${formatLabel} · ${result.width} × ${result.height} · ${result.mimeType}`;
+
+  const metrics = document.createElement("dl");
+  metrics.className = "result-metrics";
+  const addMetric = (label, value) => {
+    const row = document.createElement("div");
+    const term = document.createElement("dt");
+    term.textContent = label;
+    const description = document.createElement("dd");
+    description.textContent = value;
+    row.append(term, description);
+    metrics.append(row);
+  };
+  const size = result.size;
+  const difference = size.differenceBytes;
+  const changeText = difference === 0
+    ? "No size change (0%)"
+    : `${difference > 0 ? "−" : "+"}${formatBytes(Math.abs(difference))} (${Math.abs(size.reductionPercent).toFixed(1)}% ${difference > 0 ? "smaller" : "larger"})`;
+  addMetric("Original size", formatBytes(size.sourceBytes));
+  addMetric("Exported size", formatBytes(size.outputBytes));
+  addMetric("Size difference", changeText);
+  if (result.optimization.mode === "target-size") {
+    addMetric("Target size", result.optimization.targetReached ? "Reached" : "Not reached — best valid result returned");
+  }
 
   const download = document.createElement("a");
   download.className = "result-download";
@@ -394,7 +429,7 @@ const renderConversionResult = (entry, result) => {
   status.className = "result-status result-status-completed";
   status.textContent = "Completed";
 
-  item.append(heading, status, detail, download);
+  item.append(heading, status, detail, metrics, download);
   resultsList.append(item);
   updateResultsVisibility();
 };
@@ -527,37 +562,20 @@ const runConversion = async () => {
     renderConversionStatus(entry, "processing", `Converting to ${selectedFormat.replace("image/", "").toUpperCase()}...`);
 
     try {
-      const quality = Number(outputQuality.value) / 100;
       const editedImageData = editedImages.get(entry.id);
-      let result;
+      const source = editedImageData
+        ? { file: entry.file, imageData: editedImageData }
+        : entry.file;
+      const settings = exportSettingsByFile.get(entry.id)
+        || exportSettingsControls.get(entry.id)?.getSettings()
+        || { mode: "preset", preset: "medium" };
+      const options = buildExportOptions(selectedFormat, settings);
 
-      if (editedImageData) {
-        if (selectedFormat === "image/gif") {
-          throw new Error("Edited images cannot be exported as GIF yet. Choose PNG, JPEG, WebP, BMP, TIFF, or SVG, or reset the edits to convert the original file as GIF.");
-        }
-
-        const outputFormat = selectedFormat === "image/svg+xml"
-          ? "svg"
-          : selectedFormat.replace("image/", "");
-        const options = ["image/jpeg", "image/webp"].includes(selectedFormat)
-          ? { quality }
-          : {};
-        result = await convertImageDataToFormat(editedImageData, outputFormat, options);
-      } else {
-        result = selectedFormat === "image/jpeg"
-          ? await convertImageToJpeg(entry.file, { quality })
-          : selectedFormat === "image/webp"
-            ? await convertImageToWebp(entry.file, { quality })
-            : selectedFormat === "image/bmp"
-              ? await convertImageToBmp(entry.file)
-              : selectedFormat === "image/tiff"
-                ? await convertImageToTiff(entry.file)
-                : selectedFormat === "image/svg+xml"
-                  ? await convertImageToSvg(entry.file)
-                  : selectedFormat === "image/gif"
-                    ? await convertImageToGif(entry.file)
-                    : await convertImageToPng(entry.file);
+      if (editedImageData && options.format === "gif") {
+        throw new Error("Edited images cannot be exported as GIF yet. Choose PNG, JPEG, WebP, BMP, TIFF, or SVG, or reset the edits to convert the original file as GIF.");
       }
+
+      const result = await runExportWithOptimizer(optimizeImage, source, options);
 
       if (selectedFiles.has(entry.id)) {
         renderConversionResult(entry, result);
@@ -626,6 +644,7 @@ const addFiles = async (files) => {
 
     selectedFiles.set(entry.id, entry);
     renderFile(entry);
+    renderExportSettings(entry);
 
     for (const warning of validation.warnings) {
       warnings.push(`${file.name}: ${warning}`);
@@ -648,6 +667,9 @@ const removeFile = (id) => {
   releaseQueueThumbnail(id);
   selectedFiles.delete(id);
   editedImages.delete(id);
+  exportSettingsControls.delete(id);
+  exportSettingsByFile.delete(id);
+  exportSettingsList.querySelector(`[data-file-id="${id}"]`)?.remove();
   fileList.querySelector(`[data-file-id="${id}"]`)?.remove();
   removeConversionResult(id);
   updateQueueSummary();
@@ -662,6 +684,9 @@ const clearFiles = () => {
 
   selectedFiles.clear();
   editedImages.clear();
+  exportSettingsControls.clear();
+  exportSettingsByFile.clear();
+  exportSettingsList.replaceChildren();
   fileList.replaceChildren();
   clearConversionResults();
   fileInput.value = "";
@@ -708,11 +733,6 @@ dropzone.addEventListener("drop", (event) => {
 
 clearButton.addEventListener("click", clearFiles);
 
-outputQuality.addEventListener("input", () => {
-  qualityValue.value = `${outputQuality.value}%`;
-  qualityValue.textContent = `${outputQuality.value}%`;
-});
-
 convertButton.addEventListener("click", runConversion);
 
 const savedTheme = localStorage.getItem("ifc-theme");
@@ -733,7 +753,6 @@ const applyTheme = (theme) => {
 };
 
 applyTheme(savedTheme || preferredTheme);
-updateQualityVisibility();
 
 themeToggle.addEventListener("click", () => {
   const nextTheme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";

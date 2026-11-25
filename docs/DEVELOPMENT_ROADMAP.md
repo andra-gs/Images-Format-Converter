@@ -266,7 +266,7 @@ Deliverable: an image editor that supports geometric transformation and visual a
 
 ## Phase 6: Image optimization and export workflow
 
-Status: In progress as of 2026-11-23. Encoder capability inspection is complete and the initial optimizer module plus focused tests are present on `phase-6-optimization`. Automated tests, production build, and browser verification remain pending. Phase 5 post-merge `npm test` and `npm run dev` were reported successful; a separate post-merge build result was not reported. Metadata Management remains deferred.
+Status: In progress. The optimizer PR is merged into `main`, and `phase-6-export-ui` is synchronized with the latest `main` ancestry. Production optimizer wiring is implemented on the Export UI branch; full automated, build, and integrated browser verification are pending. Metadata Management remains deferred to a future backlog item.
 
 ### Team ownership
 
@@ -290,8 +290,8 @@ Objective: implement the core optimization module and accurate file-size measure
 
 Tasks:
 
-- [x] Inspect existing encoders and identify which formats expose meaningful optimization controls.
-- [x] Define a supported-format and capability matrix for optimization. Findings: [PHASE_6_OPTIMIZATION.md](./PHASE_6_OPTIMIZATION.md).
+- [ ] Inspect existing encoders and identify which formats expose meaningful optimization controls.
+- [ ] Define a supported-format and capability matrix for optimization.
 - [ ] Implement `src/js/core/image-optimizer.js`.
 - [ ] Add Low, Medium, and High quality presets for formats where the encoder supports them.
 - [ ] Map presets to documented, format-specific encoder settings. Do not assume the same quality number produces equivalent results across formats.
@@ -314,7 +314,7 @@ tests/image-optimizer.test.js
 docs/PHASE_6_OPTIMIZATION.md
 ```
 
-The API contract is approved and documented in [PHASE_6_OPTIMIZATION_API.md](./PHASE_6_OPTIMIZATION_API.md). Initial implementation is present on `phase-6-optimization`; do not integrate the UI until the optimizer passes tests, build, and browser verification and its PR is merged into `main`.
+Expected API contract: agree with Farrel before implementation. The contract should accept the source image/result and an explicit optimization configuration, use the existing conversion/encoder path, and return the generated Blob plus actual source/output size information. Final names and shapes must be documented before UI integration.
 
 Completion criteria:
 
@@ -372,26 +372,26 @@ Completion criteria:
 
 ### Supported-format planning matrix
 
-This matrix reflects the inspected encoder capabilities. Optimizer controls are implemented for JPEG/WebP, but final availability remains subject to automated and real-browser verification.
+This matrix describes the initial investigation and intended behavior. Final availability must be based on the actual encoder capabilities and browser verification.
 
 | Output format | Initial optimization plan |
 |---|---|
-| JPEG | Presets and best-effort target-size sampling using Canvas quality control |
-| WebP | Presets and best-effort target-size sampling using Canvas quality control |
-| PNG | Existing encoder only; no quality preset or target-size mode |
-| BMP | Existing 24-bit encoder only; no quality preset or target-size mode |
-| TIFF | Existing baseline uncompressed encoder only; no quality preset or target-size mode |
-| GIF | Existing frame-aware encoder only; no generic quality preset or target-size mode |
-| SVG | Existing embedded-PNG wrapper only; no SVG quality preset or target-size mode |
+| JPEG | Quality control; evaluate iterative quality adjustment for target-size attempts |
+| WebP | Quality control; evaluate iterative quality adjustment for target-size attempts |
+| PNG | Lossless output and encoder-supported optimization; no lossy quality preset unless explicitly implemented |
+| BMP | No quality control in the current baseline encoder; report optimization as unavailable unless a real optimization path is added |
+| TIFF | Follow the current baseline uncompressed encoder; no quality control or compression selection is promised |
+| GIF | Follow the current GIF encoder capabilities; do not expose generic quality presets without a verified mapping |
+| SVG | No raster quality control. Preserve the existing embedded-PNG wrapper behavior and do not describe it as vector optimization |
 
 ### Phase 6 integration order
 
 1. Phase 5 post-merge checks on `main`: the project owner reports `npm test` and `npm run dev` completed successfully on 2026-11-23. The production build result is not recorded in this checkpoint and must be run before the Phase 6 processing PR is submitted.
 2. Create `phase-6-optimization` and `phase-6-export-ui` from the latest `main`.
-3. Agree on the optimizer API, preset mapping, supported-format matrix, error behavior, size-reporting shape, and resource ownership before either implementation is integrated. The agreed implementation baseline is documented in [PHASE_6_OPTIMIZATION_API.md](./PHASE_6_OPTIMIZATION_API.md); update that contract and notify the UI owner before changing shared API behavior.
+3. Agree on the optimizer API, preset mapping, supported-format matrix, error behavior, size-reporting shape, and resource ownership before either implementation is integrated.
 4. `andra-gs` implements the optimizer and focused tests. Farrel may build the UI against a temporary mock contract, but must not invent a competing API.
 5. Review and merge the optimizer Pull Request into `main`.
-6. `FarrelPtrv` updates `phase-6-export-ui` from the newly updated `main`, then integrates the real optimizer with individual downloads and ZIP export.
+6. `FarrelPtrv` updates `phase-6-export-ui` from the newly updated `main`, then integrates the real optimizer with individual downloads and ZIP export. The branch synchronization and production wiring have now been performed; verification remains.
 7. Review and merge the export UI Pull Request.
 8. Run the complete automated test suite and production build, then test representative real files in the browser, including individual downloads, mixed-format batches, and ZIP extraction/integrity.
 
@@ -513,3 +513,42 @@ This repository is developed by a three-person team overall. Phase 6 feature wor
 | Phase 6 | `phase-6-optimization` | Not applicable | `phase-6-export-ui` |
 
 Branch names are the agreed convention. The branches are created when the relevant phase begins; documenting a branch name does not mean that the branch already exists.
+
+
+## 2026-11-25 - Phase 6 optimizer synchronization update
+
+The Image Optimization Engine has been merged into `main` through PR #7 and its source, API contract, optimizer tests, and standalone browser harness have been synchronized onto `phase-6-export-ui`. Andra reports that real-browser verification has been completed. This report is owner-confirmed; the current branch still requires integrated application testing after Export UI production wiring.
+
+Completed synchronization items:
+- [x] Bring `src/js/core/image-optimizer.js` onto `phase-6-export-ui`.
+- [x] Bring the approved optimizer API contract and implementation notes onto `phase-6-export-ui`.
+- [x] Bring the optimizer automated test file and browser harness onto `phase-6-export-ui`.
+- [x] Preserve the existing Export UI, adapter, and branch-specific history.
+- [ ] Integrate the optimizer into the production conversion flow.
+- [ ] Apply per-file settings to individual downloads.
+- [ ] Apply per-file settings to ZIP exports while preserving per-file failure isolation.
+- [ ] Run the full automated suite, production build, and integrated browser regression checks.
+
+All synchronization commits are targeted at `phase-6-export-ui`. The `main` branch is not modified by this update.
+
+
+## 2026-11-25 - Export UI production optimizer wiring
+
+Current branch: `phase-6-export-ui` (head `ba40e1e` at this documentation checkpoint).
+
+Implementation now present:
+- `main.js` calls the real optimizer through the validated Export UI adapter.
+- Per-file optimization settings are passed independently, with original File or edited `{ file, imageData }` sources.
+- Unsupported optimization formats use `mode: "none"`.
+- The existing sequential queue, per-file error isolation, progress updates, and between-file cancellation checks are retained.
+- Individual downloads and ZIP export reuse the same optimizer result Blob; ZIP does not re-encode.
+- Result UI reports source/output sizes, byte and percentage change, MIME type, and Target Size status.
+
+Still required before PR:
+- [ ] Run `npm test` after production integration.
+- [ ] Run `npm run build` after production integration.
+- [ ] Test JPEG/WebP presets and Target Size reached/not-reached with real images.
+- [ ] Test PNG/BMP/TIFF/SVG no-optimization and animated GIF preservation.
+- [ ] Test edited ImageData, mixed-format batch, failure isolation, individual downloads, and ZIP Blob reuse.
+- [ ] Repeat existing conversion, Editor, queue progress, cancellation, and theme regression checks in a real browser.
+- [ ] Record actual results and limitations in the development log.

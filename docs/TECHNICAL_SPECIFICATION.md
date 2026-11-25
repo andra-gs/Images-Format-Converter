@@ -507,52 +507,34 @@ Input semantics:
 Focused unit coverage is in `tests/editor-input-state.test.js`. Real-browser checks for HEIC, TIFF, PNG, JPEG, and WebP remain required for the integrated Editor; unit tests alone do not establish browser compatibility.
 
 
-## 29. Image Optimization Engine
+## Phase 6 - Image Optimization Engine
 
-The Phase 6 optimizer is implemented in `src/js/core/image-optimizer.js` and reuses the existing conversion service. It does not introduce a second decoder, encoder, or validation pipeline.
+The optimizer is implemented in `src/js/core/image-optimizer.js` and exposes:
+- `optimizeImage(source, options)`
+- `IMAGE_OPTIMIZATION_CAPABILITIES`
 
-Public exports:
+The module reuses the existing conversion service and encoder paths. It accepts a File/Blob source or an edited-image source object containing the original file and ImageData. Animated GIF remains on the original File-based path; edited ImageData is not silently discarded for GIF export.
 
-```js
-optimizeImage(source, options)
-IMAGE_OPTIMIZATION_CAPABILITIES
-```
+Optimization capabilities:
+- JPEG and WebP: Low, Medium, and High presets; best-effort target-size mode with bounded attempts.
+- PNG, BMP, TIFF, GIF, and SVG: existing conversion path only, with optimization mode `none`.
+- Results report actual source/output byte sizes, byte difference, percentage reduction or increase, output format/MIME type, dimensions, optimization metadata, and output-validation status.
 
-Source input:
+The Export UI owns settings presentation, per-file orchestration, individual downloads, and ZIP export. The optimizer owns quality mapping and target-size search. The adapter validates the UI-to-optimizer contract and must not duplicate optimizer policy.
 
-- Original source: non-empty `File` or `Blob`.
-- Edited source: `{ file, imageData }`, where `file` is the original non-empty File/Blob and `imageData` is the current edited sRGB ImageData.
-- The original file supplies the source byte count even when edited pixels are encoded.
-- Inputs remain caller-owned and are not mutated.
-- Edited ImageData cannot be exported as GIF. GIF must use the original File-based conversion path to preserve animated frames.
+Synchronization note (2026-11-25): the optimizer module, API contract, focused tests, and browser harness have been copied from `main` to `phase-6-export-ui`. This does not imply production Export UI integration is complete. The `main` branch was not changed by this synchronization.
 
-Supported optimization capabilities:
 
-| Output format | Presets | Target size | Existing conversion path |
-|---|---:|---:|---|
-| JPEG | Yes | Yes | Canvas encoder quality option |
-| WebP | Yes | Yes | Canvas encoder quality option |
-| PNG | No | No | Existing PNG encoder |
-| BMP | No | No | Existing 24-bit encoder |
-| TIFF | No | No | Existing uncompressed UTIF2 encoder |
-| GIF | No | No | Existing frame-aware GIF conversion |
-| SVG | No | No | Existing SVG wrapper with embedded PNG |
+## Phase 6 production export integration (2026-11-25)
 
-HEIC and HEIF remain input-only formats.
+`src/js/main.js` now uses the Phase 6 optimizer for the production conversion queue:
 
-Preset values for JPEG and WebP are Low 0.55, Medium 0.75, and High 0.90. These values are encoder quality parameters, not cross-format visual-quality equivalence guarantees.
+- Import `optimizeImage()` from `src/js/core/image-optimizer.js` and call it through `runExportWithOptimizer()` from the Export UI adapter.
+- Build optimizer options from each queue entry's own `exportSettingsByFile` state. Unsupported output formats are normalized to `mode: "none"` by `buildExportOptions()`.
+- Unedited entries pass the original `entry.file`. Edited entries pass `{ file: entry.file, imageData }`, preserving the edited-pixel source while retaining the original file size as the source metric.
+- The existing sequential `for...of` loop, per-entry `try/catch`, progress accounting, and cancellation checks between entries remain in place. The production queue does not use `runIndependentExports()` or `Promise.all()`.
+- The validated optimizer result Blob is stored in `conversionResults`; individual download links and ZIP generation consume this stored Blob. ZIP generation does not call the optimizer again.
+- Result cards display optimizer-reported original/output sizes, byte difference, percentage reduction or increase, output MIME type, and Target Size reached/not-reached status.
+- Animated GIF remains on the File-based optimizer path. Edited ImageData to GIF remains unsupported and is rejected before optimizer invocation.
 
-Target-size mode accepts a positive finite byte count and is limited to JPEG/WebP. It samples at most seven quality values between 0.10 and 0.95, measures each returned Blob, and only considers candidates that pass the existing conversion service's output validation. Individual failed candidates do not stop the remaining attempts. The selected output is the valid candidate closest to the requested target without exceeding it. If no candidate fits, the smallest valid candidate is returned with `targetReached: false`. Exact target size is not guaranteed.
-
-Successful results include the validated Blob, output format and MIME type, dimensions, actual source/output byte counts, byte difference, percentage reduction/increase, optimization metadata, and `validation.status: "passed"`. Negative percentage reduction is valid when the output is larger than the source.
-
-Error codes:
-
-- `INVALID_OPTIMIZATION_OPTIONS`
-- `UNSUPPORTED_OPTIMIZATION`
-- `UNSUPPORTED_OUTPUT_FORMAT`
-- `TARGET_SIZE_INVALID`
-- `ENCODING_FAILED`
-- `OUTPUT_VALIDATION_FAILED`
-
-The conversion service does not expose cancellation for an active conversion request. The optimizer does not claim active-operation cancellation support.
+Validation status: implementation is present on `phase-6-export-ui`; automated tests, production build, and integrated real-browser verification after this wiring are pending. No change to the shared conversion service or ZIP encoder was made.
