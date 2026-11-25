@@ -91,7 +91,7 @@ The following wiring is now present in `src/js/main.js`:
 - [x] Display original size, output size, byte difference, percentage change, MIME type, and Target Size reached/not-reached status.
 - [x] Keep animated GIF on the original File-based optimizer path; edited ImageData to GIF remains unsupported.
 
-### Integrated regression verification — pending
+### Integrated regression verification — completed (PR #9 report)
 - [x] Individual JPEG/WebP exports with each preset.
 - [x] JPEG/WebP Target Size reached and not reached.
 - [x] PNG, BMP, TIFF, SVG in None mode.
