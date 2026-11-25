@@ -1,149 +1,348 @@
+<div align="center">
+
 # Images Format Converter
 
-A local-first image format conversion web application. Image files are processed in the user's browser and are not uploaded to a remote server.
+**A privacy-focused, browser-based image converter with editing and optimization tools.**
 
-> Project status: Phases 0–6 complete and merged into `main`; Phase 7 - Testing, Documentation & Release is next. Known issue: the startup skeleton still appears in the light theme when dark theme is selected.
-> Stack: Vanilla JavaScript + Vite + plain CSS
-> Icons: Lucide via NPM
-> Architecture: Client-side, modular, hybrid processing
+Convert, edit, and optimize image files directly in your browser. Your images stay on your device and are not uploaded to a conversion server.
 
-## Current implementation
+![Version](https://img.shields.io/badge/version-0.1.0-2563eb)
+![JavaScript](https://img.shields.io/badge/JavaScript-Vanilla-F7DF1E?logo=javascript&logoColor=222)
+![Vite](https://img.shields.io/badge/Vite-7-646CFF?logo=vite&logoColor=white)
+![Processing](https://img.shields.io/badge/processing-browser--local-16a34a)
+![Status](https://img.shields.io/badge/status-in%20development-orange)
 
-The current interface includes:
+</div>
 
-- File selection through the file picker and drag-and-drop.
-- A selected-file queue with image previews, file details, individual removal, and clear-all behavior.
-- Batch conversion with per-file pending, processing, completed, failed, and cancelled states, plus overall batch progress.
-- Web Worker conversion when supported, with a main-thread fallback and a sequential concurrency limit.
-- Cancellation of remaining queued files after the active conversion finishes. Successful outputs can be downloaded individually or together in a ZIP archive using JSZip. The user has verified ZIP export, including archive extraction and image integrity.
-- Light and dark themes with saved preference.
-- Conversion settings for PNG, JPEG, WebP, BMP, baseline uncompressed TIFF, SVG wrapper output, and GIF output. Phase 6 adds per-file export optimization settings: Low/Medium/High presets and best-effort Target Size for JPEG/WebP, with `mode: none` for PNG, BMP, TIFF, GIF, and SVG. Result cards show actual source/output sizes and optimization status. Individual downloads and ZIP reuse the same validated optimized Blob. The dedicated 24-bit BMP encoder is implemented and user-verified with real files.
-- Startup skeleton that prevents an unstyled-content flash. Known issue: the user's last reported check found that the skeleton always appears in the light theme; theme matching still needs a fix and retest.
-- Initial file validation and image-format signature detection.
-- SVG input is parsed and sanitized to a restricted vector subset before rasterization. SVG output embeds a PNG data resource in an SVG image element. This preserves the raster image but does not vectorize it. The sanitizer allows only bounded embedded PNG data for image elements and continues to reject external resources and active content. The user has verified SVG rasterization and conversion to PNG, JPEG, WebP, BMP, and TIFF in the real browser. Raster-to-SVG output has also been verified with transparent and opaque sources, matching dimensions, SVG re-decoding, individual downloads, and ZIP export.
-- GIF input uses gifuct-js to decode the first frame for conversion to static formats. GIF output uses modern-gif to create single-frame GIFs from static images and re-encode animated GIFs with frame order, timing, and looping metadata. The user has verified animated GIF-to-GIF and static-image-to-GIF conversion in the real browser, including timing, looping, transparency, frame order, batch processing, individual downloads, and ZIP export. GIF animation-to-other-animated-formats is outside the current scope.
-- An explicit capability registry that keeps detection, decoding, and encoding status separate.
-- A browser image decoder for PNG, JPEG, WebP, and BMP, with an ImageBitmap path and HTML image fallback. HEIC/HEIF decoding uses heic-to and has been user-verified in the decoder, main conversion pipeline, and Web Worker. TIFF decoding uses UTIF2 and has been user-verified with real fixtures in the browser, main conversion pipeline, and Web Worker.
-- A PNG encoder and conversion service using OffscreenCanvas with an HTML Canvas fallback. The service checks the PNG signature and reopens the output to verify its dimensions.
-- A dedicated 24-bit BMP encoder that writes bottom-up BGR pixel rows with 4-byte alignment. Transparent pixels are composited onto white. Automated tests cover its header, pixel data, row padding, and Canvas fallback. Real-file browser conversion has been user-verified.
-- Baseline TIFF output through UTIF2. The encoder writes uncompressed RGBA TIFF files and is integrated into the main interface and Web Worker. Real-file conversion, viewing, dimensions, Worker execution, individual downloads, and ZIP export have been user-verified.
-- JPEG output is implemented and enabled in the main interface. The user verified PNG, JPEG, WebP, and BMP inputs convert to JPEG, transparent PNG areas become white, quality settings work, output MIME type is `image/jpeg`, dimensions match, previews display, and `.jpg` downloads work.
-- The main interface supports PNG output from PNG, JPEG, WebP, and BMP inputs, with individual PNG downloads and per-file error results.
-- The user verified that all four input formats convert successfully, output files open as PNG, dimensions match the originals, PNG transparency is preserved, filenames use the .png extension, downloads work, and multiple files convert independently.
-- The user has verified Phase 3 batch processing, worker execution, progress states, cancellation, failure isolation, responsiveness, cleanup, individual downloads, and ZIP archive integrity.
+<!--
+SCREENSHOT:
+1. Add docs/screenshots/hero.png to show the main application.
+2. Uncomment the image block below when the screenshot is ready.
 
-PNG, JPEG, WebP, and BMP conversion paths are user-verified with real files. Phase 3, including ZIP export, is user-verified. HEIC/HEIF decoding is user-verified. TIFF input decoding and conversion are user-verified with real fixtures. The decoder reads the first page only. TIFF output is implemented as uncompressed baseline TIFF and has been user-verified with real files. SVG decoding, raster-to-SVG output, re-decoding, downloads, and ZIP export are user-verified. The user also reports `npm test` and `npm run build` pass after the SVG output implementation. GIF first-frame conversion to static formats is user-verified. Animated GIF-to-GIF and static-image-to-GIF output have been implemented with modern-gif, and have passed dependency installation, automated tests, production build, and user-run real-browser verification.
+<p align="center">
+  <img src="docs/screenshots/hero.png" alt="Images Format Converter main interface" width="900">
+</p>
+-->
 
-## Phase status and latest verification
+## Contents
 
-- Phase 0–4: complete.
-- Phase 5 - Image Manipulation: merged through PR #5 and verified with automated tests, production build, and real-browser Editor checks.
-- Phase 6 - Image Optimization & Export Workflow: merged through PR #7 and PR #9. PR #9 reports 156/156 automated tests passing, a successful production build, successful integrated browser checks, and passing GitHub Actions. The build retains a non-fatal Vite chunk-size advisory for the HEIC-related bundles (~3.2 MB each).
-- Phase 7 - Testing, Documentation & Release: next; cross-browser, mobile, accessibility, security, performance, and release-readiness work remains.
+- [Overview](#overview)
+- [Screenshots](#screenshots)
+- [Features](#features)
+- [Supported formats](#supported-formats)
+- [Privacy and local processing](#privacy-and-local-processing)
+- [Technology stack](#technology-stack)
+- [Getting started](#getting-started)
+- [Available commands](#available-commands)
+- [Project structure](#project-structure)
+- [Development roadmap](#development-roadmap)
+- [Documentation](#documentation)
+- [About](#about)
 
-These Phase 6 results were reported by the contributor in PR #9. They were not independently rerun during this documentation update.
+## Overview
 
-## Project goals
+Images Format Converter is a web application for converting image files between supported formats. It also provides an editing workspace and export optimization controls.
 
-- Convert images between supported formats directly in the browser.
-- Keep image files on the user's device during processing.
-- Support multiple images and batch conversion.
-- Provide quality, resizing, preview, and download controls.
-- Offer light and dark themes.
-- Keep the codebase modular for additional decoders and encoders.
+The application uses a client-side processing architecture. Image decoding, editing, conversion, validation, and optimization run in the browser. A backend or user account is not required for normal image processing.
 
-## Planned formats
+The project is built with Vanilla JavaScript and Vite. Its interface uses plain CSS and supports light and dark themes.
 
-PNG, JPG/JPEG, WebP, BMP, HEIC/HEIF, TIFF, SVG, and GIF.
+## Screenshots
 
-Decoding and encoding are separate capabilities. The application must not advertise a conversion path until it has been implemented and tested.
+Screenshots will be added to the `docs/screenshots/` directory. The following slots are reserved for the application interface.
 
-Special cases:
-- Canvas commonly supports PNG output and browser-dependent JPEG/WebP output. Verify the returned Blob MIME type.
-- BMP may require a dedicated encoder.
-- HEIC/HEIF uses the integrated `heic-to` decoder adapter. The user verified real-file decoding, main conversion, and Worker processing.
-- TIFF uses the integrated UTIF2 decoder adapter. Real-file input verification passed; the current adapter reads only the first TIFF page.
-- TIFF output uses UTIF2's uncompressed encoder. Real-file output is user-verified. Compression, metadata preservation, and multi-page writing are not included.
-- SVG-to-raster uses a restricted sanitizer before rasterization. Raster-to-SVG output is an SVG wrapper containing embedded PNG data, not true vector conversion.
-- GIF-to-static conversion uses the first frame. GIF-to-GIF output re-encodes all frames and aims to preserve frame timing and looping metadata. Static images produce single-frame GIFs. Animation is not converted to animated WebP or APNG.
+| Screenshot | Suggested file | What to capture |
+|---|---|---|
+| Main interface | `hero.png` | Full application view with the upload area |
+| File queue | `file-queue.png` | Selected files, previews, and file details |
+| Image editor | `image-editor.png` | Transform and adjustment controls |
+| Export settings | `export-settings.png` | Optimization presets and Target Size controls |
+| Conversion results | `conversion-results.png` | Output details, file-size comparison, and download actions |
+| Dark theme | `dark-theme.png` | Main interface using the dark theme |
+| Mobile layout | `mobile-view.png` | Responsive interface on a narrow screen |
 
-## Technology
+Recommended capture format: PNG. Capture the real application UI and avoid including personal files or private information.
+
+<!--
+When screenshots are ready, add them using this pattern:
+
+<p align="center">
+  <img src="docs/screenshots/file-queue.png" alt="File queue and image previews" width="850">
+</p>
+-->
+
+## Features
+
+### Image conversion
+
+- Select files using the file picker or drag and drop.
+- Convert multiple files in one batch.
+- Preview selected images and inspect file details.
+- Download each converted image or export successful results together as a ZIP archive.
+- Validate generated output before making it available for download.
+
+### Image editing
+
+The integrated editor supports:
+
+- Resize with aspect-ratio locking.
+- Crop.
+- Rotate by 90, 180, or 270 degrees.
+- Horizontal and vertical flip.
+- Brightness, contrast, saturation, and blur adjustments.
+- Grayscale and sepia effects.
+- Preview, reset, and apply actions before conversion.
+
+### Export optimization
+
+- Low, Medium, and High presets for JPEG and WebP.
+- Best-effort Target Size for JPEG and WebP.
+- Actual source and output file-size reporting.
+- Byte and percentage difference reporting.
+- Output validation and per-file error handling.
+- ZIP export reuses the validated output generated for each file.
+
+Target Size is best-effort. The encoder may not be able to reach the exact requested size. The application reports the achieved result instead of promising an exact match.
+
+### Batch processing
+
+- Per-file processing states and batch progress.
+- Web Worker processing when supported by the browser.
+- Main-thread fallback when Worker processing is unavailable.
+- Sequential processing to limit memory usage.
+- Cancellation of remaining queued files.
+- Failure isolation so one failed file does not automatically stop unrelated files.
+
+### Interface
+
+- Light and dark themes.
+- Saved theme preference.
+- Responsive desktop and mobile layouts.
+- Keyboard-accessible controls and custom format dropdown.
+- Startup skeleton while the application initializes.
+
+## Supported formats
+
+Input decoding and output encoding are separate capabilities. A format being accepted as input does not mean the application can export to that same format.
+
+| Format | Input | Output | Notes |
+|---|:---:|:---:|---|
+| PNG | Yes | Yes | Transparency supported |
+| JPEG / JPG | Yes | Yes | Transparency is composited onto a background |
+| WebP | Yes | Yes | Quality presets and Target Size are available |
+| BMP | Yes | Yes | Dedicated 24-bit output encoder |
+| HEIC / HEIF | Yes | No | Input decoding only |
+| TIFF | Yes | Yes | Baseline uncompressed TIFF output |
+| SVG | Yes | Yes | Sanitized input rasterization; output is an SVG wrapper containing an embedded PNG |
+| GIF | Yes | Yes | First-frame input for raster conversion; animated GIF-to-GIF and static-image-to-GIF are supported |
+
+Important format limitations:
+
+- SVG output is not true vectorization. It wraps a PNG image inside an SVG document.
+- Animated GIF preservation is supported for GIF-to-GIF. Animated GIF-to-WebP or APNG is not currently supported.
+- TIFF output is baseline uncompressed and does not provide multi-page TIFF export.
+- HEIC/HEIF is currently an input format only.
+- Optimization presets and Target Size are available for JPEG and WebP. Other output formats use the normal encoder path without the optimization modes.
+
+## Privacy and local processing
+
+Images are processed locally in your browser.
+
+- Image files are not uploaded to a remote conversion server.
+- No application account is required.
+- The application does not need a backend or database for its core conversion workflow.
+- Web Workers are used where supported to keep processing away from the main UI thread.
+
+The development server and package manager need an internet connection to install dependencies. That is separate from processing images in the application.
+
+## Technology stack
 
 | Area | Technology |
 |---|---|
+| Language | Vanilla JavaScript with ES modules |
 | Markup | HTML5 |
 | Styling | Plain CSS3 |
-| Language | Vanilla JavaScript ES modules |
-| Development/build | Vite |
-| Icons | Lucide NPM package |
-| Standard image processing | Canvas API, ImageBitmap |
-| Background processing | Web Workers, OffscreenCanvas where supported |
-| ZIP downloads | JSZip |
-| HEIC/HEIF decoding | heic-to (WebAssembly, browser and worker entry points) |
-| TIFF decoding and baseline encoding | UTIF2 (first-page raster decoding; uncompressed TIFF output) |
-| GIF decoding and encoding | gifuct-js 2.1.2 for first-frame static conversion; modern-gif 2.1.0 for animated GIF decode/re-encode and GIF output |
-| Version control | Git and GitHub |
+| Development server and bundler | Vite 7 |
+| Icons | Lucide |
+| Batch archive | JSZip |
+| HEIC / HEIF decoding | heic-to |
+| TIFF decoding and encoding | UTIF2 |
+| GIF decoding | gifuct-js |
+| GIF encoding | modern-gif |
+| Processing | Browser APIs, Canvas, and Web Workers |
+| Testing | Node.js built-in test runner |
 
-No backend, database, cloud storage, or remote image-processing API is planned.
+## Getting started
 
-## Run locally
+This guide uses Windows 10/11 and PowerShell. The commands are also easy to adapt for macOS or Linux.
 
-Requirements: Node.js compatible with the Vite version in package.json and npm.
+### 1. Install Git
 
-```bash
+Git is used to download the project source code and manage changes.
+
+1. Open the [Git for Windows download page](https://git-scm.com/download/win).
+2. Download and run the installer.
+3. Use the default installation options if you are unsure which options to choose.
+4. Finish the installation.
+5. Open PowerShell and verify Git:
+
+```powershell
+git --version
+```
+
+If PowerShell cannot find `git`, close the terminal, open it again, and retry.
+
+### 2. Install Node.js and npm
+
+Node.js runs JavaScript development tools on your computer. npm is the package manager used to install this project's dependencies.
+
+This project uses Vite 7. Use Node.js 22.12 or newer in the Node 22 line to match the project's CI environment. Vite 7 requires Node.js 20.19+ or 22.12+.
+
+1. Open the [official Node.js download page](https://nodejs.org/en/download/).
+2. Download the Windows Installer (`.msi`) for the Node.js 22 LTS release. If the main download page only shows a newer major version, use the [Node.js 22 release archive](https://nodejs.org/en/download/archive/v22.23.5/).
+3. Run the installer.
+4. Keep the option to install npm and add Node.js to PATH enabled.
+5. Finish the installation.
+6. Close and reopen PowerShell.
+7. Verify both tools:
+
+```powershell
+node -v
+npm -v
+```
+
+Both commands should print a version number. You do not need to install npm separately when using the official Windows Node.js installer.
+
+### 3. Install a code editor
+
+A code editor is not required to run the application, but it makes development easier.
+
+[Visual Studio Code](https://code.visualstudio.com/) is a recommended option. Download it, run the installer, and open the project folder after cloning the repository.
+
+### 4. Clone the repository
+
+Open PowerShell in the directory where you want to keep your projects. Run:
+
+```powershell
 git clone https://github.com/andra-gs/Images-Format-Converter.git
 cd Images-Format-Converter
-npm install
+```
+
+You now have a local copy of the repository.
+
+### 5. Install project dependencies
+
+The repository includes `package-lock.json`. Use `npm ci` to install the exact dependency versions recorded in the lockfile:
+
+```powershell
+npm ci
+```
+
+Wait until npm finishes. It will create the `node_modules` directory. You do not need to install Vite, Lucide, or the other project packages globally.
+
+### 6. Start the development server
+
+Run:
+
+```powershell
 npm run dev
 ```
 
-Open the localhost URL printed by Vite.
+Vite will print a local address, usually:
 
-Production build and preview:
+```text
+http://localhost:5173/
+```
 
-```bash
+Open that address in your browser. Keep the terminal running while you use the development version. To stop the server, press `Ctrl+C` in the terminal.
+
+### 7. Run tests and create a production build
+
+Run the automated test suite:
+
+```powershell
 npm test
+```
+
+Create a production build:
+
+```powershell
 npm run build
+```
+
+Vite writes the production files to the `dist/` directory. To preview that build locally, run:
+
+```powershell
 npm run preview
 ```
 
+Use the local address printed by Vite to open the preview.
+
+## Available commands
+
+| Command | Description |
+|---|---|
+| `npm ci` | Install dependencies from the lockfile |
+| `npm run dev` | Start the Vite development server |
+| `npm test` | Run automated tests with Node.js |
+| `npm run build` | Generate the production build in `dist/` |
+| `npm run preview` | Preview the production build locally |
+
+## Project structure
+
+```text
+Images-Format-Converter/
+├── docs/
+│   ├── screenshots/       # Project screenshots for the README
+│   └── ...                # Technical and phase documentation
+├── public/                # Static public assets
+├── src/
+│   ├── js/
+│   │   ├── core/          # Conversion, transformation, optimization
+│   │   ├── ui/            # User interface modules
+│   │   └── workers/       # Web Worker processing
+│   └── styles/            # Application stylesheets
+├── tests/                 # Automated tests
+├── index.html             # Vite HTML entry point
+├── package.json           # Scripts and dependencies
+├── package-lock.json      # Locked dependency versions
+└── vite.config.js         # Vite configuration
+```
+
+## Development roadmap
+
+| Phase | Scope | Status |
+|---|---|---|
+| 0 | Project foundation | Complete |
+| 1 | User interface | Complete, startup skeleton theme matching remains open |
+| 2 | Core conversion engine | Complete |
+| 3 | Batch processing | Complete |
+| 4 | Advanced format support | Complete |
+| 5 | Image manipulation and editor integration | Complete |
+| 6 | Image optimization and export workflow | Complete |
+| 7 | Testing, documentation, and release | Next |
+
+Phase 7 includes cross-browser and mobile testing, large-image and memory testing, security review, verification of advertised conversion paths, and release preparation.
+
 ## Documentation
 
-- [Agent instructions](AGENTS.md)
-- [Project context](docs/PROJECT_CONTEXT.md)
-- [Technical specification](docs/TECHNICAL_SPECIFICATION.md)
-- [Development roadmap](docs/DEVELOPMENT_ROADMAP.md)
-- [Development log](docs/DEVELOPMENT_LOG.md)
-- [Starter prompt](docs/STARTER_PROMPT.md)
-- [Phase 5 Image Transformation](docs/PHASE_5_TRANSFORMATION.md)
-- [Phase 5 Image Adjustment](docs/PHASE_5_ADJUSTMENT.md)
-- [Phase 5 Editor UI](docs/PHASE_5_EDITOR_UI.md)
-- [Phase 6 Optimization Engine](docs/PHASE_6_OPTIMIZATION.md)
-- [Phase 6 Optimization API](docs/PHASE_6_OPTIMIZATION_API.md)
-- [Phase 6 Export UI](docs/PHASE_6_EXPORT_UI.md)
-- [Phase 6 Integration Checklist](docs/PHASE_6_OPTIMIZER_INTEGRATION_CHECKLIST.md)
+| Document | Description |
+|---|---|
+| [Development Roadmap](docs/DEVELOPMENT_ROADMAP.md) | Phase scope, status, and next steps |
+| [Development Log](docs/DEVELOPMENT_LOG.md) | Dated implementation and verification history |
+| [Project Context](docs/PROJECT_CONTEXT.md) | Product goals, scope, and project decisions |
+| [Technical Specification](docs/TECHNICAL_SPECIFICATION.md) | Architecture, modules, and technical contracts |
+| [Phase 5: Image Manipulation](docs/PHASE_5_TRANSFORMATION.md) | Transformation implementation and API |
+| [Phase 6: Optimization](docs/PHASE_6_OPTIMIZATION.md) | Optimization behavior and supported formats |
+| [Phase 6: Optimization API](docs/PHASE_6_OPTIMIZATION_API.md) | Optimizer API contract |
+| [Phase 6: Export UI](docs/PHASE_6_EXPORT_UI.md) | Export settings and integration behavior |
 
-## Development principles
+## About
 
-1. Keep image processing local to the browser.
-2. Separate UI, orchestration, format adapters, workers, and utilities.
-3. Treat decoding and encoding as separate capabilities.
-4. Validate file content and decoder results. Do not trust extensions alone.
-5. Revoke Object URLs and release large image resources.
-6. Use Web Workers for suitable heavy work, with a fallback where practical.
-7. Report unsupported conversions honestly.
-8. Reopen generated outputs to validate them.
+Images Format Converter is an independent project created by [Andra](https://github.com/andra-gs). The project explores browser-based image processing, modular JavaScript architecture, Web Workers, image format compatibility, and export optimization.
 
-## Team development: Phase 5 and Phase 6
+The application is under active development. Contributions, bug reports, and suggestions are welcome through [GitHub Issues](https://github.com/andra-gs/Images-Format-Converter/issues).
 
-The project is developed by three contributors. Task ownership is tied to GitHub usernames so that contributors and their ChatGPT sessions can identify the correct scope.
+## License
 
-| GitHub username | Phase 5 | Phase 6 |
-|---|---|---|
-| `andra-gs` | Image Transformation: resize, aspect ratio, crop, rotate, flip | Image Optimization Engine: format-aware presets, feasible target-size attempts, file-size measurement and output validation |
-| `Adit1945-web` | Image Adjustment: brightness, contrast, saturation, grayscale, sepia, blur | No Phase 6 assignment. Metadata Management is deferred to a future backlog item. |
-| `FarrelPtrv` | Editor UI and Integration: editing workspace, preview, controls, and conversion handoff | Export Presets and UI Integration: capability-aware controls, size reporting, individual and ZIP export |
-
-Phase 5 and Phase 6 are complete and merged into `main`. Phase 6 was delivered by PR #7 (Image Optimization Engine) and PR #9 (Export UI production integration). The two-person Phase 6 assignments are complete: `andra-gs` owned the optimizer and `FarrelPtrv` owned export UI/integration. Metadata Management remains deferred with no owner or branch. The next planned stage is Phase 7: release-readiness testing, documentation review, security checks, and cross-browser validation.
-
-See [Development Roadmap](docs/DEVELOPMENT_ROADMAP.md), [Project Context](docs/PROJECT_CONTEXT.md), [Technical Specification](docs/TECHNICAL_SPECIFICATION.md), and [AGENTS.md](AGENTS.md) for the task ownership, branch rules, integration order, and instructions for ChatGPT sessions assisting each contributor. Use [Starter Prompt](docs/STARTER_PROMPT.md) to initialize a new development session.
+No repository license has been declared yet. Until a license is added to the repository, do not assume that the source code is available for unrestricted reuse.
