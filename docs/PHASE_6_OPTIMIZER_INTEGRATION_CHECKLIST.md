@@ -3,18 +3,17 @@
 **Branch:** `phase-6-export-ui`  
 **UI owner:** `FarrelPtrv`  
 **Optimizer owner:** `andra-gs`  
-**Status:** Preparation only. Production integration must wait until the optimizer changes are merged into `main`.
+**Status:** Production wiring implemented on `phase-6-export-ui`; automated, build, and integrated browser verification are pending.
 
 This checklist is the handoff and verification plan for connecting the Export UI adapter to the real Image Optimization Engine. It does not authorize changes to the shared conversion service, Queue orchestration, or ZIP exporter beyond the agreed Phase 6 scope.
 
 ## 1. Integration gate
 
-- [ ] Andra confirms the optimizer implementation is ready for review.
-- [ ] Optimizer PR is opened and reviewed.
-- [ ] Optimizer PR is merged into `main`.
-- [ ] `phase-6-export-ui` is updated from the latest `main`.
-- [ ] The API contract is checked against the merged implementation.
-- [ ] Any contract differences are agreed with Andra before adapter changes.
+- [x] Andra confirms the optimizer implementation is ready for integration.
+- [x] Optimizer PR #7 is merged into `main`.
+- [x] `phase-6-export-ui` contains the optimizer source, tests, harness, and approved API contract.
+- [x] Git ancestry synchronized: `main` is an ancestor of `phase-6-export-ui` after merge commit `82f7420`.
+- [x] The API contract was checked against the merged implementation; no contract change was required.
 
 Do not connect the production UI to an unmerged optimizer branch.
 
@@ -75,20 +74,33 @@ Preset mapping belongs to the optimizer. The Export UI and adapter must not inde
 - [ ] Width and height come from the optimizer result.
 - [ ] Invalid Blob, MIME, dimensions, size metrics, or validation metadata are rejected by the adapter.
 
-## 6. Export workflow and regression
+## 6. Production integration implementation
 
-- [x] Individual download applies the selected file's settings (existing regression check).
-- [x] Edited images export the current edited ImageData (existing regression check).
-- [x] Unedited images export the original File/Blob source (existing regression check).
-- [x] Per-file settings remain independent (existing browser UI check).
-- [x] ZIP export applies each file's own settings (existing regression check).
-- [x] One image failure does not prevent other images from exporting (existing regression check).
-- [x] Existing JPEG-to-PNG conversion still works.
-- [x] Existing PNG-to-JPEG conversion still works.
-- [x] Existing WebP-to-PNG conversion still works.
-- [x] Batch conversion still works.
-- [x] Editor open/edit workflow still works.
-- [x] Existing individual download and ZIP behavior remains intact.
+The following wiring is now present in `src/js/main.js`:
+- [x] Import the real `optimizeImage()` and use the existing adapter boundary.
+- [x] Build options from each file's own Export Settings.
+- [x] Pass the original `entry.file` for unedited images.
+- [x] Pass `{ file: entry.file, imageData }` for edited images.
+- [x] Route unsupported optimization formats through explicit `mode: "none"`.
+- [x] Keep the existing sequential `for...of` queue and await one file at a time.
+- [x] Keep per-file try/catch so one failed export does not stop later files.
+- [x] Preserve cancellation checks between files and existing progress updates.
+- [x] Store the validated optimizer Blob in `conversionResults`.
+- [x] Individual download links use the stored Blob.
+- [x] ZIP packages stored result Blobs and does not invoke the optimizer again.
+- [x] Display original size, output size, byte difference, percentage change, MIME type, and Target Size reached/not-reached status.
+- [x] Keep animated GIF on the original File-based optimizer path; edited ImageData to GIF remains unsupported.
+
+### Integrated regression verification — pending
+- [ ] Individual JPEG/WebP exports with each preset.
+- [ ] JPEG/WebP Target Size reached and not reached.
+- [ ] PNG, BMP, TIFF, SVG in None mode.
+- [ ] GIF-to-GIF retains animation.
+- [ ] Edited image exports use current edited pixels.
+- [ ] Mixed-format batch, per-file settings, and failure isolation.
+- [ ] Individual downloads open with the correct extension and MIME type.
+- [ ] ZIP contains the exact already-optimized Blobs, with no second optimization.
+- [ ] Existing conversion, Editor, queue progress, cancellation, and error states remain functional.
 
 ## 7. Mock harness scope (pre-integration)
 
@@ -132,7 +144,7 @@ Latest user-reported local verification on the Export UI branch (2026-11-24):
 
 The 131/131 result includes the metadata validation regression tests after the adapter error-message correction in commit `be0530d`. These are user-reported local results; the repository changes were not executed by GitHub during documentation updates.
 
-For the real optimizer integration, still required:
+For the newly wired production integration, still required:
 - [ ] Automated tests rerun after optimizer merge and integration.
 - [ ] Production build rerun after optimizer merge and integration.
 - [ ] Real-browser tests run against the actual optimizer, not the mock.
