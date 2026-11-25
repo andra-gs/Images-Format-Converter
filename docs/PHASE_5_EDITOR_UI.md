@@ -163,3 +163,7 @@ Command: `npm run build`
 - HEIC-related chunks are approximately 3.23 MB each before gzip. Vite emitted its advisory warning for chunks larger than 500 kB; this did not fail the build.
 
 These are user-reported local results from the latest code state, not independently executed results in this environment.
+
+## Final integration status (2026-11-25)
+
+PR #5 was merged into `main` on 2026-11-22. It reported 98/98 automated tests passing, a successful production build, and real-browser verification for HEIC/TIFF queue thumbnails and Editor previews, PNG/JPEG/WebP previews, Apply edits, and existing conversion regressions. The project owner also reported post-merge `npm test` and `npm run dev` checks passing on 2026-11-23. Phase 5 is complete. Cross-browser, mobile, accessibility, and broader release-readiness checks remain in Phase 7.
