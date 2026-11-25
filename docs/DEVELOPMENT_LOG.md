@@ -5,9 +5,9 @@ This file records actual repository progress. Update it after meaningful impleme
 ## Project status
 
 - Current stage: Phase 6 - Image Optimization and Export Workflow
-- Current phase status: Phase 5 and the Image Optimization Engine have been merged into `main`. The optimizer source, API contract, focused tests, and browser harness have now been synchronized onto `phase-6-export-ui` without modifying `main`. Andra reports real-browser verification completed. Export UI production integration, individual downloads, and per-file ZIP integration remain in progress.
+- Current phase status: Phase 5 and the Image Optimization Engine have been merged into `main`. The optimizer source and API are synchronized on `phase-6-export-ui`; production conversion, individual download, ZIP reuse, and result metrics are now wired through the existing sequential queue. Automated tests, production build, and integrated real-browser regression remain pending.
 - Latest release: None
-- Last updated: 2026-11-24
+- Last updated: 2026-11-25
 
 ## Status legend
 
@@ -31,6 +31,19 @@ This file records actual repository progress. Update it after meaningful impleme
 | Phase 7: Testing, documentation, and release | Not started | Cross-browser QA, security review, documentation, production validation, and v1.0.0 readiness |
 
 ## Change log
+
+### 2026-11-25 - Production Image Optimizer wiring
+
+- Status: Production integration code implemented on `phase-6-export-ui`; automated tests, production build, and real-browser verification have not yet been run after these changes.
+- Git synchronization: created merge commit `82f7420` with `main` (`af254db`) as its second parent and the existing Export UI tree preserved. The compare endpoint now reports `main` as an ancestor of `phase-6-export-ui` (0 commits behind). No ref or file on `main` was changed.
+- `src/js/main.js` now imports the real `optimizeImage()` and sends each export through `runExportWithOptimizer()` and the existing adapter.
+- Each queue entry reads its own saved settings. Unedited sources use `entry.file`; edited sources use `{ file: entry.file, imageData }`. `buildExportOptions()` enforces `mode: "none"` for PNG, BMP, TIFF, SVG, and GIF.
+- The existing sequential `for...of` queue remains intact. Each file is awaited and caught independently; progress, cancellation checks between files, and per-file failure reporting remain in the existing flow. `runIndependentExports()` is not used.
+- Optimizer result Blobs are stored in `conversionResults`. Individual downloads use that Blob, and ZIP generation packages those same stored Blobs without running optimization again.
+- Result cards now show original size, exported size, byte difference, percentage reduction/increase, output MIME type, and Target Size reached/not-reached status.
+- Animated GIF continues through the optimizer's File-based conversion path. Edited ImageData to GIF remains explicitly rejected, matching the optimizer contract.
+- Added result metric styling in `src/styles/components.css` and updated `docs/PHASE_6_OPTIMIZER_INTEGRATION_CHECKLIST.md` to distinguish implemented wiring from pending validation.
+- Verification boundary: no claim is made that `npm test`, `npm run build`, or integrated browser tests passed after these edits. These checks must be run after the branch is pulled locally.
 
 ### 2026-11-25 - Optimizer synchronization and conflict-resolution checkpoint
 
