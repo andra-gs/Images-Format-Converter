@@ -115,6 +115,8 @@ npm run preview
 - [Development roadmap](docs/DEVELOPMENT_ROADMAP.md)
 - [Development log](docs/DEVELOPMENT_LOG.md)
 - [Starter prompt](docs/STARTER_PROMPT.md)
+- [Phase 5 Image Transformation](docs/PHASE_5_TRANSFORMATION.md)
+- [Phase 5 Image Adjustment](docs/PHASE_5_ADJUSTMENT.md)
 - [Phase 5 Editor UI](docs/PHASE_5_EDITOR_UI.md)
 - [Phase 6 Optimization Engine](docs/PHASE_6_OPTIMIZATION.md)
 - [Phase 6 Optimization API](docs/PHASE_6_OPTIMIZATION_API.md)
