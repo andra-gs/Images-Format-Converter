@@ -2,7 +2,7 @@
 
 A local-first image format conversion web application. Image files are processed in the user's browser and are not uploaded to a remote server.
 
-> Project status: Phase 5 - Image Manipulation (merged; post-merge checks user-reported as passing); Phase 6 - Image Optimization & Export Workflow (kickoff)
+> Project status: Phases 0–6 complete and merged into `main`; Phase 7 - Testing, Documentation & Release is next. Known issue: the startup skeleton still appears in the light theme when dark theme is selected.
 > Stack: Vanilla JavaScript + Vite + plain CSS
 > Icons: Lucide via NPM
 > Architecture: Client-side, modular, hybrid processing
@@ -17,8 +17,8 @@ The current interface includes:
 - Web Worker conversion when supported, with a main-thread fallback and a sequential concurrency limit.
 - Cancellation of remaining queued files after the active conversion finishes. Successful outputs can be downloaded individually or together in a ZIP archive using JSZip. The user has verified ZIP export, including archive extraction and image integrity.
 - Light and dark themes with saved preference.
-- Conversion settings for PNG, JPEG, WebP, BMP, baseline uncompressed TIFF, SVG wrapper output, and GIF output, with quality control for JPEG and WebP. The dedicated 24-bit BMP encoder is implemented and user-verified with real PNG, JPEG, WebP, and BMP files.
-- Startup skeleton that follows the selected theme and prevents an unstyled-content flash.
+- Conversion settings for PNG, JPEG, WebP, BMP, baseline uncompressed TIFF, SVG wrapper output, and GIF output. Phase 6 adds per-file export optimization settings: Low/Medium/High presets and best-effort Target Size for JPEG/WebP, with `mode: none` for PNG, BMP, TIFF, GIF, and SVG. Result cards show actual source/output sizes and optimization status. Individual downloads and ZIP reuse the same validated optimized Blob. The dedicated 24-bit BMP encoder is implemented and user-verified with real files.
+- Startup skeleton that prevents an unstyled-content flash. Known issue: the user's last reported check found that the skeleton always appears in the light theme; theme matching still needs a fix and retest.
 - Initial file validation and image-format signature detection.
 - SVG input is parsed and sanitized to a restricted vector subset before rasterization. SVG output embeds a PNG data resource in an SVG image element. This preserves the raster image but does not vectorize it. The sanitizer allows only bounded embedded PNG data for image elements and continues to reject external resources and active content. The user has verified SVG rasterization and conversion to PNG, JPEG, WebP, BMP, and TIFF in the real browser. Raster-to-SVG output has also been verified with transparent and opaque sources, matching dimensions, SVG re-decoding, individual downloads, and ZIP export.
 - GIF input uses gifuct-js to decode the first frame for conversion to static formats. GIF output uses modern-gif to create single-frame GIFs from static images and re-encode animated GIFs with frame order, timing, and looping metadata. The user has verified animated GIF-to-GIF and static-image-to-GIF conversion in the real browser, including timing, looping, transparency, frame order, batch processing, individual downloads, and ZIP export. GIF animation-to-other-animated-formats is outside the current scope.
@@ -33,6 +33,15 @@ The current interface includes:
 - The user has verified Phase 3 batch processing, worker execution, progress states, cancellation, failure isolation, responsiveness, cleanup, individual downloads, and ZIP archive integrity.
 
 PNG, JPEG, WebP, and BMP conversion paths are user-verified with real files. Phase 3, including ZIP export, is user-verified. HEIC/HEIF decoding is user-verified. TIFF input decoding and conversion are user-verified with real fixtures. The decoder reads the first page only. TIFF output is implemented as uncompressed baseline TIFF and has been user-verified with real files. SVG decoding, raster-to-SVG output, re-decoding, downloads, and ZIP export are user-verified. The user also reports `npm test` and `npm run build` pass after the SVG output implementation. GIF first-frame conversion to static formats is user-verified. Animated GIF-to-GIF and static-image-to-GIF output have been implemented with modern-gif, and have passed dependency installation, automated tests, production build, and user-run real-browser verification.
+
+## Phase status and latest verification
+
+- Phase 0–4: complete.
+- Phase 5 - Image Manipulation: merged through PR #5 and verified with automated tests, production build, and real-browser Editor checks.
+- Phase 6 - Image Optimization & Export Workflow: merged through PR #7 and PR #9. PR #9 reports 156/156 automated tests passing, a successful production build, successful integrated browser checks, and passing GitHub Actions. The build retains a non-fatal Vite chunk-size advisory for the HEIC-related bundles (~3.2 MB each).
+- Phase 7 - Testing, Documentation & Release: next; cross-browser, mobile, accessibility, security, performance, and release-readiness work remains.
+
+These Phase 6 results were reported by the contributor in PR #9. They were not independently rerun during this documentation update.
 
 ## Project goals
 
@@ -106,6 +115,11 @@ npm run preview
 - [Development roadmap](docs/DEVELOPMENT_ROADMAP.md)
 - [Development log](docs/DEVELOPMENT_LOG.md)
 - [Starter prompt](docs/STARTER_PROMPT.md)
+- [Phase 5 Editor UI](docs/PHASE_5_EDITOR_UI.md)
+- [Phase 6 Optimization Engine](docs/PHASE_6_OPTIMIZATION.md)
+- [Phase 6 Optimization API](docs/PHASE_6_OPTIMIZATION_API.md)
+- [Phase 6 Export UI](docs/PHASE_6_EXPORT_UI.md)
+- [Phase 6 Integration Checklist](docs/PHASE_6_OPTIMIZER_INTEGRATION_CHECKLIST.md)
 
 ## Development principles
 
@@ -128,6 +142,6 @@ The project is developed by three contributors. Task ownership is tied to GitHub
 | `Adit1945-web` | Image Adjustment: brightness, contrast, saturation, grayscale, sepia, blur | No Phase 6 assignment. Metadata Management is deferred to a future backlog item. |
 | `FarrelPtrv` | Editor UI and Integration: editing workspace, preview, controls, and conversion handoff | Export Presets and UI Integration: capability-aware controls, size reporting, individual and ZIP export |
 
-Phase 5 has been merged into `main`. On 2026-11-23, the project owner reported that `npm test` and `npm run dev` checks passed after the merge. Phase 6 now has two active contributors. Create the assigned branches from the latest `main`, agree on the optimizer API and format capability matrix before integration, merge the processing module first, then merge the export UI. Run the full test suite, production build, and browser regression checks after integration.
+Phase 5 and Phase 6 are complete and merged into `main`. Phase 6 was delivered by PR #7 (Image Optimization Engine) and PR #9 (Export UI production integration). The two-person Phase 6 assignments are complete: `andra-gs` owned the optimizer and `FarrelPtrv` owned export UI/integration. Metadata Management remains deferred with no owner or branch. The next planned stage is Phase 7: release-readiness testing, documentation review, security checks, and cross-browser validation.
 
 See [Development Roadmap](docs/DEVELOPMENT_ROADMAP.md), [Project Context](docs/PROJECT_CONTEXT.md), [Technical Specification](docs/TECHNICAL_SPECIFICATION.md), and [AGENTS.md](AGENTS.md) for the task ownership, branch rules, integration order, and instructions for ChatGPT sessions assisting each contributor. Use [Starter Prompt](docs/STARTER_PROMPT.md) to initialize a new development session.
