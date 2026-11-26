@@ -47,12 +47,6 @@ Your files are processed directly in your browser. They are not sent to a remote
 
 ## Screenshots
 
-### Main workspace
-
-<p align="center">
-  <img src="docs/screenshots/hero.png" alt="Main application workspace" width="900">
-</p>
-
 ### Batch conversion
 
 <p align="center">
