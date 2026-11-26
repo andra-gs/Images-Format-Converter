@@ -126,6 +126,7 @@ Use the workspace in the theme and screen size that suit you. The layout adapts 
 - Responsive desktop and mobile layouts.
 - Keyboard-accessible controls and custom format dropdown.
 - Startup skeleton while the application initializes.
+- Known issue in `v1.0.0`: the startup skeleton currently appears in light theme even when dark theme is selected. The main application theme still supports light and dark modes.
 
 ## Supported formats
 
@@ -352,11 +353,9 @@ Release verification recorded in the published notes: 156/156 automated tests pa
 | [Phase 5: Image Adjustment](docs/PHASE_5_ADJUSTMENT.md) | Adjustment implementation and API |
 | [Phase 5: Editor UI](docs/PHASE_5_EDITOR_UI.md) | Editor workflow and integration |
 | [Phase 6: Export Adapter Validation](docs/PHASE_6_EXPORT_ADAPTER_VALIDATION.md) | Export adapter contract and validation |
-| [Phase 6: Export UI](docs/PHASE_6_EXPORT_UI.md) | Export settings and integration behavior |
 | [Phase 6: Optimizer Integration Checklist](docs/PHASE_6_OPTIMIZER_INTEGRATION_CHECKLIST.md) | Optimizer integration checklist |
 | [Phase 6: Optimization](docs/PHASE_6_OPTIMIZATION.md) | Optimization behavior and supported formats |
 | [Phase 6: Optimization API](docs/PHASE_6_OPTIMIZATION_API.md) | Optimizer API contract |
-| [Phase 6: Export UI](docs/PHASE_6_EXPORT_UI.md) | Export settings and integration behavior |
 
 ## About
 
