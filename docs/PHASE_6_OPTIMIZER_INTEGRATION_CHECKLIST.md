@@ -166,3 +166,7 @@ Final integrated verification was reported in PR #9: `npm test` passed 156/156, 
 - Browser verification: contributor-reported successful for all integrated scenarios listed in the checklist.
 
 The test/build/browser results were reported by the contributor in PR #9; they were not independently rerun during this documentation-only update.
+
+## Stable release status (2026-11-26)
+
+The integration described in this checklist was completed and included in the published stable release [`v1.0.0`](https://github.com/andra-gs/Images-Format-Converter/releases/tag/v1.0.0). This checklist is retained as the historical integration record.
