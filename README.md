@@ -14,15 +14,21 @@ Convert, edit, and optimize image files directly in your browser. Your images st
 
 </div>
 
-<!--
-SCREENSHOT:
-1. Add docs/screenshots/hero.png to show the main application.
-2. Uncomment the image block below when the screenshot is ready.
-
 <p align="center">
   <img src="docs/screenshots/hero.png" alt="Images Format Converter main interface" width="900">
 </p>
--->
+
+## Overview
+
+**Your images. Your workflow. Your device.**
+
+Stop jumping between separate websites just to convert, resize, crop, and optimize images. Images Format Converter brings those everyday tasks into one clean workspace.
+
+Convert batches of images across a wide range of formats, make quick edits before exporting, and fine-tune JPEG or WebP output with quality presets or a target file size. Preview your files, track each conversion, compare output sizes, and download individual results or a ZIP archive.
+
+Your files are processed directly in your browser. They are not sent to a remote conversion server, and you do not need an account to get started. Whether you are preparing images for a website, organizing assets, or simply changing file formats, the workflow stays in one place and under your control.
+
+**Convert. Edit. Optimize. Keep your files private.**
 
 ## Contents
 
@@ -39,37 +45,40 @@ SCREENSHOT:
 - [Documentation](#documentation)
 - [About](#about)
 
-## Overview
-
-Images Format Converter is a web application for converting image files between supported formats. It also provides an editing workspace and export optimization controls.
-
-The application uses a client-side processing architecture. Image decoding, editing, conversion, validation, and optimization run in the browser. A backend or user account is not required for normal image processing.
-
-The project is built with Vanilla JavaScript and Vite. Its interface uses plain CSS and supports light and dark themes.
-
 ## Screenshots
 
-Screenshots will be added to the `docs/screenshots/` directory. The following slots are reserved for the application interface.
-
-| Screenshot | Suggested file | What to capture |
-|---|---|---|
-| Main interface | `hero.png` | Full application view with the upload area |
-| File queue | `file-queue.png` | Selected files, previews, and file details |
-| Image editor | `image-editor.png` | Transform and adjustment controls |
-| Export settings | `export-settings.png` | Optimization presets and Target Size controls |
-| Conversion results | `conversion-results.png` | Output details, file-size comparison, and download actions |
-| Dark theme | `dark-theme.png` | Main interface using the dark theme |
-| Mobile layout | `mobile-view.png` | Responsive interface on a narrow screen |
-
-Recommended capture format: PNG. Capture the real application UI and avoid including personal files or private information.
-
-<!--
-When screenshots are ready, add them using this pattern:
+### Main workspace
 
 <p align="center">
-  <img src="docs/screenshots/file-queue.png" alt="File queue and image previews" width="850">
+  <img src="docs/screenshots/hero.png" alt="Main application workspace" width="900">
 </p>
--->
+
+### Batch conversion
+
+<p align="center">
+  <img src="docs/screenshots/file-queue.png" alt="Selected image files, previews, and file details" width="850">
+</p>
+<p align="center">
+  <img src="docs/screenshots/conversion-results.png" alt="Conversion results with output details and download actions" width="850">
+</p>
+
+### Image editing and export optimization
+
+<p align="center">
+  <img src="docs/screenshots/image-editor.png" alt="Image editor with transformation and adjustment controls" width="850">
+</p>
+<p align="center">
+  <img src="docs/screenshots/export-settings.png" alt="Export optimization settings and target size controls" width="850">
+</p>
+
+### Choose your theme and screen
+
+<p align="center">
+  <img src="docs/screenshots/dark-theme.png" alt="Application interface in dark theme" width="850">
+</p>
+<p align="center">
+  <img src="docs/screenshots/mobile-view.png" alt="Responsive application layout on a mobile screen" width="420">
+</p>
 
 ## Features
 
