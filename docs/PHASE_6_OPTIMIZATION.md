@@ -143,3 +143,7 @@ The integrated application now:
 - Displays actual source/output sizes, byte difference, percentage change, MIME type, and Target Size status.
 
 PR #9 verification report: 156/156 tests passed, production build succeeded, GitHub Actions passed, and integrated browser checks were completed successfully. The build still emits a non-fatal Vite chunk-size advisory for the HEIC-related bundles (~3.2 MB each).
+
+## Stable release status (2026-11-26)
+
+The optimizer implementation described here is included in the published stable release [`v1.0.0`](https://github.com/andra-gs/Images-Format-Converter/releases/tag/v1.0.0). Release verification is summarized in the [Development Log](./DEVELOPMENT_LOG.md).
