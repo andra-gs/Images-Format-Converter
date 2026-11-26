@@ -167,3 +167,7 @@ These are user-reported local results from the latest code state, not independen
 ## Final integration status (2026-11-25)
 
 PR #5 was merged into `main` on 2026-11-22. It reported 98/98 automated tests passing, a successful production build, and real-browser verification for HEIC/TIFF queue thumbnails and Editor previews, PNG/JPEG/WebP previews, Apply edits, and existing conversion regressions. The project owner also reported post-merge `npm test` and `npm run dev` checks passing on 2026-11-23. Phase 5 is complete. The project owner later confirmed that the broader Phase 7 testing activities, including cross-browser and mobile checks, were completed on 2026-11-26. See the current roadmap and development log for the overall QA status.
+
+## Stable release status (2026-11-26)
+
+The integrated Editor workflow is included in the published stable release [`v1.0.0`](https://github.com/andra-gs/Images-Format-Converter/releases/tag/v1.0.0). The project owner confirmed completion of Phase 7 QA activities on 2026-11-26. The release notes retain the known startup-skeleton theme mismatch as an outstanding UI issue.
