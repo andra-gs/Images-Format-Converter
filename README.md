@@ -6,11 +6,11 @@
 
 Convert, edit, and optimize image files directly in your browser. Your images stay on your device and are not uploaded to a conversion server.
 
-![Version](https://img.shields.io/badge/version-0.1.0-2563eb)
+![Version](https://img.shields.io/badge/version-1.0.0-2563eb)
 ![JavaScript](https://img.shields.io/badge/JavaScript-Vanilla-F7DF1E?logo=javascript&logoColor=222)
 ![Vite](https://img.shields.io/badge/Vite-7-646CFF?logo=vite&logoColor=white)
 ![Processing](https://img.shields.io/badge/processing-browser--local-16a34a)
-![Status](https://img.shields.io/badge/status-release%20pending-orange)
+![Status](https://img.shields.io/badge/status-v1.0.0%20released-brightgreen)
 
 </div>
 
@@ -41,6 +41,7 @@ Your images stay on your device throughout the conversion process. There is no a
 - [Available commands](#available-commands)
 - [Project structure](#project-structure)
 - [Development roadmap](#development-roadmap)
+- [Release](#release)
 - [Documentation](#documentation)
 - [About](#about)
 
@@ -325,9 +326,19 @@ Images-Format-Converter/
 | 4 | Advanced format support | Complete |
 | 5 | Image manipulation and editor integration | Complete |
 | 6 | Image optimization and export workflow | Complete |
-| 7 | Testing and documentation | Complete, release pending |
+| 7 | Testing and documentation | Complete, v1.0.0 released |
 
-The Phase 7 testing and documentation checklist has been completed. The `v1.0.0` release tag and publication are intentionally deferred.
+Phase 7 testing and documentation are complete. The first stable release, `v1.0.0`, was published on 2026-11-26.
+
+## Release
+
+The first stable release is available as `v1.0.0`.
+
+- [View release notes](https://github.com/andra-gs/Images-Format-Converter/releases/tag/v1.0.0)
+- [Download the release ZIP](https://github.com/andra-gs/Images-Format-Converter/releases/download/v1.0.0/Images-Format-Converter-v1.0.0.zip)
+- Release tag commit: [`df882784d4bd18854067663191bc4b00dae5c0d5`](https://github.com/andra-gs/Images-Format-Converter/commit/df882784d4bd18854067663191bc4b00dae5c0d5)
+
+Release verification recorded in the published notes: 156/156 automated tests passed, production build successful, GitHub Actions checks passed, and integrated browser verification reported complete. Known limitations remain listed in the release notes and supported-format section above.
 
 ## Documentation
 
@@ -337,7 +348,12 @@ The Phase 7 testing and documentation checklist has been completed. The `v1.0.0`
 | [Development Log](docs/DEVELOPMENT_LOG.md) | Dated implementation and verification history |
 | [Project Context](docs/PROJECT_CONTEXT.md) | Product goals, scope, and project decisions |
 | [Technical Specification](docs/TECHNICAL_SPECIFICATION.md) | Architecture, modules, and technical contracts |
-| [Phase 5: Image Manipulation](docs/PHASE_5_TRANSFORMATION.md) | Transformation implementation and API |
+| [Phase 5: Image Transformation](docs/PHASE_5_TRANSFORMATION.md) | Transformation implementation and API |
+| [Phase 5: Image Adjustment](docs/PHASE_5_ADJUSTMENT.md) | Adjustment implementation and API |
+| [Phase 5: Editor UI](docs/PHASE_5_EDITOR_UI.md) | Editor workflow and integration |
+| [Phase 6: Export Adapter Validation](docs/PHASE_6_EXPORT_ADAPTER_VALIDATION.md) | Export adapter contract and validation |
+| [Phase 6: Export UI](docs/PHASE_6_EXPORT_UI.md) | Export settings and integration behavior |
+| [Phase 6: Optimizer Integration Checklist](docs/PHASE_6_OPTIMIZER_INTEGRATION_CHECKLIST.md) | Optimizer integration checklist |
 | [Phase 6: Optimization](docs/PHASE_6_OPTIMIZATION.md) | Optimization behavior and supported formats |
 | [Phase 6: Optimization API](docs/PHASE_6_OPTIMIZATION_API.md) | Optimizer API contract |
 | [Phase 6: Export UI](docs/PHASE_6_EXPORT_UI.md) | Export settings and integration behavior |
