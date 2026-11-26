@@ -4,10 +4,10 @@ This file records actual repository progress. Update it after meaningful impleme
 
 ## Project status
 
-- Current stage: Phase 7 - Testing, Documentation, and Release (next)
-- Current phase status: Phases 0–6 are complete and merged into `main`. Phase 7 release-readiness work has not started. Phase 1 retains one known UI issue: the user's last reported check found that the startup skeleton always appears in the light theme, even when dark theme is selected. The no-unstyled-content-flash check passed.
+- Current stage: Release preparation (deferred)
+- Current phase status: Phases 0–7 QA and documentation are complete. The project owner confirmed all Phase 7 testing activities are complete on 2026-11-26. Release tagging and publication are intentionally deferred. Phase 1 retains one separately tracked UI issue: the last recorded check found that the startup skeleton always appears in the light theme, even when dark theme is selected.
 - Latest release: None
-- Last updated: 2026-11-25
+- Last updated: 2026-11-26
 
 ## Status legend
 
@@ -28,9 +28,18 @@ This file records actual repository progress. Update it after meaningful impleme
 | Phase 4: Advanced formats | Tested | Completed; CI validation and user-run real-browser verification passed. Known format limitations remain documented |
 | Phase 5: Image manipulation | Complete | Merged into `main`; project owner reports post-merge `npm test` and `npm run dev` checks passed on 2026-11-23. A separate post-merge production build result is not recorded |
 | Phase 6: Image optimization and export workflow | Complete | Optimizer merged through PR #7; production Export UI integration merged through PR #9 on 2026-11-25. PR #9 reports 156/156 tests, successful build, successful integrated browser checks, and passing GitHub Actions. Metadata Management remains deferred |
-| Phase 7: Testing, documentation, and release | Not started | Cross-browser QA, security review, documentation, production validation, and v1.0.0 readiness |
+| Phase 7: Testing and documentation | Complete | Project owner confirmed all Phase 7 testing activities are complete. Release tag `v1.0.0` and publication are deferred |
 
 ## Change log
+
+### 2026-11-26 - Phase 7 testing and documentation completed
+- Status: Phase 7 QA and documentation are complete, based on the project owner's confirmation that all Phase 7 testing activities have been performed.
+- Scope recorded as complete: cross-browser checks, mobile layout checks, large-image and memory checks, security review, advertised conversion-path verification, local-processing/network-transfer verification, production build check, README installation and usage instructions, screenshots, supported-format matrix, and known-limitations/browser-compatibility documentation.
+- Release decision: the `v1.0.0` tag and release publication are intentionally deferred. No release was created as part of this update.
+- Evidence boundary: individual browser/device names, detailed test cases, command output, and per-test pass/fail results were not provided in this update. This entry records owner confirmation and does not invent those details.
+- Known issue: the previously recorded startup-skeleton theme mismatch remains separately tracked until a fix and retest are documented.
+- Documentation synchronization only. No application code, tests, or production build were run by the assistant during this update.
+
 
 ### 2026-11-25 - Phase 6 merged and verified
 - Status: Complete; PR #9 merged the production Export UI integration into `main` after optimizer PR #7.
