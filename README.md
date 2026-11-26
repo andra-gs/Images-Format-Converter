@@ -339,10 +339,20 @@ Phase 7 includes cross-browser and mobile testing, large-image and memory testin
 
 ## About
 
-Images Format Converter is an independent project created by [Andra](https://github.com/andra-gs). The project explores browser-based image processing, modular JavaScript architecture, Web Workers, image format compatibility, and export optimization.
+Images Format Converter is an independent open-source project created by [Andra Nooryanto](https://github.com/andra-gs). It explores browser-based image processing, modular JavaScript architecture, Web Workers, image format compatibility, and export optimization.
 
-The application is under active development. Contributions, bug reports, and suggestions are welcome through [GitHub Issues](https://github.com/andra-gs/Images-Format-Converter/issues).
+**Creator**
+- [Andra Nooryanto](https://github.com/andra-gs)
+
+**Contributor**
+- [FarrelPtrv](https://github.com/FarrelPtrv)
+
+Contributions, bug reports, and suggestions are welcome through [GitHub Issues](https://github.com/andra-gs/Images-Format-Converter/issues).
 
 ## License
 
-The package metadata declares the ISC license, but the repository does not yet include a `LICENSE` file. The licensing information is incomplete. Check with the project owner before redistributing or reusing the source code.
+This project is licensed under the [MIT License](LICENSE).
+
+You may use, copy, modify, merge, publish, distribute, sublicense, and sell copies of the software, subject to the MIT License terms. When redistributing the project or substantial portions of its source, you must retain the copyright notice and permission notice included in the `LICENSE` file.
+
+Copyright (c) 2026 Andra Nooryanto.
