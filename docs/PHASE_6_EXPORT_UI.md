@@ -202,3 +202,7 @@ Verification reported in PR #9:
 - The build retains a non-fatal Vite chunk-size advisory for HEIC-related bundles (~3.2 MB each).
 
 These results are reported evidence from PR #9 and were not independently rerun during this documentation update.
+
+## Stable release status (2026-11-26)
+
+The production Export UI integration described here is included in the published stable release [`v1.0.0`](https://github.com/andra-gs/Images-Format-Converter/releases/tag/v1.0.0). Release verification is summarized in the [Development Log](./DEVELOPMENT_LOG.md).
