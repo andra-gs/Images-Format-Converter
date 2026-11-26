@@ -570,3 +570,11 @@ Verification status: PR #9 merged the production integration into `main`. The PR
 - Evidence: [PR #9](https://github.com/andra-gs/Images-Format-Converter/pull/9), merge commit `17bb59628660d31bad64bb16eebb5337d9bf44a6`.
 
 These verification results are contributor-reported in the Pull Request and were not independently rerun during this documentation update.
+
+## 29. Stable release baseline (2026-11-26)
+
+The implementation and contracts in this specification describe the first stable release, [`v1.0.0`](https://github.com/andra-gs/Images-Format-Converter/releases/tag/v1.0.0). The release tag points to commit `df882784d4bd18854067663191bc4b00dae5c0d5`.
+
+The published release notes record 156/156 automated tests passing, a successful production build, passing GitHub Actions checks, and completed integrated browser verification. These are release-recorded results, not tests rerun as part of this documentation update.
+
+Known release limitations remain in effect: the startup skeleton uses the light theme even when dark theme is selected; HEIC/HEIF is input-only; animated GIF preservation is limited to GIF-to-GIF; TIFF output is baseline uncompressed and processes only the first page; raster-to-SVG embeds PNG rather than vectorizing; JPEG/WebP optimization is best-effort; and Metadata Management is not included.
