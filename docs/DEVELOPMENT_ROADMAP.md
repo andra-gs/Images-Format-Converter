@@ -426,7 +426,7 @@ No owner, branch, API, or delivery date is assigned to this deferred work yet.
 
 ## Phase 7: Testing and documentation
 
-Status: Complete (2026-11-26). The project owner confirmed that all Phase 7 testing activities have been completed. Release tagging and publication are intentionally deferred to a later step.
+Status: Complete and released (2026-11-26). The project owner confirmed completion of Phase 7 testing activities. Git tag `v1.0.0` points to commit `df882784d4bd18854067663191bc4b00dae5c0d5`, and the GitHub release was published on 2026-11-26.
 
 Tasks:
 
@@ -440,9 +440,9 @@ Tasks:
 - [x] Complete README installation and usage instructions.
 - [x] Add screenshots and a supported-format matrix.
 - [x] Document known limitations and browser compatibility.
-- [ ] Tag and publish release `v1.0.0` (deferred by project owner).
+- [x] Tag and publish release `v1.0.0` on GitHub.
 
-Deliverable: completed QA and project documentation. Release tagging and publication remain separate pending work.
+Deliverable: completed QA, synchronized project documentation, and the published first stable release `v1.0.0`. Release notes and the downloadable ZIP are available at https://github.com/andra-gs/Images-Format-Converter/releases/tag/v1.0.0.
 
 ## Priority guide
 
