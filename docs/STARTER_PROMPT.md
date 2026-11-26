@@ -20,6 +20,8 @@ Gunakan dokumentasi terbaru dari branch `main`. Jangan mengandalkan salinan lama
 
 ## Tugas awal
 
+Repository sudah mencapai rilis stabil pertama `v1.0.0`. Jangan menganggap Phase 7 masih aktif. Untuk pekerjaan lanjutan, identifikasi apakah permintaan termasuk bugfix, maintenance, atau pengembangan versi berikutnya. Jangan mengubah tag atau aset release `v1.0.0`.
+
 1. Identifikasi GitHub username developer yang sedang menggunakan sesi ini. Jangan menebak dari pemilik repository atau akun ChatGPT.
 2. Periksa branch aktif dan kondisi repository terbaru.
 3. Baca status fase dan riwayat perubahan pada Development Roadmap serta Development Log.
@@ -33,8 +35,10 @@ Gunakan dokumentasi terbaru dari branch `main`. Jangan mengandalkan salinan lama
 - Phase 0 sampai Phase 6: selesai dan sudah terintegrasi ke branch `main`.
 - Phase 5: Image Manipulation, selesai melalui PR #5.
 - Phase 6: Image Optimization & Export Workflow, selesai melalui PR #7 dan PR #9. PR #9 melaporkan 156/156 automated tests lulus, production build berhasil, GitHub Actions lulus, dan integrated browser checks selesai.
-- Phase 7: Testing, Documentation, and Release, tahap berikutnya dan belum dimulai.
-- Known issue: startup skeleton terakhir dilaporkan selalu menggunakan tema terang, meskipun dark theme dipilih. Perlu diperbaiki dan diuji ulang.
+- Phase 7: Testing and Documentation, selesai pada 2026-11-26. Release stabil pertama `v1.0.0` juga sudah diterbitkan pada 2026-11-26.
+- Release: https://github.com/andra-gs/Images-Format-Converter/releases/tag/v1.0.0
+- Tag commit: `df882784d4bd18854067663191bc4b00dae5c0d5`.
+- Known issue pada `v1.0.0`: startup skeleton terakhir dilaporkan selalu menggunakan tema terang, meskipun dark theme dipilih. Catat sebagai pekerjaan maintenance dan jangan mengklaim sudah diperbaiki sebelum ada perubahan serta pengujian ulang.
 - Metadata Management tetap menjadi deferred backlog tanpa owner atau branch.
 
 Rincian tugas, file target, kriteria selesai, branch, dan urutan merge tersedia di `docs/DEVELOPMENT_ROADMAP.md`.
