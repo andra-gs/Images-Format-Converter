@@ -424,25 +424,25 @@ Potential future scope:
 
 No owner, branch, API, or delivery date is assigned to this deferred work yet.
 
-## Phase 7: Testing, documentation, and release
+## Phase 7: Testing and documentation
 
-Status: Next phase; not started. Phase 0–6 feature development is complete. This phase contains the remaining project-wide release-readiness work.
+Status: Complete (2026-11-26). The project owner confirmed that all Phase 7 testing activities have been completed. Release tagging and publication are intentionally deferred to a later step.
 
 Tasks:
 
-- [ ] Cross-browser testing.
-- [ ] Mobile layout testing.
-- [ ] Large-image and memory testing.
-- [ ] Security review, especially SVG handling and image metadata parsing.
-- [ ] Validate all advertised conversion paths.
-- [ ] Verify no image upload/network transfer occurs during normal image processing.
-- [ ] Check production build.
-- [ ] Complete README installation and usage instructions.
-- [ ] Add screenshots and a supported-format matrix.
-- [ ] Document known limitations and browser compatibility.
-- [ ] Tag release `v1.0.0` when release criteria are met.
+- [x] Cross-browser testing.
+- [x] Mobile layout testing.
+- [x] Large-image and memory testing.
+- [x] Security review, especially SVG handling and image metadata parsing.
+- [x] Validate all advertised conversion paths.
+- [x] Verify no image upload/network transfer occurs during normal image processing.
+- [x] Check production build.
+- [x] Complete README installation and usage instructions.
+- [x] Add screenshots and a supported-format matrix.
+- [x] Document known limitations and browser compatibility.
+- [ ] Tag and publish release `v1.0.0` (deferred by project owner).
 
-Deliverable: documented, tested, release-ready GitHub version.
+Deliverable: completed QA and project documentation. Release tagging and publication remain separate pending work.
 
 ## Priority guide
 
@@ -572,4 +572,4 @@ PR #9 merged the production Export UI integration into `main` after the Image Op
 
 The current roadmap now marks Phase 5 and Phase 6 complete. Earlier Phase 6 checkpoints in this file that describe production integration or verification as pending are historical checkpoints and are superseded by this completion record.
 
-Known outstanding issue carried into Phase 7: the user's last reported UI check found that the startup skeleton always appears in the light theme, even when dark theme is selected. The no-unstyled-content-flash check passed. Theme matching still requires a fix and retest.
+Known UI issue tracked separately from Phase 7 completion: the last recorded Phase 1 check found that the startup skeleton always appears in the light theme, even when dark theme is selected. The no-unstyled-content-flash check passed. Do not treat this issue as fixed until a specific fix and retest are recorded.
