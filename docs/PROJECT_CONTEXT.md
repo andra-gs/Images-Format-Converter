@@ -159,7 +159,7 @@ A conversion is successful only when:
 
 ## 8. Current phase and out of scope for the initial MVP
 
-Phase 4 (Advanced Format Support) was completed on 2026-11-20. Phase 5 (Image Manipulation) was merged through PR #5 and its integrated Editor workflow was verified. Phase 6 (Image Optimization and Export Workflow) was completed through PR #7 and PR #9, both merged into `main` by 2026-11-25. PR #9 reports 156/156 automated tests passing, a successful production build, successful integrated browser checks, and passing GitHub Actions. Phase 7 testing and documentation were completed on 2026-11-26, based on the project owner's confirmation that all planned QA activities were performed. The `v1.0.0` tag and release publication are intentionally deferred. A previously reported startup-skeleton theme mismatch remains a separately tracked UI issue until a fix and retest are documented.
+Phase 4 (Advanced Format Support) was completed on 2026-11-20. Phase 5 (Image Manipulation) was merged through PR #5 and its integrated Editor workflow was verified. Phase 6 (Image Optimization and Export Workflow) was completed through PR #7 and PR #9, both merged into `main` by 2026-11-25. PR #9 reports 156/156 automated tests passing, a successful production build, successful integrated browser checks, and passing GitHub Actions. Phase 7 testing and documentation were completed on 2026-11-26, based on the project owner's confirmation that all planned QA activities were performed. The first stable GitHub release `v1.0.0` was published on 2026-11-26 at tag commit `df882784d4bd18854067663191bc4b00dae5c0d5`. A previously reported startup-skeleton theme mismatch remains a separately tracked UI issue for a future maintenance update.
 
 - User accounts and authentication.
 - Cloud storage.
@@ -211,11 +211,12 @@ Do not push feature work directly to `main`. Submit a Pull Request to `main`, in
 
 ChatGPT must read the root-level `AGENTS.md` first and identify the developer's GitHub username before selecting a task. If the username is unknown, ask for it. It must also read `docs/DEVELOPMENT_ROADMAP.md`, this file, and `docs/TECHNICAL_SPECIFICATION.md`, then work only within that member's assigned responsibility for the active phase. `docs/STARTER_PROMPT.md` may be used to start a session. It must not silently implement another member's work, change task ownership, or modify shared integration files without coordination. It must distinguish planned tasks from implemented and verified functionality.
 
-## 10. Current implementation status (2026-11-26)
+## 10. Current implementation and release status (2026-11-26)
 
 - Phases 0–6: implementation complete and merged into `main`.
 - Phase 5: Image Transformer, Image Adjuster, and Editor integration are complete.
 - Phase 6: Image Optimization Engine and Export UI production integration are complete.
-- Phase 7: testing and documentation complete, based on project-owner confirmation. Release tagging and publication remain deferred.
+- Phase 7: testing and documentation complete, based on project-owner confirmation. Stable release `v1.0.0` published on 2026-11-26.
 - Deferred backlog: Metadata Management remains unassigned and outside Phase 6.
-- Known UI issue: the startup skeleton was last reported to always appear in the light theme. The application theme itself switches between light and dark, and the no-unstyled-content-flash check passed. Track this separately until a fix and retest are recorded.
+- Known UI issue in `v1.0.0`: the startup skeleton was last reported to always appear in the light theme. The application theme itself switches between light and dark, and the no-unstyled-content-flash check passed. Track this separately for a future maintenance update until a fix and retest are recorded.
+- Release: https://github.com/andra-gs/Images-Format-Converter/releases/tag/v1.0.0
