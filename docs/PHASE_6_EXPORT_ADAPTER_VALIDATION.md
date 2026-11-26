@@ -56,3 +56,7 @@ The previously failing metadata validation tests now pass with the adapter's inc
 The adapter is integrated into the production export flow through PR #9. The merged integration reports 156/156 automated tests passing, successful production build, passing GitHub Actions, and successful integrated browser checks. Per-file optimizer results are validated before storage in `conversionResults`; individual download and ZIP export reuse the validated Blob.
 
 These results were reported in PR #9 and were not independently rerun during this documentation update.
+
+## Stable release status (2026-11-26)
+
+The production export adapter and validation flow described in this document are included in the published stable release [`v1.0.0`](https://github.com/andra-gs/Images-Format-Converter/releases/tag/v1.0.0). Release verification is summarized in the [Development Log](./DEVELOPMENT_LOG.md).
