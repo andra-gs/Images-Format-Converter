@@ -4,9 +4,10 @@ This file records actual repository progress. Update it after meaningful impleme
 
 ## Project status
 
-- Current stage: Release preparation (deferred)
-- Current phase status: Phases 0–7 QA and documentation are complete. The project owner confirmed all Phase 7 testing activities are complete on 2026-11-26. Release tagging and publication are intentionally deferred. Phase 1 retains one separately tracked UI issue: the last recorded check found that the startup skeleton always appears in the light theme, even when dark theme is selected.
-- Latest release: None
+- Current stage: v1.0.0 released
+- Current phase status: Phases 0–7 are complete and the first stable release `v1.0.0` was published on 2026-11-26. Phase 1 retains one separately tracked UI issue: the startup skeleton was last reported to always appear in the light theme, even when dark theme is selected.
+- Latest release: [v1.0.0](https://github.com/andra-gs/Images-Format-Converter/releases/tag/v1.0.0), published 2026-11-26
+- Release tag commit: `df882784d4bd18854067663191bc4b00dae5c0d5`
 - Last updated: 2026-11-26
 
 ## Status legend
@@ -28,15 +29,16 @@ This file records actual repository progress. Update it after meaningful impleme
 | Phase 4: Advanced formats | Tested | Completed; CI validation and user-run real-browser verification passed. Known format limitations remain documented |
 | Phase 5: Image manipulation | Complete | Merged into `main`; project owner reports post-merge `npm test` and `npm run dev` checks passed on 2026-11-23. A separate post-merge production build result is not recorded |
 | Phase 6: Image optimization and export workflow | Complete | Optimizer merged through PR #7; production Export UI integration merged through PR #9 on 2026-11-25. PR #9 reports 156/156 tests, successful build, successful integrated browser checks, and passing GitHub Actions. Metadata Management remains deferred |
-| Phase 7: Testing and documentation | Complete | Project owner confirmed all Phase 7 testing activities are complete. Release tag `v1.0.0` and publication are deferred |
+| Phase 7: Testing and documentation | Complete and released | Phase 7 QA and documentation complete; GitHub release `v1.0.0` published on 2026-11-26 |
 
 ## Change log
 
-### 2026-11-26 - Phase 7 testing and documentation completed
-- Status: Phase 7 QA and documentation are complete, based on the project owner's confirmation that all Phase 7 testing activities have been performed.
+### 2026-11-26 - v1.0.0 stable release published
+- Status: Phase 7 QA and documentation are complete, and the first stable GitHub release `v1.0.0` has been published.
 - Scope recorded as complete: cross-browser checks, mobile layout checks, large-image and memory checks, security review, advertised conversion-path verification, local-processing/network-transfer verification, production build check, README installation and usage instructions, screenshots, supported-format matrix, and known-limitations/browser-compatibility documentation.
-- Release decision: the `v1.0.0` tag and release publication are intentionally deferred. No release was created as part of this update.
-- Evidence boundary: individual browser/device names, detailed test cases, command output, and per-test pass/fail results were not provided in this update. This entry records owner confirmation and does not invent those details.
+- Release: [Images Format Converter v1.0.0](https://github.com/andra-gs/Images-Format-Converter/releases/tag/v1.0.0). Tag commit: `df882784d4bd18854067663191bc4b00dae5c0d5`.
+- Release asset: `Images-Format-Converter-v1.0.0.zip` (1,767,000 bytes), SHA-256 `eed2ebda948193238bf5a0300c03f6d960db45e9e0ea74976d9b7ee4a8c58c41`.
+- Release verification stated in the published release notes: 156/156 automated tests passed, production build succeeded, GitHub Actions checks passed, and integrated browser verification was reported complete. The release notes do not enumerate individual browser/device names or per-test outputs, so those details are not inferred here.
 - Known issue: the previously recorded startup-skeleton theme mismatch remains separately tracked until a fix and retest are documented.
 - Documentation synchronization only. No application code, tests, or production build were run by the assistant during this update.
 
@@ -52,7 +54,7 @@ This file records actual repository progress. Update it after meaningful impleme
 
 ### 2026-11-25 - Documentation audit: outstanding UI issue
 - Reviewed the last user-reported Phase 1 browser checklist. Custom dropdown padding, option selection, keyboard navigation, outside-click dismissal, theme switching, and absence of unstyled-content flash passed.
-- The startup skeleton did not follow the selected theme and always appeared light. The roadmap and README previously overstated this as verified; the status is corrected and a fix/retest remains open for Phase 7.
+- The startup skeleton did not follow the selected theme and always appeared light. This remains a known issue after the v1.0.0 release and should be addressed and retested in a future maintenance update.
 
 ### 2026-11-25 - Production Image Optimizer wiring
 
