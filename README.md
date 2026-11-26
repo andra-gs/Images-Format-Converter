@@ -10,7 +10,7 @@ Convert, edit, and optimize image files directly in your browser. Your images st
 ![JavaScript](https://img.shields.io/badge/JavaScript-Vanilla-F7DF1E?logo=javascript&logoColor=222)
 ![Vite](https://img.shields.io/badge/Vite-7-646CFF?logo=vite&logoColor=white)
 ![Processing](https://img.shields.io/badge/processing-browser--local-16a34a)
-![Status](https://img.shields.io/badge/status-in%20development-orange)
+![Status](https://img.shields.io/badge/status-release%20pending-orange)
 
 </div>
 
@@ -325,9 +325,9 @@ Images-Format-Converter/
 | 4 | Advanced format support | Complete |
 | 5 | Image manipulation and editor integration | Complete |
 | 6 | Image optimization and export workflow | Complete |
-| 7 | Testing, documentation, and release | Next |
+| 7 | Testing and documentation | Complete, release pending |
 
-Phase 7 includes cross-browser and mobile testing, large-image and memory testing, security review, verification of advertised conversion paths, and release preparation.
+The Phase 7 testing and documentation checklist has been completed. The `v1.0.0` release tag and publication are intentionally deferred.
 
 ## Documentation
 
