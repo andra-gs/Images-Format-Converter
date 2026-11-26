@@ -524,7 +524,7 @@ Input semantics:
 - With resize aspect ratio locked, the user-entered dimension recalculates the opposite draft dimension. If one dimension is null at processing time, the Transformer derives it from the other dimension and the cropped source aspect ratio.
 - With aspect ratio unlocked, both positive dimensions are required before Apply; a missing dimension must not be sent to the Transformer as a valid resize request.
 
-Focused unit coverage is in `tests/editor-input-state.test.js`. The Phase 5 Editor UI document records user-reported browser verification for HEIC, TIFF, PNG, JPEG, and WebP, plus Apply behavior and queue thumbnail previews. Broader cross-browser and mobile checks remain part of Phase 7.
+Focused unit coverage is in `tests/editor-input-state.test.js`. The Phase 5 Editor UI document records user-reported browser verification for HEIC, TIFF, PNG, JPEG, and WebP, plus Apply behavior and queue thumbnail previews. The project owner confirmed completion of the broader cross-browser and mobile QA activities in Phase 7 on 2026-11-26. Detailed browser/device results are not duplicated in this technical contract.
 
 
 ## Phase 6 - Image Optimization Engine
