@@ -304,3 +304,7 @@ Target-size remains best-effort. The optimizer measures and validates each candi
 - Browser checks covered JPEG/WebP presets, Target Size reached/not reached, unsupported formats in `none` mode, animated GIF preservation, edited ImageData, mixed-format batches, failure isolation, individual downloads, ZIP Blob reuse, and existing conversion/Editor regressions.
 
 The verification results are contributor-reported in PR #9 and were not independently rerun during this documentation update.
+
+## Stable release status (2026-11-26)
+
+This optimizer API contract is part of the published stable release [`v1.0.0`](https://github.com/andra-gs/Images-Format-Converter/releases/tag/v1.0.0). Changes to this contract after the release should be documented against the relevant subsequent version.
