@@ -20,20 +20,19 @@ Convert, edit, and optimize image files directly in your browser. Your images st
 
 ## Overview
 
-**Your images. Your workflow. Your device.**
+**One workspace for every image task. No uploads. No unnecessary steps.**
 
-Stop jumping between separate websites just to convert, resize, crop, and optimize images. Images Format Converter brings those everyday tasks into one clean workspace.
+Converting images should not mean opening several websites, repeating the same steps, or handing your files to an unknown server. Images Format Converter gives you a straightforward workspace to convert, edit, and optimize images right from your browser.
 
-Convert batches of images across a wide range of formats, make quick edits before exporting, and fine-tune JPEG or WebP output with quality presets or a target file size. Preview your files, track each conversion, compare output sizes, and download individual results or a ZIP archive.
+Bring multiple files into one batch, choose the format you need, make adjustments in the built-in editor, and fine-tune JPEG or WebP exports. Review previews and file details, follow conversion progress, compare original and output sizes, then download each result or everything together in a ZIP archive.
 
-Your files are processed directly in your browser. They are not sent to a remote conversion server, and you do not need an account to get started. Whether you are preparing images for a website, organizing assets, or simply changing file formats, the workflow stays in one place and under your control.
+Your images stay on your device throughout the conversion process. There is no account to create and no conversion server to upload your files to. Whether you are preparing website assets, managing design resources, or handling everyday image files, you can get the job done in one place.
 
-**Convert. Edit. Optimize. Keep your files private.**
+**Drop your images. Make them yours. Convert with confidence.**
 
 ## Contents
 
 - [Overview](#overview)
-- [Screenshots](#screenshots)
 - [Features](#features)
 - [Supported formats](#supported-formats)
 - [Privacy and local processing](#privacy-and-local-processing)
@@ -45,46 +44,28 @@ Your files are processed directly in your browser. They are not sent to a remote
 - [Documentation](#documentation)
 - [About](#about)
 
-## Screenshots
-
-### Batch conversion
-
-<p align="center">
-  <img src="docs/screenshots/file-queue.png" alt="Selected image files, previews, and file details" width="850">
-</p>
-<p align="center">
-  <img src="docs/screenshots/conversion-results.png" alt="Conversion results with output details and download actions" width="850">
-</p>
-
-### Image editing and export optimization
-
-<p align="center">
-  <img src="docs/screenshots/image-editor.png" alt="Image editor with transformation and adjustment controls" width="850">
-</p>
-<p align="center">
-  <img src="docs/screenshots/export-settings.png" alt="Export optimization settings and target size controls" width="850">
-</p>
-
-### Choose your theme and screen
-
-<p align="center">
-  <img src="docs/screenshots/dark-theme.png" alt="Application interface in dark theme" width="850">
-</p>
-<p align="center">
-  <img src="docs/screenshots/mobile-view.png" alt="Responsive application layout on a mobile screen" width="420">
-</p>
-
 ## Features
 
 ### Image conversion
 
+Add images with the file picker or drag and drop, then process them together in one batch. Preview each file, check its details, and keep track of what is ready to convert.
+
+<p align="center">
+  <img src="docs/screenshots/file-queue.png" alt="Batch queue showing selected images, previews, and file details" width="850">
+</p>
+
 - Select files using the file picker or drag and drop.
 - Convert multiple files in one batch.
 - Preview selected images and inspect file details.
-- Download each converted image or export successful results together as a ZIP archive.
 - Validate generated output before making it available for download.
 
 ### Image editing
+
+Make common adjustments before exporting, without switching to another editor. The built-in editor gives you control over image dimensions, framing, orientation, and visual adjustments.
+
+<p align="center">
+  <img src="docs/screenshots/image-editor.png" alt="Built-in image editor with resize, crop, rotation, and adjustment controls" width="850">
+</p>
 
 The integrated editor supports:
 
@@ -98,6 +79,12 @@ The integrated editor supports:
 
 ### Export optimization
 
+Choose an output quality that fits your needs. Use ready-made presets or set a target file size for JPEG and WebP, then review the actual result before downloading.
+
+<p align="center">
+  <img src="docs/screenshots/export-settings.png" alt="Export settings with quality presets and target file size" width="850">
+</p>
+
 - Low, Medium, and High presets for JPEG and WebP.
 - Best-effort Target Size for JPEG and WebP.
 - Actual source and output file-size reporting.
@@ -109,6 +96,12 @@ Target Size is best-effort. The encoder may not be able to reach the exact reque
 
 ### Batch processing
 
+Follow each file as it moves through the conversion queue. Successful results remain available even when another file encounters an error.
+
+<p align="center">
+  <img src="docs/screenshots/conversion-results.png" alt="Batch conversion results with output details and download actions" width="850">
+</p>
+
 - Per-file processing states and batch progress.
 - Web Worker processing when supported by the browser.
 - Main-thread fallback when Worker processing is unavailable.
@@ -117,6 +110,15 @@ Target Size is best-effort. The encoder may not be able to reach the exact reque
 - Failure isolation so one failed file does not automatically stop unrelated files.
 
 ### Interface
+
+Use the workspace in the theme and screen size that suit you. The layout adapts from desktop to mobile, with light and dark themes available.
+
+<p align="center">
+  <img src="docs/screenshots/dark-theme.png" alt="Images Format Converter interface in dark theme" width="850">
+</p>
+<p align="center">
+  <img src="docs/screenshots/mobile-view.png" alt="Responsive Images Format Converter interface on a mobile screen" width="420">
+</p>
 
 - Light and dark themes.
 - Saved theme preference.
