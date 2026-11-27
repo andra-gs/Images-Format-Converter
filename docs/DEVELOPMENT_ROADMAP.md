@@ -444,6 +444,138 @@ Tasks:
 
 Deliverable: completed QA, synchronized project documentation, and the published first stable release `v1.0.0`. Release notes and the downloadable ZIP are available at https://github.com/andra-gs/Images-Format-Converter/releases/tag/v1.0.0.
 
+
+## Post-v1.0.0 roadmap: Document conversion
+
+The first stable release focuses on image conversion. The next development track adds document workflows for common academic tasks while preserving the local-first principle. PDF and Word files are document formats, so they must use a document-processing pipeline rather than being forced into the existing raster-image conversion service.
+
+All phases below are planned. No PDF or Word conversion capability is implemented or advertised by this roadmap entry. Start a phase only after its scope, technical dependencies, ownership, and acceptance criteria are agreed. Keep the existing image pipeline stable and reusable where appropriate.
+
+### Phase 8: Image to PDF
+
+**Priority: P1. First document feature.**
+
+Objective: let users convert one or more supported images into a single PDF document entirely in the browser.
+
+Planned scope:
+- Accept the image input formats already supported by the application, subject to the actual decoder capability registry and browser environment.
+- Convert one image into a one-page PDF or combine multiple images into one multi-page PDF.
+- Provide a page list with thumbnail preview, page order, and remove/reorder actions.
+- Provide page size presets such as A4, A5, Letter, and original-image dimensions.
+- Provide portrait/landscape orientation, page margins, and image placement modes such as Fit and Fill.
+- Preserve image aspect ratio when fitting content. Make cropping behavior explicit when Fill is selected.
+- Offer PDF page preview before export.
+- Provide a clear output filename and PDF download.
+- Keep image decoding, page composition, and PDF generation local to the browser.
+
+Technical evaluation:
+- Compare pdf-lib and jsPDF for multi-page composition, image embedding, page dimensions, memory behavior, bundle size, licensing, and browser compatibility.
+- Reuse the existing image decoder and validation where their contracts fit. Do not duplicate image format decoding.
+- Define whether image transparency is preserved by the selected PDF library and document any flattening behavior.
+- Do not add a library until its license, bundle impact, and real-file behavior are reviewed.
+
+Completion criteria:
+- Single-image and multi-image PDF files open in independent PDF viewers.
+- Page count, order, page dimensions, orientation, margins, and placement match the selected settings.
+- Representative transparent and opaque sources render as expected.
+- Large batches fail gracefully without freezing the interface or exhausting memory under the documented limits.
+- Per-file decode failures are isolated and explained.
+- No selected image data is transmitted to a remote service.
+- Automated tests, real-browser checks, and production build pass.
+
+### Phase 9: PDF to Image
+
+**Priority: P1.**
+
+Objective: render PDF pages into the image formats already supported by the application.
+
+Planned scope:
+- Accept PDF files and inspect page count and page dimensions.
+- Render selected pages or all pages to PNG, JPEG, or WebP.
+- Provide page selection, output scale or resolution, and output quality controls where supported by the existing encoder and optimizer.
+- Preview rendered pages before download.
+- Support batch processing of multiple PDF files with per-file and per-page status.
+- Reuse the existing image encoders, output validation, optimization capabilities, individual download, and ZIP export where the contracts fit.
+- Define explicit page-count, pixel, file-size, and memory limits. Avoid rendering every page at full resolution simultaneously.
+
+Technical evaluation:
+- Evaluate Mozilla PDF.js for local PDF parsing and page rendering.
+- Review its worker configuration, supported PDF features, font handling, license, bundle size, and browser compatibility.
+- Treat malformed, encrypted, password-protected, or unsupported PDFs with explicit error states. Password handling must not send document data to a server.
+
+Completion criteria:
+- Selected pages render with correct page order, dimensions, and orientation.
+- PNG, JPEG, and WebP outputs pass the existing output signature and decode validation.
+- JPEG/WebP quality and optimization settings report actual output sizes.
+- Long documents are processed incrementally with bounded memory use and cancellation.
+- Unsupported or protected documents fail clearly without breaking unrelated queue items.
+- Automated tests, real-browser checks, and production build pass.
+
+### Phase 10: DOCX to PDF
+
+**Priority: P2. Research and prototype gate before full implementation.**
+
+Objective: investigate and, only if quality is acceptable, add browser-local conversion of modern Microsoft Word DOCX documents to PDF.
+
+Scope boundary:
+- Target DOCX first. Legacy binary DOC is explicitly out of scope for this phase.
+- This phase begins with a technical spike and representative-document test corpus. It is not permission to promise Word-compatible rendering.
+- Evaluate documents containing headings, paragraphs, lists, tables, images, headers/footers, page numbers, page breaks, custom page sizes, margins, and mixed fonts.
+- Assess layout fidelity, font substitution, pagination, RTL and Unicode text, hyperlinks, embedded objects, charts, and unsupported Word features.
+- Compare browser-based rendering options and any feasible local runtime. Evaluate licensing, bundle size, performance, memory, browser support, and maintenance.
+- Mammoth.js may be evaluated for semantic DOCX-to-HTML extraction, but it must not be treated as a faithful Microsoft Word layout engine.
+- docx-preview may be evaluated for browser preview, but preview capability alone does not prove reliable PDF export.
+- LibreOffice may be used as a fidelity reference during evaluation. A server-hosted conversion service is not acceptable under the current privacy requirement. A local/WASM approach must be proven feasible before adoption.
+
+Decision gate:
+- Produce a written comparison using a repeatable corpus of real DOCX fixtures.
+- Record visual differences and unsupported features, not just whether a PDF file was generated.
+- Proceed to implementation only if the browser-local solution reaches an explicitly agreed fidelity threshold and acceptable performance.
+- If no candidate meets the threshold, keep DOCX-to-PDF deferred and document the limitation. Do not silently fall back to screenshots or claim Word compatibility.
+
+Completion criteria if implementation is approved:
+- DOCX content and pagination meet the agreed visual-fidelity threshold across the fixture corpus.
+- Unsupported features are detected or documented.
+- Fonts, tables, images, headers/footers, and page breaks behave according to the published compatibility matrix.
+- Conversion remains local and does not upload document contents.
+- Automated tests, visual regression checks, real-browser checks, and production build pass.
+
+### Phase 11: PDF document management
+
+**Priority: P2.**
+
+Objective: provide basic PDF page organization after PDF creation and rendering workflows are stable.
+
+Planned scope:
+- Merge multiple PDF files into one document.
+- Reorder, rotate, and remove pages.
+- Preview page thumbnails and show page count.
+- Export the resulting PDF locally.
+- Preserve page content where the chosen library supports it. Clearly document any loss of forms, annotations, bookmarks, links, metadata, or interactive elements.
+- Consider split/extract-pages as a later extension only after merge and page editing are stable.
+
+Technical evaluation:
+- Evaluate pdf-lib or another browser-compatible library for page copying, merging, rotation, and removal.
+- Verify behavior with PDFs containing mixed page sizes, rotated pages, annotations, forms, embedded fonts, and large images.
+- Define handling for encrypted PDFs and unsupported object types before exposing controls.
+
+Completion criteria:
+- Merge order and page operations match the user's selection.
+- Output opens in independent PDF readers and retains supported page content.
+- Unsupported document structures produce clear warnings or errors.
+- Processing uses bounded memory and remains local.
+- Automated tests, real-browser checks, and production build pass.
+
+### Recommended implementation order
+
+1. Complete Phase 8 before starting Phase 9. This delivers the most direct campus workflow: images to one PDF.
+2. Complete Phase 9 next. It reuses the PDF foundation and the existing image export pipeline.
+3. Run Phase 10 as a research/prototype decision gate. Do not commit to full DOCX implementation until rendering fidelity is demonstrated.
+4. Start Phase 11 after the PDF creation and rendering foundations are stable.
+
+Metadata Management remains a separate deferred backlog item. It is not implicitly included in these document phases.
+
+
 ## Priority guide
 
 - P0: required for the first working MVP.
