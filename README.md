@@ -328,8 +328,12 @@ Images-Format-Converter/
 | 5 | Image manipulation and editor integration | Complete |
 | 6 | Image optimization and export workflow | Complete |
 | 7 | Testing and documentation | Complete, v1.0.0 released |
+| 8 | Image to PDF | Planned |
+| 9 | PDF to Image | Planned |
+| 10 | DOCX to PDF | Research / prototype gate |
+| 11 | PDF document management | Planned |
 
-Phase 7 testing and documentation are complete. The first stable release, `v1.0.0`, was published on 2026-11-26.
+Phase 7 testing and documentation are complete. The first stable release, `v1.0.0`, was published on 2026-11-26. The planned post-release roadmap adds Image to PDF, PDF to Image, a research-gated DOCX to PDF workflow, and PDF page management. These document features are planned and are not available in the current release.
 
 ## Release
 
