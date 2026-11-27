@@ -40,6 +40,9 @@ Repository sudah mencapai rilis stabil pertama `v1.0.0`. Jangan menganggap Phase
 - Tag commit: `df882784d4bd18854067663191bc4b00dae5c0d5`.
 - Known issue pada `v1.0.0`: startup skeleton terakhir dilaporkan selalu menggunakan tema terang, meskipun dark theme dipilih. Catat sebagai pekerjaan maintenance dan jangan mengklaim sudah diperbaiki sebelum ada perubahan serta pengujian ulang.
 - Metadata Management tetap menjadi deferred backlog tanpa owner atau branch.
+- Post-v1.0.0 roadmap: Phase 8 Image to PDF, Phase 9 PDF to Image, Phase 10 DOCX to PDF (research/prototype gate), dan Phase 11 PDF document management. Semua masih planned, belum diimplementasikan.
+- Jangan menambahkan PDF/DOCX ke image capability registry sebagai raster codec. Rancang document-processing layer terpisah dan pertahankan local-first. Kandidat library di Technical Specification belum disetujui.
+- DOCX-to-PDF harus melewati fidelity test corpus dan decision gate. Mammoth.js/docx-preview bukan bukti rendering setara Microsoft Word. Legacy DOC belum termasuk scope.
 
 Rincian tugas, file target, kriteria selesai, branch, dan urutan merge tersedia di `docs/DEVELOPMENT_ROADMAP.md`.
 
