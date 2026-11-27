@@ -1265,3 +1265,30 @@ Add newest entries first.
 - Marked Phase 5 and Phase 6 complete based on merged PRs and reported verification evidence.
 - Preserved earlier development-log entries as historical checkpoints. Their pending states are superseded by this entry and the PR #9 merge.
 - No application code was changed and no tests or production build were run as part of this documentation-only update.
+
+
+### 2026-11-27 - Post-v1.0.0 document conversion roadmap
+- Status: Planned. Documentation update only.
+- Decisions recorded:
+  - Add a separate document-conversion roadmap after the stable v1.0.0 image-conversion release.
+  - Phase 8: Image to PDF, prioritized as the first document workflow for combining supported images into a multi-page PDF.
+  - Phase 9: PDF to Image, rendering selected or all PDF pages to PNG, JPEG, or WebP and reusing existing image export capabilities where appropriate.
+  - Phase 10: DOCX to PDF, limited initially to research and a prototype. Full implementation is conditional on acceptable layout fidelity across a representative DOCX test corpus. Legacy DOC is out of scope.
+  - Phase 11: PDF document management, beginning with merge, reorder, rotate, and remove-page operations.
+  - PDF and DOCX must use a separate document-processing layer rather than being added as raster codecs to the current image pipeline.
+  - Local-first processing remains mandatory. No document content may be uploaded to a remote conversion service.
+  - pdf-lib, jsPDF, PDF.js, Mammoth.js, docx-preview, and LibreOffice are evaluation candidates only. No new dependency was selected or installed.
+- Documentation updated:
+  - README.md
+  - docs/DEVELOPMENT_ROADMAP.md
+  - docs/PROJECT_CONTEXT.md
+  - docs/TECHNICAL_SPECIFICATION.md
+  - docs/STARTER_PROMPT.md
+  - docs/DEVELOPMENT_LOG.md
+- Tests and build:
+  - No application code or dependencies changed.
+  - No automated tests, browser checks, or production build were run as part of this planning-only documentation update.
+- Next steps:
+  - Confirm the Phase 8 owner and branch under the project's collaboration rules.
+  - Evaluate PDF generation candidates before selecting a dependency.
+  - Define Phase 8 UI, page model, limits, and test fixtures before implementation.
