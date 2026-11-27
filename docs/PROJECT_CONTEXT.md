@@ -220,3 +220,29 @@ ChatGPT must read the root-level `AGENTS.md` first and identify the developer's 
 - Deferred backlog: Metadata Management remains unassigned and outside Phase 6.
 - Known UI issue in `v1.0.0`: the startup skeleton was last reported to always appear in the light theme. The application theme itself switches between light and dark, and the no-unstyled-content-flash check passed. Track this separately for a future maintenance update until a fix and retest are recorded.
 - Release: https://github.com/andra-gs/Images-Format-Converter/releases/tag/v1.0.0
+
+
+## 11. Post-v1.0.0 document conversion direction
+
+The first stable release, v1.0.0, covers image conversion, editing, and export optimization. The next planned product track adds document workflows for common academic use cases. These are roadmap items, not current application capabilities.
+
+Planned sequence:
+1. Image to PDF: combine one or more supported images into a locally generated multi-page PDF with page order, page size, orientation, margins, and image-fit controls.
+2. PDF to Image: render selected or all PDF pages to PNG, JPEG, or WebP, reusing the existing image encoder, validation, optimization, and download pipeline where appropriate.
+3. DOCX to PDF: research and prototype modern DOCX conversion. Implementation is conditional on demonstrated layout fidelity in a representative document corpus. Legacy DOC is out of scope for this phase.
+4. PDF document management: merge PDFs and reorder, rotate, or remove pages after the creation and rendering pipelines are stable.
+
+### Document pipeline principles
+
+- Treat PDF and DOCX as document formats, not as additional raster image codecs.
+- Keep document parsing, rendering, composition, and export in a separate document-processing layer. Reuse existing image decoders and encoders only through stable interfaces.
+- Preserve local-first privacy. Selected documents and their contents must not be uploaded to a backend, cloud storage, or remote conversion service.
+- Evaluate libraries for licensing, maintenance, browser compatibility, bundle size, performance, memory use, and real-document fidelity before selecting dependencies.
+- PDF.js is a candidate for PDF parsing and page rendering. pdf-lib and jsPDF are candidates for PDF creation and page manipulation. These are candidates only, not approved dependencies.
+- Mammoth.js and docx-preview may be evaluated for DOCX content extraction or browser preview. Neither should be assumed to reproduce Microsoft Word's layout faithfully.
+- Do not implement DOCX-to-PDF by taking screenshots of HTML and presenting the result as a faithful Word conversion.
+- Establish limits for file size, page count, rendered pixel count, and concurrent document operations. Process long documents incrementally and release canvases, workers, object URLs, and large buffers.
+- Define clear behavior for encrypted/password-protected PDFs, malformed documents, unsupported Word features, fonts, tables, headers/footers, page breaks, and embedded objects.
+- Do not expose a format or conversion path in the UI until its implementation and real-file verification are complete.
+
+The detailed phase scope and acceptance criteria are maintained in docs/DEVELOPMENT_ROADMAP.md. No document conversion dependency or runtime capability is selected by this planning update.
