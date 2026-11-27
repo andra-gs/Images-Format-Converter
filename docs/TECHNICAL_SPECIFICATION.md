@@ -578,3 +578,50 @@ The implementation and contracts in this specification describe the first stable
 The published release notes record 156/156 automated tests passing, a successful production build, passing GitHub Actions checks, and completed integrated browser verification. These are release-recorded results, not tests rerun as part of this documentation update.
 
 Known release limitations remain in effect: the startup skeleton uses the light theme even when dark theme is selected; HEIC/HEIF is input-only; animated GIF preservation is limited to GIF-to-GIF; TIFF output is baseline uncompressed and processes only the first page; raster-to-SVG embeds PNG rather than vectorizing; JPEG/WebP optimization is best-effort; and Metadata Management is not included.
+
+
+## 30. Planned document-processing architecture (post-v1.0.0)
+
+This section records future architectural direction only. It does not describe implemented modules, approved dependencies, or currently supported conversion paths.
+
+### Separation from the image pipeline
+
+PDF and DOCX are document formats. Do not add them to the raster image decoder/encoder registry as if they were ordinary image codecs. Introduce a separate document-processing layer when Phase 8 begins.
+
+Conceptual flow:
+
+Presentation: Document UI
+  -> Application: Document workflow controller
+  -> Validation: Document capability and validation layer
+  -> Adapters: PDF parser/renderer and PDF composer/editor
+  -> Bridge: Page canvas or ImageData adapter
+  -> Existing image encoders only for PDF-page-to-image export
+  -> Local Blob, preview, and download
+
+The exact module boundaries and worker ownership must be designed against the implementation that exists when the phase starts. This flow is a direction, not a prescribed file structure or API.
+
+### Candidate libraries for evaluation
+
+| Library | Candidate role | Evaluation notes |
+|---|---|---|
+| pdf-lib | Create PDFs, copy/merge pages, page manipulation | Verify image embedding, page operations, document feature preservation, memory, and browser behavior |
+| jsPDF | Create PDFs from raster images and page layouts | Compare multi-page composition, image quality, page sizing, and bundle impact |
+| PDF.js | Parse PDFs and render pages to Canvas | Review worker setup, fonts, supported PDF features, memory, and rendering fidelity |
+| Mammoth.js | Extract DOCX semantic content to HTML | Not a Microsoft Word layout engine; do not claim exact pagination or visual fidelity |
+| docx-preview | Render DOCX content in a browser for preview | Preview does not establish a reliable PDF export path or Word-equivalent layout |
+| LibreOffice | Reference renderer for DOCX fidelity evaluation | A remote service is outside the privacy model; local/WASM feasibility must be demonstrated before adoption |
+
+No dependency in this table is approved or installed by this planning update. Review package maintenance, license, security, browser compatibility, bundle size, and representative real-file behavior before adoption.
+
+### Cross-pipeline contracts and constraints
+
+- Image to PDF may reuse existing image decoders, but PDF page composition and PDF encoding belong to the document layer.
+- PDF to Image should render one page at a time or use a bounded queue. It may hand rendered Canvas/ImageData to existing PNG, JPEG, and WebP encoders and optimization APIs after an explicit adapter contract is agreed.
+- PDF page rendering must enforce page-count, scale, dimension, total-pixel, file-size, and memory limits.
+- PDF creation must define page dimensions, orientation, margins, image fit/fill semantics, transparency behavior, and page ordering.
+- DOCX-to-PDF requires a fidelity test corpus and a written compatibility matrix. HTML extraction or browser preview alone is insufficient evidence of Word-compatible PDF output.
+- PDF merge and page editing must document which structures are retained or lost, including forms, annotations, bookmarks, links, metadata, and encryption.
+- All processing remains local. No document bytes, page images, extracted text, or metadata may be transmitted to a remote service.
+- Release temporary canvases, ImageBitmap objects, workers, object URLs, and large buffers. Isolate failures by document/page where practical.
+
+Implementation must follow the phase-specific scope and acceptance criteria in docs/DEVELOPMENT_ROADMAP.md. Do not advertise planned document formats in the current supported-format matrix.
