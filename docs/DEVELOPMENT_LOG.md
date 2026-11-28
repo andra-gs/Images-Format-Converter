@@ -36,7 +36,7 @@ This file records actual repository progress. Update it after meaningful impleme
 ## Change log
 
 ### 2026-11-28 - Phase 9 kickoff and PDF.js evaluation
-- Created feature branch `phase-9-pdf-engine` from the current `main` branch. Current branch head after the documentation commits: `1295126d0bfce2118141289d87b9f5fe2a7d0095`.
+- Created feature branch `phase-9-pdf-engine` from the current `main` branch.
 - Reviewed the current `AGENTS.md`, Phase 9 roadmap, technical architecture, image encoder, conversion service, and image optimizer contracts.
 - Evaluated Mozilla PDF.js / `pdfjs-dist`. The current stable package reviewed is `6.5.438` under Apache-2.0. Its display API and worker architecture fit local PDF loading and page rendering. The published distribution and reported minified/gzip figures indicate a non-trivial bundle contribution; the actual Vite output must be measured after integration.
 - Identified unresolved evaluation items: local worker asset resolution, CMap and standard-font asset delivery, supported browser matrix, real-PDF fidelity, and memory behavior.
