@@ -1,5 +1,32 @@
 # Development Log
 
+### 2026-11-28 — Phase 8 UI integrated with production PDF engine
+- Status: Engine integration implemented on `phase-8-pdf-ui`; automated and browser verification pending.
+- Changes:
+  - Replaced the UI mock import with the production `calculateImagePdfPageLayout()` and `createImagePdf()` exports from `src/js/documents/image-to-pdf.js`.
+  - Connected the ordered image queue, page options, AbortSignal cancellation, and engine progress snapshots to the real PDF generation workflow.
+  - Connected the returned PDF Blob to the existing embedded viewer and download link, retaining Object URL cleanup on replacement, explicit clear, Clear All, and page unload.
+  - Updated export labels and status/error messages to remove mock-only wording.
+  - Resolve failed queue entries by stable `imageId`, falling back to `imageIndex`.
+  - Repointed focused layout tests to the production engine helper and removed the obsolete UI mock module and mock test file.
+  - Updated the Phase 8 UI documentation and checklist for real engine verification.
+- Files changed:
+  - `src/js/ui/ui/image-to-pdf-panel.js`
+  - `src/js/ui/image-to-pdf-mock.js` (deleted)
+  - `src/styles/image-to-pdf.css`
+  - `tests/image-to-pdf-ui-mock.test.js` (deleted)
+  - `tests/image-to-pdf-ui-layout.test.js` (added)
+  - `docs/PHASE_8_PDF_UI.md`
+  - `docs/DEVELOPMENT_LOG.md`
+- Verification:
+  - Source-level integration was reviewed against the engine API contract.
+  - Automated tests, production build, and browser QA have not yet been run against this integration.
+- Next steps:
+  - Run `npm test` and `npm run build`.
+  - Complete real-file browser checks for single/multi-page PDFs, viewer navigation, download, cancellation, error identification, and Object URL cleanup.
+  - Do not create the final UI PR until verification is complete.
+
+
 This file records actual repository progress. Update it after meaningful implementation or testing work.
 
 ## Project status
