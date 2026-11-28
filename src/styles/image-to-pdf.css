@@ -390,3 +390,90 @@
   .pdf-panel-heading { flex-direction: column; }
   .pdf-beta-label { align-self: flex-start; }
 }
+
+
+/* Generated PDF result viewer — displays only the engine-produced PDF Blob. */
+.pdf-result-card {
+  margin-top: 1.25rem;
+  padding: 1.25rem;
+  border: 1px solid var(--border-color, rgba(128, 128, 128, .25));
+  border-radius: 1rem;
+  background: var(--surface, var(--card-bg, transparent));
+}
+.pdf-result-status {
+  display: inline-flex;
+  align-items: center;
+  padding: .35rem .65rem;
+  border-radius: 999px;
+  font-size: .75rem;
+  color: var(--text-muted, #777);
+  background: var(--surface-muted, rgba(128, 128, 128, .12));
+}
+.pdf-document-stage {
+  min-height: 420px;
+  margin-top: 1rem;
+  overflow: hidden;
+  border: 1px solid var(--border-color, rgba(128, 128, 128, .25));
+  border-radius: .75rem;
+  background: var(--surface-muted, rgba(128, 128, 128, .08));
+}
+.pdf-document-empty {
+  min-height: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: .75rem;
+  padding: 2rem;
+  text-align: center;
+  color: var(--text-muted, #777);
+}
+.pdf-document-empty[hidden],
+.pdf-document-frame[hidden],
+.pdf-download-button[hidden] { display: none; }
+.pdf-document-empty i { width: 2.5rem; height: 2.5rem; }
+.pdf-document-empty strong { color: var(--text-primary, inherit); }
+.pdf-document-empty span { max-width: 34rem; line-height: 1.55; }
+.pdf-document-frame {
+  display: block;
+  width: 100%;
+  height: min(78vh, 900px);
+  min-height: 420px;
+  border: 0;
+  background: white;
+}
+.pdf-result-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .75rem;
+  margin-top: 1rem;
+}
+.pdf-download-button,
+.pdf-clear-result-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.5rem;
+  padding: .65rem 1rem;
+  border: 1px solid var(--border-color, rgba(128, 128, 128, .3));
+  border-radius: .65rem;
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+.pdf-download-button {
+  color: white;
+  background: var(--accent, #365cf5);
+  border-color: transparent;
+}
+.pdf-clear-result-button {
+  color: var(--text-primary, inherit);
+  background: transparent;
+}
+.pdf-clear-result-button:disabled { opacity: .5; cursor: not-allowed; }
+@media (max-width: 640px) {
+  .pdf-document-stage, .pdf-document-empty { min-height: 340px; }
+  .pdf-document-frame { min-height: 340px; height: 68vh; }
+  .pdf-result-actions > * { flex: 1 1 100%; }
+}
