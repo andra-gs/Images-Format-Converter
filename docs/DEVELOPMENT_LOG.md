@@ -5,7 +5,7 @@ This file records actual repository progress. Update it after meaningful impleme
 ## Project status
 
 - Current stage: Phase 9 planning and PDF.js evaluation after the v1.0.0 release
-- Current phase status: Phases 0–7 are complete and `v1.0.0` was published on 2026-11-26. Phase 8 Image to PDF engine PR #13 is merged into `main`; automated checks passed. The project owner reported browser QA passed, but the QA checklist still has no recorded results. Farrel's Phase 8 UI PR #12 is closed and unmerged, so the complete workflow remains unfinished. Phase 9 engine planning has started on `phase-9-pdf-engine` with PDF.js evaluation and a draft API contract. No Phase 9 dependency or engine implementation has been added. Phase 1 retains one separately tracked UI issue: the startup skeleton was last reported to always appear in the light theme, even when dark theme is selected.
+- Current phase status: Phases 0–7 are complete and `v1.0.0` was published on 2026-11-26. Phase 8 Image to PDF engine PR #13 is merged into `main`; automated checks passed. The project owner reported browser QA passed, but the QA checklist still has no recorded results. Farrel's Phase 8 UI PR #12 is closed and unmerged, so the complete workflow remains unfinished. Phase 9 engine work has started on `phase-9-pdf-engine`. PDF.js evaluation and a draft API contract are available. A dependency-free internal PDF raster geometry helper and focused unit tests have been added; PDF.js loading/rendering integration has not started. Phase 1 retains one separately tracked UI issue: the startup skeleton was last reported to always appear in the light theme, even when dark theme is selected.
 - Latest release: [v1.0.0](https://github.com/andra-gs/Images-Format-Converter/releases/tag/v1.0.0), published 2026-11-26
 - Release tag commit: `df882784d4bd18854067663191bc4b00dae5c0d5`
 - Last updated: 2026-11-28
@@ -31,9 +31,16 @@ This file records actual repository progress. Update it after meaningful impleme
 | Phase 6: Image optimization and export workflow | Complete | Optimizer merged through PR #7; production Export UI integration merged through PR #9 on 2026-11-25. PR #9 reports 156/156 tests, successful build, successful integrated browser checks, and passing GitHub Actions. Metadata Management remains deferred |
 | Phase 7: Testing and documentation | Complete and released | Phase 7 QA and documentation complete; GitHub release `v1.0.0` published on 2026-11-26 |
 | Phase 8: Image to PDF | Engine merged; UI integration pending | PR #13 merged into `main`; 170/170 automated tests, production build, CodeQL, and dependency installation passed. Owner reported browser QA passed, but `PHASE_8_ENGINE_QA.md` remains unchecked. Farrel's PR #12 is closed and unmerged; its UI branch still needs synchronization and real-engine integration |
-| Phase 9: PDF to Image | In progress (planning) | PDF.js evaluation completed at a preliminary level; draft API contract created on `phase-9-pdf-engine`. Dependency installation, implementation, and browser verification have not started |
+| Phase 9: PDF to Image | In progress | Draft API contract created. Internal raster dimension calculation and boundary tests added without introducing PDF.js or locking the public API. Test execution, PDF.js integration, and browser verification remain pending |
 
 ## Change log
+
+### 2026-11-28 - Phase 9 foundational geometry
+- Added `src/js/documents/pdf-raster-geometry.js`, a dependency-free helper that converts PDF viewport dimensions in points to integer pixel dimensions at a requested DPI.
+- Added configurable DPI, per-side dimension, and per-page pixel guards. Defaults mirror the provisional contract values and can be tightened by the caller.
+- The helper expects dimensions from a PDF.js viewport at scale 1, including intrinsic page rotation. It does not load PDFs, allocate Canvas resources, or expose the final document-session API.
+- Added `tests/pdf-raster-geometry.test.js` for point-to-pixel conversion, default DPI, rotated viewport dimensions, invalid inputs, dimension and pixel limits, and custom limits.
+- Automated tests and production build have not yet been run in this environment. No PDF.js dependency was installed and no UI/public API integration was started.
 
 ### 2026-11-28 - Phase 9 kickoff and PDF.js evaluation
 - Created feature branch `phase-9-pdf-engine` from the current `main` branch.
