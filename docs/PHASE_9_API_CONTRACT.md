@@ -188,6 +188,8 @@ The existing optimizer accepts a File/Blob or an object containing an original F
 
 ## 5. Resolution and resource limits
 
+An internal, dependency-free helper now exists at `src/js/documents/pdf-raster-geometry.js`. It calculates integer raster dimensions from a PDF viewport measured in points at scale 1 and checks configurable DPI, maximum dimension, and per-page pixel limits before Canvas allocation. It is an implementation utility only, not a commitment to the final public document-session API. Focused tests are in `tests/pdf-raster-geometry.test.js`; execution is pending.
+
 The following are conservative proposed starting limits. They must be confirmed with real-browser memory tests before being treated as final production limits.
 
 | Limit | Proposed value |
