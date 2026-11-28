@@ -50,6 +50,29 @@ if (!app) {
   throw new Error('Application root "#app" was not found.');
 }
 
+const workspaceModeButtons = [...document.querySelectorAll("[data-workspace-mode]")];
+const imageFormatWorkspace = document.querySelector("#image-format-workspace");
+
+const selectWorkspaceMode = (mode) => {
+  const pdfWorkspace = document.querySelector("#image-to-pdf-panel");
+  const showPdf = mode === "pdf";
+
+  if (imageFormatWorkspace) imageFormatWorkspace.hidden = showPdf;
+  if (pdfWorkspace) pdfWorkspace.hidden = !showPdf;
+
+  workspaceModeButtons.forEach((button) => {
+    const selected = button.dataset.workspaceMode === mode;
+    button.classList.toggle("is-active", selected);
+    button.setAttribute("aria-selected", String(selected));
+    button.tabIndex = selected ? 0 : -1;
+  });
+};
+
+workspaceModeButtons.forEach((button) => {
+  button.addEventListener("click", () => selectWorkspaceMode(button.dataset.workspaceMode));
+});
+selectWorkspaceMode("format");
+
 const fileInput = document.querySelector("#file-input");
 const browseButton = document.querySelector("#browse-button");
 const dropzone = document.querySelector("#dropzone");
