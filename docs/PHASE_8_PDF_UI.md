@@ -79,4 +79,7 @@ After Andra's engine PR is merged into `main`, update this branch from latest `m
 
 ## Current status
 
-UI foundation and isolated mock have been committed to this feature branch. Automated tests, production build, and browser checks have **not** been run in this environment. Real PDF generation and download remain blocked on Andra's engine implementation and merge to `main`. Browser QA for the real PDF viewer is explicitly deferred until the engine returns an actual PDF Blob.
+- The UI foundation, isolated mock, generated-PDF viewer path, and top-level workspace selector are committed to this feature branch.
+- The branch owner reported that automated tests, production build, and browser QA passed before the workspace selector was added.
+- Re-run automated tests, production build, and browser QA after the workspace selector changes before opening the UI PR.
+- Real PDF generation and download remain blocked on Andra's engine implementation and merge to `main`. Browser QA for the real PDF viewer is explicitly deferred until the engine returns an actual PDF Blob.
