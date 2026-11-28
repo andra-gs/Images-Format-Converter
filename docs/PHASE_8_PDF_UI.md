@@ -6,18 +6,18 @@
 - Branch: `phase-8-pdf-ui`
 - Base: `main` at kickoff commit `098bc6c23d0d544c10d9b09e373f211bc719ee03`
 - UI module: `src/js/ui/image-to-pdf-panel.js`
-- Contract mock: `src/js/ui/image-to-pdf-mock.js`
+- Production engine: `src/js/documents/image-to-pdf.js`
 - Stylesheet: `src/styles/image-to-pdf.css`
-- Focused tests: `tests/image-to-pdf-ui-mock.test.js`
+- Focused layout tests: `tests/image-to-pdf-ui-layout.test.js`
 
 ## Shared API contract
 
-The UI follows the approved `docs/API_CONTRACT_PHASE_8_IMAGE_TO_PDF.md` contract on Andra's `phase-8-image-to-pdf` branch. The approved public functions are:
+The UI is integrated with the production engine in `src/js/documents/image-to-pdf.js`, using the API defined in `docs/API_CONTRACT_PHASE_8_IMAGE_TO_PDF.md`. The public functions are:
 
 - `calculateImagePdfPageLayout({ imageWidth, imageHeight, options })`
 - `createImagePdf({ images, options, signal, onProgress })`
 
-The UI mock is intentionally isolated in its own module. It does not import jsPDF, decode image content for PDF composition, or produce a PDF document. The mock returns an explicit mock result so the UI can be developed without implying that export is already functional.
+The UI imports `calculateImagePdfPageLayout()` and `createImagePdf()` from the document engine. jsPDF remains isolated inside the engine; the UI does not import the PDF library or duplicate image decoding/composition.
 
 ## Implemented UI scope
 
@@ -32,24 +32,24 @@ The UI mock is intentionally isolated in its own module. It does not import jsPD
 - Fit (`contain`) and Fill (`cover`) settings.
 - Uniform margin and per-side margin controls.
 - White page background only. Transparency is intentionally not exposed before the contract's two-viewer verification gate passes.
-- Preview geometry is requested from the mock `calculateImagePdfPageLayout()` function. The UI maps its returned page and image rectangles to CSS positioning; it does not implement a second Fit/Fill layout calculation.
+- Preview geometry is requested from the production `calculateImagePdfPageLayout()` function. The UI maps its returned page and image rectangles to CSS positioning; it does not implement a second Fit/Fill layout calculation.
 - A separate **Generated PDF Preview** area with a real PDF viewer (`iframe`), output metadata, Download PDF, and Clear generated PDF controls. It accepts only a non-empty `application/pdf` Blob returned by `createImagePdf()`; it never renders source thumbnails as if they were a PDF.
 - Generated PDF Object URL lifecycle: revoke the previous result before replacing it, on Clear generated PDF, on Clear All, and on page unload.
-- Mock validation/decoding/composition/finalization progress, cancellation through `AbortController`, and error/status presentation.
+- Real engine validation/decoding/composition/finalization progress, cancellation through `AbortController`, and typed error/status presentation. Failed queue entries are identified by stable `imageId`, with `imageIndex` as a fallback.
 - Thumbnail Object URLs are revoked when queue entries are removed, cleared, or the page unloads. Temporary decoded resources are closed immediately after thumbnail creation.
 
-## Explicit mock boundary
+## Production engine integration
 
-The current export action remains a temporary mock. It simulates the contract lifecycle and progress events but does not create a PDF Blob. The Generated PDF Preview therefore remains in its honest empty state; no fake PDF or download is offered. The viewer/download path is wired to accept the real engine result once integration occurs.
+The UI now calls the real `createImagePdf()` engine with the ordered `{ id, file }` queue, the approved page options, an `AbortSignal`, and an `onProgress` callback. A successful result must contain the engine's non-empty `application/pdf` Blob; the UI then creates the preview/download Object URL and displays page count, filename, and file size. The UI revokes the previous PDF URL before replacement and on explicit clear, Clear All, and page unload.
 
-After Andra's engine PR is merged into `main`, update this branch from latest `main`, replace the mock import with the approved engine module, and verify that the returned Blob opens in the embedded PDF viewer and downloads correctly. Verify multi-page navigation in the browser PDF viewer and URL cleanup. Do not import jsPDF into this UI module.
+The UI does not import jsPDF. The engine remains responsible for validation, decoding, page composition, output validation, and typed failures. The UI resolves a failed queue item by `imageId` first and falls back to `imageIndex`.
 
 ## Verification plan
 
 ### Automated
 - [ ] Run `npm test`.
 - [ ] Run `npm run build`.
-- [ ] Confirm focused layout mock tests cover fixed presets, auto orientation, Image Size, per-side margins, contain/cover, invalid dimensions, and page limits.
+- [ ] Confirm focused production-layout tests cover fixed presets, auto orientation, Image Size, per-side margins, contain/cover, invalid dimensions, transparency gating, and invalid options.
 
 ### Browser — desktop and mobile widths
 - [ ] Switch between Image Format Converter and Images to PDF; confirm only the selected workspace is visible and both queues retain their state.
@@ -70,16 +70,18 @@ After Andra's engine PR is merged into `main`, update this branch from latest `m
 - [ ] After engine integration, verify PDF page navigation, zoom, Download PDF, filename, and output page count.
 - [ ] Verify replacing a generated PDF revokes the previous Object URL.
 - [ ] Verify Clear generated PDF, Clear All, and page unload revoke the generated PDF Object URL.
-- [ ] While still on the mock, verify the mock does not populate the PDF viewer or expose a download.
-- [ ] Cancel a running mock export and verify the cancelled state.
+- [ ] Generate PDFs from one image and a multi-image queue; verify the embedded viewer shows the actual PDF pages.
+- [ ] Cancel a running export and verify the cancelled state and absence of a partial PDF.
+- [ ] Trigger a failing image and verify the correct queue item is identified by its stable ID.
 - [ ] Verify no transparency control is shown.
 - [ ] Verify light/dark themes, keyboard focus, accessible labels, and responsive layout.
-- [ ] Confirm the mock does not create or download a PDF.
+- [ ] Confirm the PDF is generated locally and the download contains a valid PDF document.
 - [ ] Confirm existing image conversion, Editor, and export optimization workflows remain unaffected.
 
 ## Current status
 
-- The UI foundation, isolated mock, generated-PDF viewer path, and top-level workspace selector are committed to this feature branch.
-- The branch owner reported that automated tests, production build, and browser QA passed before the workspace selector was added.
-- Re-run automated tests, production build, and browser QA after the workspace selector changes before opening the UI PR.
-- Real PDF generation and download remain blocked on Andra's engine implementation and merge to `main`. Browser QA for the real PDF viewer is explicitly deferred until the engine returns an actual PDF Blob.
+- The UI foundation, top-level workspace selector, real engine integration, generated-PDF viewer, and download path are committed to `phase-8-pdf-ui`.
+- The UI calls the production engine merged into `main` through PR #13 and no longer imports or ships the mock module.
+- Focused layout tests now import the production layout helper.
+- Automated tests, production build, and browser QA have not yet been rerun after this integration. Do not open the final UI PR until these checks pass.
+- Real-file browser verification remains required for multi-page output, PDF navigation/download, cancellation, failure identification at the UI boundary, and Object URL cleanup.
