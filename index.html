@@ -61,8 +61,8 @@
           <p>Choose a tool to get started. Your files stay on your device.</p>
         </section>
 
-        <nav class="workspace-mode-picker" aria-label="Choose a conversion tool" role="tablist">
-          <button class="workspace-mode-option is-active" type="button" role="tab" id="mode-image-format" aria-selected="true" aria-controls="image-format-workspace" data-workspace-mode="format">
+        <div class="workspace-mode-picker" role="group" aria-label="Choose a conversion tool">
+          <button class="workspace-mode-option is-active" type="button" id="mode-image-format" aria-pressed="true" aria-controls="image-format-workspace" data-workspace-mode="format">
             <span class="workspace-mode-icon" aria-hidden="true"><i data-lucide="file-image"></i></span>
             <span class="workspace-mode-copy">
               <strong>Image Format Converter</strong>
@@ -70,7 +70,7 @@
             </span>
             <span class="workspace-mode-arrow" aria-hidden="true">→</span>
           </button>
-          <button class="workspace-mode-option" type="button" role="tab" id="mode-images-to-pdf" aria-selected="false" aria-controls="image-to-pdf-panel" data-workspace-mode="pdf">
+          <button class="workspace-mode-option" type="button" id="mode-images-to-pdf" aria-pressed="false" aria-controls="image-to-pdf-panel" data-workspace-mode="pdf">
             <span class="workspace-mode-icon" aria-hidden="true"><i data-lucide="file-output"></i></span>
             <span class="workspace-mode-copy">
               <strong>Images to PDF</strong>
@@ -78,7 +78,7 @@
             </span>
             <span class="workspace-mode-arrow" aria-hidden="true">→</span>
           </button>
-        </nav>
+        </div>
 
         <div id="image-format-workspace" class="workspace-mode-content">
         <section class="workspace" aria-labelledby="workspace-title">
