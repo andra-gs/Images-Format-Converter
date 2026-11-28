@@ -22,6 +22,7 @@ The UI mock is intentionally isolated in its own module. It does not import jsPD
 ## Implemented UI scope
 
 - Dedicated Image to PDF workspace mounted separately from the existing image conversion workflow.
+- A top-level mode selector lets users switch between **Image Format Converter** and **Images to PDF**. Only the selected workspace is shown; switching modes preserves each workspace's current queue and settings.
 - Multiple image selection and drag-and-drop.
 - Stable queue IDs, local thumbnails, file names, and file sizes.
 - Remove, clear, and move-up/move-down controls for page ordering.
@@ -51,6 +52,7 @@ After Andra's engine PR is merged into `main`, update this branch from latest `m
 - [ ] Confirm focused layout mock tests cover fixed presets, auto orientation, Image Size, per-side margins, contain/cover, invalid dimensions, and page limits.
 
 ### Browser — desktop and mobile widths
+- [ ] Switch between Image Format Converter and Images to PDF; confirm only the selected workspace is visible and both queues retain their state.
 - [ ] Add one image and multiple images using the file picker.
 - [ ] Add images using drag-and-drop.
 - [ ] Confirm thumbnails, file names, sizes, and page count.
