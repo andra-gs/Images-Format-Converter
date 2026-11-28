@@ -1,4 +1,4 @@
-import { createIcons, FileText, ImagePlus, Images, ArrowUp, ArrowDown, X, FileOutput, Info } from "lucide";
+import { createIcons, FileText, ImagePlus, Images, ArrowUp, ArrowDown, X, FileOutput, Info, RotateCcw } from "lucide";
 import "../../styles/image-to-pdf.css";
 import { validateImageFile } from "../core/file-validator.js";
 import { decodeImage } from "../core/image-decoder.js";
@@ -53,8 +53,8 @@ if (mountPoint && !document.querySelector("#image-to-pdf-panel")) {
         <section class="pdf-preview-card" aria-labelledby="pdf-preview-title">
           <div class="pdf-card-heading">
             <div>
-              <h3 id="pdf-preview-title">Page preview</h3>
-              <p id="pdf-preview-caption">Add an image to preview its page.</p>
+              <h3 id="pdf-preview-title">Layout preview</h3>
+              <p id="pdf-preview-caption">Pre-export layout approximation for the selected source image.</p>
             </div>
             <span class="pdf-page-counter" id="pdf-page-counter">— / —</span>
           </div>
@@ -64,7 +64,7 @@ if (mountPoint && !document.querySelector("#image-to-pdf-panel")) {
               <span id="pdf-preview-placeholder">Page preview</span>
             </div>
           </div>
-          <div class="pdf-preview-meta" id="pdf-preview-meta">Preview geometry is supplied by the shared layout helper.</div>
+          <div class="pdf-preview-meta" id="pdf-preview-meta">This is a layout approximation, not a rendered PDF page.</div>
         </section>
       </div>
 
@@ -123,18 +123,40 @@ if (mountPoint && !document.querySelector("#image-to-pdf-panel")) {
 
       <section class="pdf-export-card" aria-labelledby="pdf-export-title">
         <div class="pdf-export-copy">
-          <h3 id="pdf-export-title">Export PDF</h3>
-          <p id="pdf-export-description">The UI is connected to a contract mock while the PDF engine is being developed separately.</p>
+          <h3 id="pdf-export-title">Generate PDF</h3>
+          <p id="pdf-export-description">Generate the actual multi-page PDF from the ordered image queue. The real export becomes available after engine integration.</p>
         </div>
         <div class="pdf-progress" id="pdf-progress" hidden>
           <div class="pdf-progress-heading"><span id="pdf-progress-label">Preparing export…</span><span id="pdf-progress-count"></span></div>
-          <progress id="pdf-progress-bar" max="100" value="0" aria-label="Mock export progress"></progress>
+          <progress id="pdf-progress-bar" max="100" value="0" aria-label="PDF generation progress"></progress>
         </div>
         <div class="pdf-export-actions">
-          <button class="pdf-export-button" id="pdf-export-button" type="button" disabled><i data-lucide="file-output"></i> Run mock export</button>
+          <button class="pdf-export-button" id="pdf-export-button" type="button" disabled><i data-lucide="file-output"></i> Run mock export (temporary)</button>
           <button class="pdf-cancel-button" id="pdf-cancel-button" type="button" hidden>Cancel</button>
         </div>
-        <p class="pdf-mock-disclaimer" id="pdf-mock-disclaimer">Mock mode only: this flow does not create or download a PDF file.</p>
+        <p class="pdf-mock-disclaimer" id="pdf-mock-disclaimer">Temporary mock only: no PDF file is generated yet. A real PDF viewer and download will appear here after engine integration.</p>
+      </section>
+
+      <section class="pdf-result-card" id="pdf-result-card" aria-labelledby="pdf-result-title">
+        <div class="pdf-card-heading">
+          <div>
+            <h3 id="pdf-result-title">Generated PDF preview</h3>
+            <p id="pdf-result-caption">The actual PDF document will appear here after generation.</p>
+          </div>
+          <span class="pdf-result-status" id="pdf-result-status">Not generated</span>
+        </div>
+        <div class="pdf-document-stage" id="pdf-document-stage">
+          <div class="pdf-document-empty" id="pdf-document-empty">
+            <i data-lucide="file-text"></i>
+            <strong>No PDF generated</strong>
+            <span>This area will display the real PDF output—not the original image preview—once the document engine is connected.</span>
+          </div>
+          <iframe class="pdf-document-frame" id="pdf-document-frame" title="Generated PDF document preview" hidden></iframe>
+        </div>
+        <div class="pdf-result-actions">
+          <a class="pdf-download-button" id="pdf-download-button" hidden download="converted.pdf">Download PDF</a>
+          <button class="pdf-clear-result-button" id="pdf-clear-result-button" type="button" disabled>Clear generated PDF</button>
+        </div>
       </section>
     </section>
   `);
@@ -161,6 +183,11 @@ if (mountPoint && !document.querySelector("#image-to-pdf-panel")) {
   const progressLabel = $("#pdf-progress-label");
   const progressCount = $("#pdf-progress-count");
   const progressBar = $("#pdf-progress-bar");
+  const pdfFrame = $("#pdf-document-frame");
+  const pdfEmpty = $("#pdf-document-empty");
+  const pdfDownload = $("#pdf-download-button");
+  const clearPdfButton = $("#pdf-clear-result-button");
+  let generatedPdfUrl = null;
 
   const entries = [];
   let activeIndex = 0;
@@ -182,6 +209,36 @@ if (mountPoint && !document.querySelector("#image-to-pdf-panel")) {
       ? Number(uniformMargin.value)
       : Object.fromEntries(["top", "right", "bottom", "left"].map((side, index) => [side, Number(marginInputs[index].value)]))
   });
+
+  const clearGeneratedPdf = () => {
+    if (generatedPdfUrl) URL.revokeObjectURL(generatedPdfUrl);
+    generatedPdfUrl = null;
+    pdfFrame.removeAttribute("src");
+    pdfFrame.hidden = true;
+    pdfEmpty.hidden = false;
+    pdfDownload.hidden = true;
+    pdfDownload.removeAttribute("href");
+    clearPdfButton.disabled = true;
+    $("#pdf-result-status").textContent = "Not generated";
+    $("#pdf-result-caption").textContent = "The actual PDF document will appear here after generation.";
+  };
+
+  const showGeneratedPdf = (result) => {
+    if (!(result?.blob instanceof Blob) || result.blob.type !== "application/pdf" || result.blob.size === 0) {
+      throw new Error("The PDF engine did not return a valid application/pdf Blob.");
+    }
+    clearGeneratedPdf();
+    generatedPdfUrl = URL.createObjectURL(result.blob);
+    pdfFrame.src = generatedPdfUrl;
+    pdfFrame.hidden = false;
+    pdfEmpty.hidden = true;
+    pdfDownload.href = generatedPdfUrl;
+    pdfDownload.download = result.filename || "converted.pdf";
+    pdfDownload.hidden = false;
+    clearPdfButton.disabled = false;
+    $("#pdf-result-status").textContent = "Generated";
+    $("#pdf-result-caption").textContent = `${result.pageCount} pages · ${result.filename || "converted.pdf"} · ${(result.blob.size / 1024).toFixed(1)} KB`;
+  };
 
   const showFeedback = (message, state = "info") => {
     feedback.textContent = message;
@@ -444,8 +501,13 @@ if (mountPoint && !document.querySelector("#image-to-pdf-panel")) {
           }
         }
       });
-      showFeedback(`Mock flow completed for ${result.pageCount} pages. No PDF file was generated; production download will be enabled after engine integration.`, "success");
-      progressLabel.textContent = "Mock flow complete";
+      if (result.blob instanceof Blob) {
+        showGeneratedPdf(result);
+        showFeedback(`Generated and validated a PDF with ${result.pageCount} pages.`, "success");
+      } else {
+        showFeedback(`Mock flow completed for ${result.pageCount} pages. No PDF was generated.`, "warning");
+      }
+      progressLabel.textContent = result.blob instanceof Blob ? "PDF generated" : "Mock flow complete";
       progressCount.textContent = `${result.pageCount} pages`;
       progressBar.value = 100;
     } catch (error) {
@@ -502,10 +564,12 @@ if (mountPoint && !document.querySelector("#image-to-pdf-panel")) {
   dropzone.addEventListener("drop", (event) => {
     addFiles(event.dataTransfer.files);
   });
+  clearPdfButton.addEventListener("click", clearGeneratedPdf);
   clearButton.addEventListener("click", () => {
     if (running) return;
     for (const entry of entries) if (entry.url) URL.revokeObjectURL(entry.url);
     entries.length = 0;
+    clearGeneratedPdf();
     activeIndex = 0;
     renderQueue();
     renderPreview();
