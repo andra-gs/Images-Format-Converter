@@ -8,10 +8,10 @@ import { calculateImagePdfPageLayout, createImagePdf } from "./image-to-pdf-mock
 const iconSet = { FileText, ImagePlus, Images, ArrowUp, ArrowDown, X, FileOutput, Info, RotateCcw };
 const renderIcons = (root = document) => createIcons({ icons: iconSet, attrs: { "aria-hidden": "true" }, root });
 
-const mountPoint = document.querySelector(".phase-note");
+const mountPoint = document.querySelector("#image-format-workspace");
 if (mountPoint && !document.querySelector("#image-to-pdf-panel")) {
-  mountPoint.insertAdjacentHTML("beforebegin", `
-    <section class="image-to-pdf-panel" id="image-to-pdf-panel" aria-labelledby="pdf-title">
+  mountPoint.insertAdjacentHTML("afterend", `
+    <section class="image-to-pdf-panel" id="image-to-pdf-panel" aria-labelledby="pdf-title" hidden>
       <div class="pdf-panel-heading">
         <div class="pdf-heading-copy">
           <span class="pdf-eyebrow">DOCUMENT TOOLS · PHASE 8</span>
