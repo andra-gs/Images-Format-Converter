@@ -338,8 +338,9 @@ if (mountPoint && !document.querySelector("#image-to-pdf-panel")) {
     if (!entry) {
       previewImage.hidden = true;
       previewPlaceholder.hidden = false;
+      page.style.width = "min(100%, 230px)";
+      page.style.height = "auto";
       page.style.aspectRatio = "210 / 297";
-      page.style.setProperty("--page-width", "210");
       $("#pdf-preview-caption").textContent = "Add an image to preview its page.";
       $("#pdf-page-counter").textContent = "— / —";
       $("#pdf-preview-meta").textContent = "Preview geometry is supplied by the shared layout helper.";
@@ -360,6 +361,9 @@ if (mountPoint && !document.querySelector("#image-to-pdf-panel")) {
       });
       if (token !== previewLoadToken || !entries.includes(entry)) return;
       const { pageWidthPt, pageHeightPt, contentRect, imageRect, crop } = layout;
+      const isLandscapePage = pageWidthPt > pageHeightPt;
+      page.style.width = isLandscapePage ? "min(100%, 320px)" : "min(100%, 230px)";
+      page.style.height = "auto";
       page.style.aspectRatio = `${pageWidthPt} / ${pageHeightPt}`;
       if (entry.url) {
         previewImage.src = entry.url;
