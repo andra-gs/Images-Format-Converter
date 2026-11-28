@@ -1292,3 +1292,16 @@ Add newest entries first.
   - Confirm the Phase 8 owner and branch under the project's collaboration rules.
   - Evaluate PDF generation candidates before selecting a dependency.
   - Define Phase 8 UI, page model, limits, and test fixtures before implementation.
+
+### 2026-11-28 - Expanded post-v1.0.0 roadmap for Phases 8–13
+- Status: Planned. Documentation-only update.
+- Changes:
+  - Expanded Phase 8–11 with explicit Andra/Farrel ownership, branch naming, integration order, and completion gates.
+  - Added Phase 12 for unified document workflows and Phase 13 for final QA, documentation, and release.
+  - Set v2.0.0 as the target, with DOCX-to-PDF conditional on the Phase 10 fidelity gate.
+  - Recorded deferred scope: legacy DOC, OCR, PDF-to-DOCX, cloud storage/synchronization, online collaboration, and advanced metadata management.
+  - Reaffirmed local-first processing and separation of document processing from the raster image pipeline.
+- Documentation updated: docs/DEVELOPMENT_ROADMAP.md, docs/PROJECT_CONTEXT.md, docs/TECHNICAL_SPECIFICATION.md, docs/STARTER_PROMPT.md, and AGENTS.md.
+- Tests and build:
+  - No application code or dependencies changed.
+  - No automated tests, browser checks, or production build were run because this update changes planning documentation only.
