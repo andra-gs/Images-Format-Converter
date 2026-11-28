@@ -369,7 +369,7 @@
 .pdf-progress[hidden] { display: none; }
 .pdf-progress-heading { color: var(--color-muted); font-size: 0.67rem; }
 .pdf-progress progress { width: 100%; height: 7px; accent-color: var(--color-accent); }
-.pdf-mock-disclaimer {
+.pdf-export-note {
   margin: 0;
   color: var(--color-muted);
   font-size: 0.64rem;
