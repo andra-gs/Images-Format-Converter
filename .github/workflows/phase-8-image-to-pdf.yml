@@ -1,0 +1,45 @@
+name: Phase 8 Image to PDF validation
+
+on:
+  push:
+    branches:
+      - phase-8-image-to-pdf
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Run automated tests
+        id: tests
+        shell: bash
+        run: |
+          set +e
+          npm test > /tmp/phase-8-test-output.txt 2>&1
+          test_status=$?
+          cat /tmp/phase-8-test-output.txt
+          if [ "$test_status" -ne 0 ]; then
+            cp /tmp/phase-8-test-output.txt /tmp/phase-8-test-failure-report.txt
+            exit "$test_status"
+          fi
+
+      - name: Build production bundle
+        run: npm run build
