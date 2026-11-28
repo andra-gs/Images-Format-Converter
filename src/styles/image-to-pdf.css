@@ -271,6 +271,7 @@
   background: white;
   box-shadow: 0 5px 20px rgb(15 23 42 / 16%);
 }
+.pdf-page > img[hidden] { display: none; }
 .pdf-page > img {
   position: absolute;
   display: block;
