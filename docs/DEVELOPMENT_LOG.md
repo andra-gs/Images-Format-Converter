@@ -1305,3 +1305,32 @@ Add newest entries first.
 - Tests and build:
   - No application code or dependencies changed.
   - No automated tests, browser checks, or production build were run because this update changes planning documentation only.
+
+
+### 2026-11-28 - Phase 8 Image to PDF engine implementation
+- Status: Engine implementation added on `phase-8-image-to-pdf`; real-browser QA remains pending.
+- Decisions and implementation:
+  - Selected and pinned `jspdf@4.2.1` after comparing pdf-lib and jsPDF.
+  - Added `src/js/documents/image-to-pdf.js` with `createImagePdf()`, `calculateImagePdfPageLayout()`, typed errors, progress callbacks, cancellation checkpoints, fail-fast behavior, output validation, and cleanup.
+  - Reused the existing image validator and decoder. The document engine remains separate from the raster capability registry and image conversion service.
+  - Implemented sequential decode and page composition, 96 PPI Image Size geometry, per-side margins, contain placement, and centered cover cropping.
+  - Kept transparent background disabled pending real generated-PDF verification in independent viewers.
+  - Added automated tests in `tests/image-to-pdf.test.js`.
+  - Added a manual browser harness at `tests/browser-image-to-pdf.html` and `tests/browser-image-to-pdf.js`, with a checklist in `docs/PHASE_8_ENGINE_QA.md`.
+- Documentation updated:
+  - `docs/API_CONTRACT_PHASE_8_IMAGE_TO_PDF.md`
+  - `docs/DEVELOPMENT_ROADMAP.md`
+  - `docs/TECHNICAL_SPECIFICATION.md`
+  - `docs/PHASE_8_ENGINE_QA.md`
+- Verification:
+  - GitHub Actions passed `npm ci`, `npm test`, and `npm run build` on commit `ac12dfce21f0b63e4ecbcb7167cfa55a59e7b20f`.
+  - The branch is one commit ahead of `main`; no engine code or dependency has been merged into `main`.
+- Collaboration:
+  - Engine draft PR: #13.
+  - Farrel's UI PR #12 was closed without merge. The UI branch remains separate and must integrate against the merged engine contract after the engine PR is approved and merged.
+- Pending:
+  - Run the browser QA harness with representative files and target desktop/mobile browsers.
+  - Verify generated PDFs in at least two independent PDF viewers.
+  - Measure actual Vite bundle contribution and browser memory behavior.
+  - Complete the transparency verification gate. Keep the UI option hidden unless it passes.
+  - After QA, mark PR #13 ready for review and merge it before UI integration.
