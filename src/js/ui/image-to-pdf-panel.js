@@ -1,5 +1,8 @@
 import { createIcons, FileText, ImagePlus, Images, ArrowUp, ArrowDown, X, FileOutput, Info } from "lucide";
 import "../styles/image-to-pdf.css";
+import { validateImageFile } from "../core/file-validator.js";
+import { decodeImage } from "../core/image-decoder.js";
+import { createImageThumbnail } from "../core/image-thumbnail.js";
 import { calculateImagePdfPageLayout, createImagePdf } from "./image-to-pdf-mock.js";
 
 const iconSet = { FileText, ImagePlus, Images, ArrowUp, ArrowDown, X, FileOutput, Info, RotateCcw };
@@ -228,7 +231,11 @@ if (mountPoint && !document.querySelector("#image-to-pdf-panel")) {
 
       const thumb = document.createElement("img");
       thumb.className = "pdf-queue-thumb";
-      thumb.src = entry.url;
+      if (entry.url) thumb.src = entry.url;
+      else {
+        thumb.classList.add("pdf-queue-thumb-empty");
+        thumb.removeAttribute("src");
+      }
       thumb.alt = "";
       const details = document.createElement("span");
       details.className = "pdf-queue-details";
@@ -285,30 +292,36 @@ if (mountPoint && !document.querySelector("#image-to-pdf-panel")) {
       return;
     }
 
-    previewImage.src = entry.url;
-    previewImage.hidden = false;
-    previewPlaceholder.hidden = true;
     $("#pdf-preview-caption").textContent = entry.file.name;
     $("#pdf-page-counter").textContent = `${activeIndex + 1} / ${entries.length}`;
 
     try {
-      await previewImage.decode();
-      if (token !== previewLoadToken || !entries.includes(entry)) return;
+      if (!entry.width || !entry.height) {
+        throw new Error("The image preview could not be decoded. The PDF engine will validate the original file during export.");
+      }
       const layout = calculateImagePdfPageLayout({
-        imageWidth: previewImage.naturalWidth,
-        imageHeight: previewImage.naturalHeight,
+        imageWidth: entry.width,
+        imageHeight: entry.height,
         options: getOptions()
       });
+      if (token !== previewLoadToken || !entries.includes(entry)) return;
       const { pageWidthPt, pageHeightPt, contentRect, imageRect, crop } = layout;
       page.style.aspectRatio = `${pageWidthPt} / ${pageHeightPt}`;
-      page.style.setProperty("--page-width", String(pageWidthPt));
-      page.style.setProperty("--page-height", String(pageHeightPt));
-      previewImage.style.left = `${imageRect.x / pageWidthPt * 100}%`;
-      previewImage.style.top = `${imageRect.y / pageHeightPt * 100}%`;
-      previewImage.style.width = `${imageRect.width / pageWidthPt * 100}%`;
-      previewImage.style.height = `${imageRect.height / pageHeightPt * 100}%`;
-      previewImage.style.objectFit = crop ? "cover" : "contain";
-      previewImage.style.objectPosition = "center";
+      if (entry.url) {
+        previewImage.src = entry.url;
+        previewImage.hidden = false;
+        previewPlaceholder.hidden = true;
+        previewImage.style.left = `${imageRect.x / pageWidthPt * 100}%`;
+        previewImage.style.top = `${imageRect.y / pageHeightPt * 100}%`;
+        previewImage.style.width = `${imageRect.width / pageWidthPt * 100}%`;
+        previewImage.style.height = `${imageRect.height / pageHeightPt * 100}%`;
+        previewImage.style.objectFit = crop ? "cover" : "contain";
+        previewImage.style.objectPosition = "center";
+      } else {
+        previewImage.hidden = true;
+        previewPlaceholder.hidden = false;
+        previewPlaceholder.textContent = "Thumbnail unavailable";
+      }
       $("#pdf-preview-meta").textContent = `${pageWidthPt.toFixed(1)} × ${pageHeightPt.toFixed(1)} pt · Content area ${contentRect.width.toFixed(1)} × ${contentRect.height.toFixed(1)} pt`;
     } catch (error) {
       previewImage.hidden = true;
@@ -338,29 +351,55 @@ if (mountPoint && !document.querySelector("#image-to-pdf-panel")) {
     renderPreview();
   };
 
-  const addFiles = (fileList) => {
-    const incoming = [...fileList].filter((file) => file.type.startsWith("image/"));
-    const rejected = [...fileList].length - incoming.length;
-    for (const file of incoming) {
+  const addFiles = async (fileList) => {
+    if (running) return;
+    const rejected = [];
+    const previewWarnings = [];
+    for (const file of [...fileList]) {
       const duplicate = entries.some((entry) =>
         entry.file.name === file.name &&
         entry.file.size === file.size &&
         entry.file.lastModified === file.lastModified
       );
       if (duplicate) continue;
+
+      const validation = await validateImageFile(file);
+      if (!validation.valid) {
+        rejected.push(`${file.name}: ${validation.reason}`);
+        continue;
+      }
+
+      let decoded;
+      let thumbnailUrl = null;
+      let width = null;
+      let height = null;
+      try {
+        decoded = await decodeImage(file, { format: validation.format.format });
+        width = decoded.width;
+        height = decoded.height;
+        const thumbnailBlob = await createImageThumbnail(decoded, { maxSize: 1200 });
+        thumbnailUrl = URL.createObjectURL(thumbnailBlob);
+      } catch (error) {
+        previewWarnings.push(`${file.name}: preview unavailable (${error.message})`);
+      } finally {
+        decoded?.close?.();
+      }
+
       entries.push({
         id: `pdf-image-${nextId++}`,
         file,
-        url: URL.createObjectURL(file)
+        format: validation.format,
+        width,
+        height,
+        url: thumbnailUrl
       });
     }
+
     if (entries.length > 0) activeIndex = Math.min(activeIndex, entries.length - 1);
     renderQueue();
     renderPreview();
-    showFeedback(
-      rejected ? `${rejected} non-image ${rejected === 1 ? "file was" : "files were"} skipped. Final file validation is performed by the PDF engine.` : "",
-      rejected ? "warning" : "info"
-    );
+    const messages = [...rejected, ...previewWarnings];
+    showFeedback(messages.join(" · "), rejected.length ? "error" : previewWarnings.length ? "warning" : "info");
   };
 
   const resetProgress = () => {
