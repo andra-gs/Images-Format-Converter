@@ -3,7 +3,7 @@ import "../../styles/image-to-pdf.css";
 import { validateImageFile } from "../core/file-validator.js";
 import { decodeImage } from "../core/image-decoder.js";
 import { createImageThumbnail } from "../core/image-thumbnail.js";
-import { calculateImagePdfPageLayout, createImagePdf } from "./image-to-pdf-mock.js";
+import { calculateImagePdfPageLayout, createImagePdf } from "../documents/image-to-pdf.js";
 
 const iconSet = { FileText, ImagePlus, Images, ArrowUp, ArrowDown, X, FileOutput, Info, RotateCcw };
 const renderIcons = (root = document) => createIcons({ icons: iconSet, attrs: { "aria-hidden": "true" }, root });
@@ -18,7 +18,7 @@ if (mountPoint && !document.querySelector("#image-to-pdf-panel")) {
           <h2 id="pdf-title">Images to PDF</h2>
           <p>Combine your images into an ordered, multi-page PDF. Everything stays in this browser.</p>
         </div>
-        <span class="pdf-beta-label">UI preview</span>
+        <span class="pdf-beta-label">Local PDF export</span>
       </div>
 
       <div class="pdf-upload-row">
@@ -124,17 +124,17 @@ if (mountPoint && !document.querySelector("#image-to-pdf-panel")) {
       <section class="pdf-export-card" aria-labelledby="pdf-export-title">
         <div class="pdf-export-copy">
           <h3 id="pdf-export-title">Generate PDF</h3>
-          <p id="pdf-export-description">Generate the actual multi-page PDF from the ordered image queue. The real export becomes available after engine integration.</p>
+          <p id="pdf-export-description">Generate a real multi-page PDF from the ordered image queue. Images are processed locally in your browser.</p>
         </div>
         <div class="pdf-progress" id="pdf-progress" hidden>
           <div class="pdf-progress-heading"><span id="pdf-progress-label">Preparing export…</span><span id="pdf-progress-count"></span></div>
           <progress id="pdf-progress-bar" max="100" value="0" aria-label="PDF generation progress"></progress>
         </div>
         <div class="pdf-export-actions">
-          <button class="pdf-export-button" id="pdf-export-button" type="button" disabled><i data-lucide="file-output"></i> Run mock export (temporary)</button>
+          <button class="pdf-export-button" id="pdf-export-button" type="button" disabled><i data-lucide="file-output"></i> Generate PDF</button>
           <button class="pdf-cancel-button" id="pdf-cancel-button" type="button" hidden>Cancel</button>
         </div>
-        <p class="pdf-mock-disclaimer" id="pdf-mock-disclaimer">Temporary mock only: no PDF file is generated yet. A real PDF viewer and download will appear here after engine integration.</p>
+        <p class="pdf-export-note" id="pdf-export-note">PDF generation runs locally in your browser. Each image becomes one page in the selected order.</p>
       </section>
 
       <section class="pdf-result-card" id="pdf-result-card" aria-labelledby="pdf-result-title">
@@ -149,7 +149,7 @@ if (mountPoint && !document.querySelector("#image-to-pdf-panel")) {
           <div class="pdf-document-empty" id="pdf-document-empty">
             <i data-lucide="file-text"></i>
             <strong>No PDF generated</strong>
-            <span>This area will display the real PDF output—not the original image preview—once the document engine is connected.</span>
+            <span>The generated PDF—not the source image preview—will appear here.</span>
           </div>
           <iframe class="pdf-document-frame" id="pdf-document-frame" title="Generated PDF document preview" hidden></iframe>
         </div>
@@ -467,7 +467,7 @@ if (mountPoint && !document.querySelector("#image-to-pdf-panel")) {
     progressCount.textContent = "";
   };
 
-  const runMockExport = async () => {
+  const runPdfExport = async () => {
     if (running || entries.length === 0) return;
     clearGeneratedPdf();
     running = true;
@@ -475,10 +475,10 @@ if (mountPoint && !document.querySelector("#image-to-pdf-panel")) {
     showFeedback("");
     progress.hidden = false;
     progressBar.removeAttribute("value");
-    progressLabel.textContent = "Starting mock export…";
+    progressLabel.textContent = "Starting PDF generation…";
     progressCount.textContent = "";
     cancelButton.hidden = false;
-    exportButton.innerHTML = '<i data-lucide="file-output"></i> Running mock…';
+    exportButton.innerHTML = '<i data-lucide="file-output"></i> Generating PDF…';
     updateControls();
     renderQueue();
     renderIcons(root);
@@ -506,34 +506,33 @@ if (mountPoint && !document.querySelector("#image-to-pdf-panel")) {
           }
         }
       });
-      if (result.blob instanceof Blob) {
-        showGeneratedPdf(result);
-        showFeedback(`Generated and validated a PDF with ${result.pageCount} pages.`, "success");
-      } else {
-        showFeedback(`Mock flow completed for ${result.pageCount} pages. No PDF was generated.`, "warning");
-      }
-      progressLabel.textContent = result.blob instanceof Blob ? "PDF generated" : "Mock flow complete";
+      showGeneratedPdf(result);
+      showFeedback(`Generated and validated a PDF with ${result.pageCount} pages.`, "success");
+      progressLabel.textContent = "PDF generated";
       progressCount.textContent = `${result.pageCount} pages`;
       progressBar.value = 100;
     } catch (error) {
       if (error.code === "ABORTED") {
-        showFeedback("Mock export cancelled. No PDF was created.", "warning");
+        showFeedback("PDF generation was cancelled. No PDF was created.", "warning");
       } else {
+        const failedEntry = error.imageId
+          ? entries.find((entry) => entry.id === error.imageId)
+          : null;
         const failedIndex = Number.isInteger(error.imageIndex) ? error.imageIndex : -1;
-        const failedName = failedIndex >= 0 ? entries[failedIndex]?.file.name : null;
+        const failedName = failedEntry?.file.name || (failedIndex >= 0 ? entries[failedIndex]?.file.name : null);
         showFeedback(
-          failedName ? `${failedName}: ${error.message}` : (error.message || "The mock export could not be completed."),
+          failedName ? `${failedName}: ${error.message}` : (error.message || "PDF generation failed."),
           "error"
         );
       }
-      progressLabel.textContent = error.code === "ABORTED" ? "Cancelled" : "Mock export failed";
+      progressLabel.textContent = error.code === "ABORTED" ? "Cancelled" : "PDF generation failed";
       progressCount.textContent = "";
       progressBar.value = 0;
     } finally {
       running = false;
       controller = null;
       cancelButton.hidden = true;
-      exportButton.innerHTML = '<i data-lucide="file-output"></i> Run mock export';
+      exportButton.innerHTML = '<i data-lucide="file-output"></i> Generate PDF';
       updateControls();
       renderQueue();
       renderIcons(root);
@@ -582,7 +581,7 @@ if (mountPoint && !document.querySelector("#image-to-pdf-panel")) {
     resetProgress();
   });
   cancelButton.addEventListener("click", () => controller?.abort());
-  exportButton.addEventListener("click", runMockExport);
+  exportButton.addEventListener("click", runPdfExport);
 
   [pageSize, orientation, fit, marginMode, uniformMargin, ...marginInputs].forEach((control) => {
     control.addEventListener("change", () => {
