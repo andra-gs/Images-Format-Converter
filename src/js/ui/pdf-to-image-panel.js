@@ -377,6 +377,7 @@ if (mountPoint && !document.querySelector("#pdf-to-image-panel")) {
   };
 
   const clearPreview = () => {
+    clearExportResults();
     for (const url of previewObjectUrls.splice(0)) URL.revokeObjectURL(url);
     previewGrid.innerHTML = '<div class="pdf-empty-state">Rendered page previews will appear here.</div>';
     previewFeedback.hidden = true;
@@ -512,6 +513,7 @@ if (mountPoint && !document.querySelector("#pdf-to-image-panel")) {
   };
 
   const appendDownloadLink = (name, blob) => {
+    downloadResults.querySelector(".pdf-empty-state")?.remove();
     const url = URL.createObjectURL(blob);
     exportObjectUrls.push(url);
     const link = document.createElement("a");
