@@ -491,6 +491,8 @@ Completion criteria:
 
 Objective: render PDF pages into the image formats already supported by the application.
 
+API contract: [Phase 9 PDF to Image API Contract](./PHASE_9_API_CONTRACT.md) (draft for team review; not approved for implementation).
+
 Planned scope:
 - Accept PDF files and inspect page count and page dimensions.
 - Render selected pages or all pages to PNG, JPEG, or WebP.
