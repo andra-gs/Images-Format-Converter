@@ -1,5 +1,5 @@
 import { createIcons, FileText, ImagePlus, Images, ArrowUp, ArrowDown, X, FileOutput, Info } from "lucide";
-import "../styles/image-to-pdf.css";
+import "../../styles/image-to-pdf.css";
 import { validateImageFile } from "../core/file-validator.js";
 import { decodeImage } from "../core/image-decoder.js";
 import { createImageThumbnail } from "../core/image-thumbnail.js";
