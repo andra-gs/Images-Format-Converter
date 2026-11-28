@@ -526,7 +526,7 @@ if (mountPoint && !document.querySelector("#image-to-pdf-panel")) {
 
   window.addEventListener("beforeunload", () => {
     controller?.abort();
-    for (const entry of entries) URL.revokeObjectURL(entry.url);
+    for (const entry of entries) if (entry.url) URL.revokeObjectURL(entry.url);
   });
 
   updateControls();
