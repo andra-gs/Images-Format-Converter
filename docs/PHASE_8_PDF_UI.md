@@ -62,6 +62,7 @@ After Andra's engine PR is merged into `main`, update this branch from latest `m
 - [ ] Verify uniform margins and individual top/right/bottom/left margins.
 - [ ] Verify invalid margins produce a clear preview error and can be corrected.
 - [ ] Verify the pre-export Layout Preview is clearly labelled as an approximation, not the final PDF.
+- [ ] Switch A4/A5/Letter between Portrait and Landscape; the page outline must visibly change from taller-than-wide to wider-than-tall. Confirm Auto follows each source image's aspect ratio.
 - [ ] Verify the Generated PDF Preview empty state is visible before a real export.
 - [ ] After engine integration, generate a PDF and verify the embedded viewer displays the actual multi-page document.
 - [ ] After engine integration, verify PDF page navigation, zoom, Download PDF, filename, and output page count.
