@@ -449,11 +449,13 @@ Deliverable: completed QA, synchronized project documentation, and the published
 
 The first stable release focuses on image conversion. The next development track adds document workflows for common academic tasks while preserving the local-first principle. PDF and Word files are document formats, so they must use a document-processing pipeline rather than being forced into the existing raster-image conversion service.
 
-All phases below are planned. No PDF or Word conversion capability is implemented or advertised by this roadmap entry. Start a phase only after its scope, technical dependencies, ownership, and acceptance criteria are agreed. Keep the existing image pipeline stable and reusable where appropriate.
+Phases 8–13 are planned, with Phase 8 currently in progress on its engine and UI feature branches. The Image to PDF engine is implemented on `phase-8-image-to-pdf` and is not yet merged into `main` or advertised as a released capability. No PDF or Word conversion capability is available from the stable application yet. Start each phase only after its scope, technical dependencies, ownership, and acceptance criteria are agreed. Keep the existing image pipeline stable and reusable where appropriate.
 
 ### Phase 8: Image to PDF
 
 **Priority: P1. First document feature.**
+
+**Status: In progress.** Engine implementation and automated tests are on `phase-8-image-to-pdf`. UI workspace work is on `phase-8-pdf-ui` and is tracked in PR #12. The engine PR must merge before UI integration.
 
 Objective: let users convert one or more supported images into a single PDF document entirely in the browser.
 
@@ -469,10 +471,10 @@ Planned scope:
 - Keep image decoding, page composition, and PDF generation local to the browser.
 
 Technical evaluation:
-- Compare pdf-lib and jsPDF for multi-page composition, image embedding, page dimensions, memory behavior, bundle size, licensing, and browser compatibility.
+- Compare pdf-lib and jsPDF for multi-page composition, image embedding, page dimensions, memory behavior, bundle size, licensing, and browser compatibility. jsPDF 4.2.1 is selected and pinned on the engine feature branch. Real-browser transparency, memory, and output-fidelity verification remain pending.
 - Reuse the existing image decoder and validation where their contracts fit. Do not duplicate image format decoding.
 - Define whether image transparency is preserved by the selected PDF library and document any flattening behavior.
-- Do not add a library until its license, bundle impact, and real-file behavior are reviewed.
+- jsPDF 4.2.1 has been selected and pinned after license, bundle-size, and API review. Real-file output, transparency, memory, and browser compatibility verification remain required before merge.
 
 Completion criteria:
 - Single-image and multi-image PDF files open in independent PDF viewers.

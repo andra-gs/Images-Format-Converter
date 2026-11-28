@@ -605,13 +605,13 @@ The exact module boundaries and worker ownership must be designed against the im
 | Library | Candidate role | Evaluation notes |
 |---|---|---|
 | pdf-lib | Create PDFs, copy/merge pages, page manipulation | Verify image embedding, page operations, document feature preservation, memory, and browser behavior |
-| jsPDF | Create PDFs from raster images and page layouts | Compare multi-page composition, image quality, page sizing, and bundle impact |
+| jsPDF | Create PDFs from raster images and page layouts | Selected for Phase 8 on the `phase-8-image-to-pdf` feature branch at version 4.2.1. Verify page sizing, image quality, transparency, and production bundle impact |
 | PDF.js | Parse PDFs and render pages to Canvas | Review worker setup, fonts, supported PDF features, memory, and rendering fidelity |
 | Mammoth.js | Extract DOCX semantic content to HTML | Not a Microsoft Word layout engine; do not claim exact pagination or visual fidelity |
 | docx-preview | Render DOCX content in a browser for preview | Preview does not establish a reliable PDF export path or Word-equivalent layout |
 | LibreOffice | Reference renderer for DOCX fidelity evaluation | A remote service is outside the privacy model; local/WASM feasibility must be demonstrated before adoption |
 
-No dependency in this table is approved or installed by this planning update. Review package maintenance, license, security, browser compatibility, bundle size, and representative real-file behavior before adoption.
+jsPDF 4.2.1 is approved and pinned on the Phase 8 engine feature branch only. It is not yet part of `main` or a released application build. pdf-lib is not installed. Other candidates remain subject to their respective phase evaluations. Continue verifying package maintenance, license, security, browser compatibility, bundle size, and representative real-file behavior.
 
 ### Cross-pipeline contracts and constraints
 
@@ -656,3 +656,38 @@ If these conditions are not met, defer production DOCX-to-PDF and keep it out of
 
 ### v2.0.0 release gate
 Release only after included workflows pass automated tests, representative real-file tests, browser QA, production build, CI, resource cleanup, and documentation review. DOCX-to-PDF is conditional. Legacy DOC, OCR, PDF-to-DOCX, cloud storage, and online collaboration are outside the planned baseline.
+
+
+## 31. Phase 8 Image to PDF engine implementation
+
+**Feature branch status:** `phase-8-image-to-pdf`. This section records branch work pending merge and does not imply that the stable `main` application already exposes PDF generation.
+
+### Engine module
+
+- Engine entry point: `src/js/documents/image-to-pdf.js`.
+- PDF generator: `jspdf@4.2.1`, pinned in `package.json` and `package-lock.json`.
+- The module imports the existing `validateImageFile()` and `decodeImage()` APIs. It does not modify the raster capability registry or conversion service.
+- PDF generation runs locally in the browser. The module returns a PDF Blob and metadata. The UI owns preview/download Object URLs.
+- Each input File creates one PDF page. Input order determines page order. GIF uses the existing first-frame decoder path; TIFF uses the existing first-page decoder path.
+- Image sources are normalized through a temporary canvas and embedded as PNG data. Temporary canvases are reset after encoding, and decoded resources are closed in `finally`.
+- `calculateImagePdfPageLayout()` is the sole source of truth for page dimensions, margins, contain placement, and centered cover crop. The PDF writer verifies the current jsPDF page dimensions against the returned layout before drawing.
+
+### Limits and failure behavior
+
+- 25 MiB per input file; 100 MiB combined input size.
+- 50 pages maximum.
+- 19,200 px maximum source dimension and 20 megapixels per image.
+- 100 megapixels combined decoded pixels.
+- 14,400 pt maximum page width or height.
+- Image Size uses 96 PPI.
+- Validation and decoding use fail-fast behavior. An input-specific error carries `imageId` and zero-based `imageIndex`. No partial PDF is returned.
+- Processing is sequential. Cancellation is checked between safe processing steps. Browser decoding and synchronous PDF serialization cannot be interrupted mid-operation.
+- White page background is the only enabled production background. Transparent output remains disabled until generated PDFs pass the agreed independent-viewer tests.
+
+### Verification status on the feature branch
+
+- Automated tests cover page geometry, page size presets, auto orientation, mixed page dimensions, margins, contain/cover crop, invalid settings, fail-fast validation/decode errors, cancellation before and during processing, resource cleanup, progress completion counts, callback isolation, and multi-page output.
+- Manual browser QA harness: `tests/browser-image-to-pdf.html` and `tests/browser-image-to-pdf.js`. The checklist is `docs/PHASE_8_ENGINE_QA.md`.
+- GitHub Actions runs on the engine branch have passed `npm ci`, `npm test`, and `npm run build`.
+- Real-browser checks with representative source images, independent PDF viewer checks, actual bundle contribution measurement, mobile memory testing, and transparency verification are still pending.
+- Do not mark Phase 8 complete until those checks and the UI integration acceptance criteria pass.
