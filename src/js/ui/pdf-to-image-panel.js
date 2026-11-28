@@ -324,7 +324,7 @@ if (mountPoint && !document.querySelector("#pdf-to-image-panel")) {
       return `
         <article class="pdf-page-item ${page.selected ? "is-selected" : ""}" data-page-id="${page.id}">
           <label class="pdf-page-select">
-            <input type="checkbox" data-select-page="${page.id}" ${page.selected ? "checked" : ""} ${isLoading || isPreviewing ? "disabled" : ""} />
+            <input type="checkbox" data-select-page="${page.id}" ${page.selected ? "checked" : ""} ${isLoading || isPreviewing || isExporting ? "disabled" : ""} />
             <span class="pdf-page-check"><i data-lucide="check"></i></span>
             <span class="pdf-page-select-label">Select page</span>
           </label>
@@ -341,9 +341,9 @@ if (mountPoint && !document.querySelector("#pdf-to-image-panel")) {
             <small>${Math.round(width)} × ${Math.round(height)} pt</small>
           </div>
           <div class="pdf-page-controls">
-            <button class="pdf-icon-button" type="button" data-move-page="${page.id}" data-direction="-1" aria-label="Move page ${page.pageNumber} up" title="Move up" ${index === 0 || isLoading || isPreviewing ? "disabled" : ""}><i data-lucide="arrow-up"></i></button>
-            <button class="pdf-icon-button" type="button" data-move-page="${page.id}" data-direction="1" aria-label="Move page ${page.pageNumber} down" title="Move down" ${index === pages.length - 1 || isLoading || isPreviewing ? "disabled" : ""}><i data-lucide="arrow-down"></i></button>
-            <button class="pdf-icon-button pdf-remove-page" type="button" data-remove-page="${page.id}" aria-label="Remove page ${page.pageNumber}" title="Remove page" ${isLoading || isPreviewing ? "disabled" : ""}><i data-lucide="x"></i></button>
+            <button class="pdf-icon-button" type="button" data-move-page="${page.id}" data-direction="-1" aria-label="Move page ${page.pageNumber} up" title="Move up" ${index === 0 || isLoading || isPreviewing || isExporting ? "disabled" : ""}><i data-lucide="arrow-up"></i></button>
+            <button class="pdf-icon-button" type="button" data-move-page="${page.id}" data-direction="1" aria-label="Move page ${page.pageNumber} down" title="Move down" ${index === pages.length - 1 || isLoading || isPreviewing || isExporting ? "disabled" : ""}><i data-lucide="arrow-down"></i></button>
+            <button class="pdf-icon-button pdf-remove-page" type="button" data-remove-page="${page.id}" aria-label="Remove page ${page.pageNumber}" title="Remove page" ${isLoading || isPreviewing || isExporting ? "disabled" : ""}><i data-lucide="x"></i></button>
           </div>
         </article>
       `;
@@ -545,6 +545,8 @@ if (mountPoint && !document.querySelector("#pdf-to-image-panel")) {
     exportProgressBar.max = selected.length;
     exportProgressLabel.textContent = `Preparing ${selected.length} selected page(s)…`;
     updateSummary();
+    renderDocuments();
+    renderPages();
 
     const zip = new JSZip();
     const errors = [];
@@ -629,6 +631,8 @@ if (mountPoint && !document.querySelector("#pdf-to-image-panel")) {
         exportFeedback.hidden = false;
       }
       updateSummary();
+      renderDocuments();
+      renderPages();
     }
   };
 
