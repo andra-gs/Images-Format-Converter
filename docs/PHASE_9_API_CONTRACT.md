@@ -1,6 +1,6 @@
 # Phase 9 API Contract: PDF to Image
 
-Status: **Draft for team review. Not approved for implementation or UI integration yet.**
+Status: **Agreed for initial implementation. Resource limits and PDF.js runtime details remain provisional pending technical and real-device verification.**
 
 Owners:
 - PDF loading, rendering, validation, limits, and engine contract: Andra (`andra-gs`)
@@ -322,12 +322,12 @@ Acceptance gate:
 - Sequential rendering stays within the documented limits and releases resources.
 - Automated tests, real-browser tests, and production build pass.
 
-## 11. Decisions requiring team review
+## 11. Agreed decisions and remaining verification
 
-1. Public API and ownership boundary: agreed in principle; final contract wording must include mandatory UI cleanup of the session and returned ImageData.
+1. Public API and ownership boundary: agreed. The UI must call `destroy()` in a `finally` cleanup path and release references to returned `ImageData` after encoding/export.
 2. Page-count limit: 200 pages accepted provisionally. Other file/page/DPI/pixel limits remain provisional pending real-device memory tests.
-3. PDF.js `6.5.438`, one local core worker, and local-only supporting assets are the initial technical direction; Vite, bundle, browser, and asset verification remain open.
-4. Password prompt, incorrect-password retry, cancellation, and in-memory-only handling are agreed requirements; finalize the callback behavior and test it against PDF.js.
-5. Target-size optimization is outside the initial Phase 9 scope. Revisit a per-page adapter in a later phase.
+3. PDF.js `6.5.438`, one local core worker, and local-only supporting assets are the initial technical direction. Vite worker emission, bundle size, browser compatibility, and required asset coverage remain to be verified before adding the dependency.
+4. Password prompt, incorrect-password retry, cancellation, and in-memory-only handling are agreed requirements. The proposed `onPassword` callback contract remains the implementation target and must be validated against PDF.js behavior.
+5. Target-size optimization is outside the initial Phase 9 scope. A per-page optimization adapter may be evaluated separately later.
 
-Until these points are reviewed, this document remains a draft. Do not treat the API as approved and do not begin UI integration against it.
+UI development may proceed against this contract using an isolated mock. Do not import the mock into production engine code. Any required API change must be discussed by both owners and recorded here before integration.
