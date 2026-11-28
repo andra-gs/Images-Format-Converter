@@ -275,7 +275,7 @@ if (mountPoint && !document.querySelector("#pdf-to-image-panel")) {
       ? `${selectedCount} of ${pages.length} pages selected`
       : "Add a PDF to view its pages.";
     clearButton.disabled = documents.length === 0 || isLoading || isPreviewing;
-    addButton.disabled = isLoading || isPreviewing;
+    addButton.disabled = isLoading || isPreviewing || isExporting;
     fileInput.disabled = isLoading || isPreviewing;
     selectAllButton.disabled = pages.length === 0 || isLoading || isPreviewing || selectedCount === pages.length;
     selectNoneButton.disabled = pages.length === 0 || isLoading || isPreviewing || selectedCount === 0;
@@ -406,7 +406,7 @@ if (mountPoint && !document.querySelector("#pdf-to-image-panel")) {
   };
 
   const runPreview = async () => {
-    if (isLoading || isPreviewing) return;
+    if (isLoading || isPreviewing || isExporting) return;
     const selected = getSelectedPages();
     if (!selected.length) {
       showFeedback("Select at least one page before creating a preview.", "warning");
@@ -635,7 +635,7 @@ if (mountPoint && !document.querySelector("#pdf-to-image-panel")) {
   };
 
   const removeDocument = async (documentId) => {
-    if (isLoading || isPreviewing) return;
+    if (isLoading || isPreviewing || isExporting) return;
     const index = documents.findIndex((entry) => entry.id === documentId);
     if (index < 0) return;
     clearPreview();
@@ -650,7 +650,7 @@ if (mountPoint && !document.querySelector("#pdf-to-image-panel")) {
 
   const addFiles = async (fileList) => {
     const candidates = [...fileList];
-    if (candidates.length === 0 || isLoading || isPreviewing) return;
+    if (candidates.length === 0 || isLoading || isPreviewing || isExporting) return;
 
     clearPreview();
     const rejected = [];
@@ -767,7 +767,7 @@ if (mountPoint && !document.querySelector("#pdf-to-image-panel")) {
 
   pageList.addEventListener("change", (event) => {
     const checkbox = event.target.closest("[data-select-page]");
-    if (!checkbox || isLoading || isPreviewing) return;
+    if (!checkbox || isLoading || isPreviewing || isExporting) return;
     const page = pages.find((entry) => entry.id === checkbox.dataset.selectPage);
     if (!page) return;
     clearPreview();
