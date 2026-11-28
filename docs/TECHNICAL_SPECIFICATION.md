@@ -611,7 +611,7 @@ The exact module boundaries and worker ownership must be designed against the im
 | docx-preview | Render DOCX content in a browser for preview | Preview does not establish a reliable PDF export path or Word-equivalent layout |
 | LibreOffice | Reference renderer for DOCX fidelity evaluation | A remote service is outside the privacy model; local/WASM feasibility must be demonstrated before adoption |
 
-jsPDF 4.2.1 is approved and pinned on the Phase 8 engine feature branch only. It is not yet part of `main` or a released application build. pdf-lib is not installed. Other candidates remain subject to their respective phase evaluations. Continue verifying package maintenance, license, security, browser compatibility, bundle size, and representative real-file behavior.
+jsPDF 4.2.1 is approved and pinned in the merged Phase 8 Image to PDF engine. pdf-lib is not installed. PDF.js `6.5.438` is the Phase 9 candidate only; it is not yet installed. Verify package/runtime compatibility, Vite local-worker emission, supporting local assets, production bundle contribution, browser support, and representative real-file behavior before adding it to application dependencies.
 
 ### Cross-pipeline contracts and constraints
 

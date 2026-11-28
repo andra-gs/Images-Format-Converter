@@ -489,6 +489,17 @@ Remaining gates and constraints:
 
 ### Phase 9: PDF to Image
 
+**Status: In progress.** API and ownership boundaries are agreed in principle. Farrel's proposed 200-page document limit is accepted provisionally. Other resource limits and the PDF.js runtime/asset strategy remain subject to technical and real-device verification. Engine work is on `phase-9-pdf-engine`; UI work is owned separately by Farrel. No PDF.js loading or page-rendering implementation is complete yet.
+
+**Current decisions:**
+- One PDF document may contain up to 200 pages, provisionally.
+- Render selected pages sequentially, with one active page render and a 100 MP total export-job pixel cap.
+- Use `pdfjs-dist@6.5.438` as the candidate, with one local core worker. Do not add renderer workers or remote assets in the initial implementation.
+- Provide local CMaps, standard fonts, ICC, or WASM assets only when required and verified.
+- Password prompt/retry/cancel is required; passwords remain in memory only.
+- Target-size optimization is outside Phase 9 scope.
+
+
 **Priority: P1.**
 
 Objective: render PDF pages into the image formats already supported by the application.

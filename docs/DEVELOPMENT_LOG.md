@@ -1,5 +1,13 @@
 # Development Log
 
+### 2026-11-28 — Phase 9 PDF-to-Image engine planning and branch synchronization
+- Status: Phase 9 API contract remains a draft. Andra's engine work is on `phase-9-pdf-engine`; Farrel owns the separate UI branch.
+- Team review: Farrel proposed a 200-page document limit. Andra accepted it provisionally, with sequential rendering, one active page render, and a 100 MP export-job pixel cap. Other resource limits remain provisional pending real-device memory tests.
+- PDF.js `6.5.438` remains the candidate, not an installed dependency. Initial direction is one local core worker, no additional renderer worker, and local supporting assets only when required. Vite worker resolution, package/runtime compatibility, bundle size, asset needs, and browser performance remain to be verified.
+- Password prompt, incorrect-password retry, cancellation, and memory-only handling are agreed requirements. Target-size optimization remains outside Phase 9 scope.
+- Added the dependency-free `calculatePdfRasterDimensions()` helper and focused tests. The current local report identified one floating-point rounding failure (expected 1650 px, received 1651 px); this remains unresolved and must be fixed without weakening the geometry requirement.
+- Branch synchronization is recorded separately in the merge commit. No PDF.js loader or rendering engine has been implemented, and no Phase 9 tests/build are claimed as passing.
+
 ### 2026-11-28 — Phase 8 UI integrated with production PDF engine
 - Status: Engine integration implemented on `phase-8-pdf-ui`; automated and browser verification pending.
 - Changes:
