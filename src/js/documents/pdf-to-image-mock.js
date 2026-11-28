@@ -100,6 +100,25 @@ export async function openPdfDocument(file, options = {}) {
       notify(onRenderProgress, { phase: "rendering", pageNumber });
       throwIfAborted(renderSignal);
       const imageData = new ImageData(width, height);
+      imageData.data.fill(255);
+      const left = Math.floor(width * 0.15);
+      const availableWidth = Math.floor(width * 0.7);
+      const lineHeight = Math.max(2, Math.round(dpi / 36));
+      const lineGap = Math.max(12, Math.round(dpi / 5));
+      let lineIndex = 0;
+      for (let y = Math.floor(height * 0.18); y < height * 0.82; y += lineGap) {
+        const lineWidth = Math.floor(availableWidth * (0.58 + (lineIndex % 4) * 0.1));
+        for (let row = y; row < Math.min(y + lineHeight, height); row += 1) {
+          for (let x = left; x < left + lineWidth; x += 1) {
+            const offset = (row * width + x) * 4;
+            imageData.data[offset] = 205;
+            imageData.data[offset + 1] = 210;
+            imageData.data[offset + 2] = 220;
+            imageData.data[offset + 3] = 255;
+          }
+        }
+        lineIndex += 1;
+      }
       return { pageNumber, dpi, width, height, rotation: page.rotation, imageData };
     },
     async destroy() {
