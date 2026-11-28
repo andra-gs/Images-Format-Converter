@@ -133,7 +133,7 @@ if (mountPoint && !document.querySelector("#pdf-to-image-panel")) {
         </div>
       </section>
 
-      <p class="pdf-to-image-privacy"><i data-lucide="info"></i><span>Files stay on your device. Page cards currently use the mock document metadata; actual page-image thumbnails will be connected when the PDF engine is integrated.</span></p>
+      <p class="pdf-to-image-privacy"><i data-lucide="info"></i><span>Files stay on your device. Page cards and previews currently use mock document data; actual PDF page content will appear after the real PDF engine is integrated.</span></p>
     </section>
   `);
 
@@ -447,7 +447,7 @@ if (mountPoint && !document.querySelector("#pdf-to-image-panel")) {
       previewController = null;
       isPreviewing = false;
       previewCancelButton.hidden = true;
-      previewProgressBar.value = selected.length;
+      previewProgressBar.value = wasCancelled ? completed : selected.length;
       previewProgressLabel.textContent = wasCancelled
         ? `Preview cancelled · ${completed} page(s) completed`
         : `Preview complete · ${completed} of ${selected.length} page(s) rendered`;
