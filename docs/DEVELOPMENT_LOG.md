@@ -33,6 +33,19 @@ This file records actual repository progress. Update it after meaningful impleme
 
 ## Change log
 
+### 2026-11-28 — Phase 8 Image to PDF UI foundation
+
+- Status: UI foundation and contract mock committed on `phase-8-pdf-ui`; automated tests, production build, and browser verification remain pending.
+- Created `phase-8-pdf-ui` from `main` at `098bc6c23d0d544c10d9b09e373f211bc719ee03`.
+- Added a separate Image to PDF workspace with multi-image selection, drag-and-drop, stable queue entries, thumbnails, remove/clear/reorder controls, page preview, page settings, and responsive styles.
+- Added an isolated mock for the approved `calculateImagePdfPageLayout()` and `createImagePdf()` UI contract. The mock simulates progress and cancellation but does not create or download a PDF.
+- Preview positioning uses the layout helper's returned page and image geometry. No jsPDF dependency, image conversion service change, raster capability registry change, or PDF composition code was added.
+- Transparency remains unavailable in the UI pending the two-independent-viewer verification gate.
+- Added focused tests for mock page presets, orientation, Image Size at 96 PPI, margins, Fit/Fill geometry, and invalid layout inputs. These tests have not yet been executed.
+- Added `docs/PHASE_8_PDF_UI.md` with scope, mock boundary, and browser verification checklist.
+- Next: run `npm test`, `npm run build`, and browser checks locally; then continue real engine integration only after Andra's engine PR is merged into `main`.
+
+
 ### 2026-11-26 - v1.0.0 stable release published
 - Status: Phase 7 QA and documentation are complete, and the first stable GitHub release `v1.0.0` has been published.
 - Scope recorded as complete: cross-browser checks, mobile layout checks, large-image and memory checks, security review, advertised conversion-path verification, local-processing/network-transfer verification, production build check, README installation and usage instructions, screenshots, supported-format matrix, and known-limitations/browser-compatibility documentation.
