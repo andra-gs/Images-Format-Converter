@@ -465,6 +465,7 @@ if (mountPoint && !document.querySelector("#image-to-pdf-panel")) {
 
   const runMockExport = async () => {
     if (running || entries.length === 0) return;
+    clearGeneratedPdf();
     running = true;
     controller = new AbortController();
     showFeedback("");
@@ -592,6 +593,7 @@ if (mountPoint && !document.querySelector("#image-to-pdf-panel")) {
   window.addEventListener("beforeunload", () => {
     controller?.abort();
     for (const entry of entries) if (entry.url) URL.revokeObjectURL(entry.url);
+    if (generatedPdfUrl) URL.revokeObjectURL(generatedPdfUrl);
   });
 
   updateControls();
