@@ -1341,3 +1341,22 @@ Add newest entries first.
   - Run automated tests and production build.
   - Browser-check the distinction between Layout Preview and the empty Generated PDF Preview in mock mode.
   - After engine merge, integrate the real engine and verify multi-page PDF viewing and download.
+
+
+### 2026-11-28 — Separate image conversion workspaces
+- Status: Implemented on `phase-8-pdf-ui`; validation after this change is pending.
+- Changes:
+  - Added a top-level mode selector with **Image Format Converter** and **Images to PDF** choices.
+  - Each mode displays only its own workspace, reducing the amount of unrelated controls visible at once.
+  - Switching modes hides rather than destroys the inactive workspace, preserving its current queue and settings.
+  - Updated the page introduction and documented the mode-switching browser check.
+- Files changed:
+  - `index.html`
+  - `src/js/main.js`
+  - `src/js/ui/image-to-pdf-panel.js`
+  - `src/styles/main.css`
+  - `src/styles/workspace-mode.css`
+  - `docs/PHASE_8_PDF_UI.md`
+- Verification:
+  - The owner reported that tests, build, and browser checks passed before this selector change.
+  - Tests, production build, and browser QA must be rerun against this latest commit before PR creation.
