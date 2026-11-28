@@ -33,6 +33,29 @@ This file records actual repository progress. Update it after meaningful impleme
 
 ## Change log
 
+### 2026-11-28 - Phase 8 Image to PDF engine merged into main
+
+- Status: Andra's Phase 8 engine PR #13 was merged into `main`.
+- Merge commit: `5889f55f1929fa649113774bf6dbbe8ad798573d`.
+- The merged engine provides `createImagePdf()`, `calculateImagePdfPageLayout()`, typed errors, progress reporting, cancellation checkpoints, output validation, and resource cleanup.
+- Verification recorded in PR #13: GitHub Actions passed `npm ci`, `npm test` (170/170 tests), and `npm run build`; CodeQL Advanced passed. The project owner also confirmed the manual browser QA passed with representative real files and expected output.
+- This merge makes the engine available for integration on `phase-8-pdf-ui`. It does not mean the UI is already wired to the production engine.
+- Remaining integration work: sync this branch with `main`, replace the UI mock with the real engine, then run integrated automated, build, and browser checks. Keep transparency unavailable unless its separate verification gate is satisfied.
+- Evidence: [PR #13](https://github.com/andra-gs/Images-Format-Converter/pull/13).
+
+### 2026-11-28 - Phase 8 Image to PDF engine implementation (historical checkpoint)
+
+- Status at the implementation checkpoint: engine code and tests were committed to `phase-8-image-to-pdf`; PR #13 was awaiting merge at that time.
+- Selected and pinned `jspdf@4.2.1` after comparing pdf-lib and jsPDF.
+- Added `src/js/documents/image-to-pdf.js` with `createImagePdf()`, `calculateImagePdfPageLayout()`, typed errors, progress callbacks, cancellation checkpoints, fail-fast behavior, output validation, and cleanup.
+- Reused the existing image validator and decoder. The document engine remains separate from the raster capability registry and image conversion service.
+- Implemented sequential decode and page composition, 96 PPI Image Size geometry, per-side margins, contain placement, and centered cover cropping.
+- Kept transparent background disabled pending its separate generated-PDF verification gate.
+- Added automated tests in `tests/image-to-pdf.test.js` and a manual browser harness at `tests/browser-image-to-pdf.html` and `tests/browser-image-to-pdf.js`, with a checklist in `docs/PHASE_8_ENGINE_QA.md`.
+- GitHub Actions passed `npm ci`, `npm test`, and `npm run build` on engine commit `ac12dfce21f0b63e4ecbcb7167cfa55a59e7b20f`.
+- The subsequent merge and owner-reported browser QA result are recorded in the entry immediately above.
+
+
 ### 2026-11-28 — Phase 8 Image to PDF UI foundation
 
 - Status: UI foundation and contract mock committed on `phase-8-pdf-ui`; automated tests, production build, and browser verification remain pending.
