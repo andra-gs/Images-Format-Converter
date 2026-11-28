@@ -1,6 +1,6 @@
-import { createIcons, FileText, ImagePlus, Images, ArrowUp, ArrowDown, X, FileOutput, Info, RotateCcw } from "lucide";
+import { createIcons, FileText, ImagePlus, Images, ArrowUp, ArrowDown, X, FileOutput, Info } from "lucide";
 import "../styles/image-to-pdf.css";
-import { calculateImagePdfPageLayout, createImagePdf, ImageToPdfError } from "./image-to-pdf-mock.js";
+import { calculateImagePdfPageLayout, createImagePdf } from "./image-to-pdf-mock.js";
 
 const iconSet = { FileText, ImagePlus, Images, ArrowUp, ArrowDown, X, FileOutput, Info, RotateCcw };
 const renderIcons = (root = document) => createIcons({ icons: iconSet, attrs: { "aria-hidden": "true" }, root });
