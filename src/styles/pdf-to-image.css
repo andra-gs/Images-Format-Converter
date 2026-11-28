@@ -65,6 +65,7 @@
 .pdf-feedback[data-state="success"] { color: #23966a; }
 .pdf-feedback[data-state="warning"] { color: #b27a25; }
 .pdf-loading { display: flex; align-items: center; gap: 9px; color: var(--color-muted); font-size: .72rem; }
+.pdf-loading[hidden] { display: none !important; }
 .pdf-loading-spinner { width: 14px; height: 14px; border: 2px solid var(--color-border); border-top-color: var(--color-accent); border-radius: 50%; animation: pdf-spin .8s linear infinite; }
 @keyframes pdf-spin { to { transform: rotate(360deg); } }
 .pdf-document-list { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
