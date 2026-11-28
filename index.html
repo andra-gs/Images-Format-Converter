@@ -78,6 +78,14 @@
             </span>
             <span class="workspace-mode-arrow" aria-hidden="true">→</span>
           </button>
+          <button class="workspace-mode-option" type="button" id="mode-pdf-to-images" aria-pressed="false" aria-controls="pdf-to-image-panel" data-workspace-mode="pdf-to-image">
+            <span class="workspace-mode-icon" aria-hidden="true"><i data-lucide="file-image"></i></span>
+            <span class="workspace-mode-copy">
+              <strong>PDF to Image</strong>
+              <small>Render selected PDF pages as PNG, JPEG, or WebP images.</small>
+            </span>
+            <span class="workspace-mode-arrow" aria-hidden="true">→</span>
+          </button>
         </div>
 
         <div id="image-format-workspace" class="workspace-mode-content">
@@ -236,5 +244,6 @@
     <script type="module" src="/src/js/main.js"></script>
     <script type="module" src="/src/js/ui/image-editor.js"></script>
     <script type="module" src="/src/js/ui/image-to-pdf-panel.js"></script>
+    <script type="module" src="/src/js/ui/pdf-to-image-panel.js"></script>
   </body>
 </html>

@@ -1,0 +1,119 @@
+.pdf-to-image-panel {
+  display: grid;
+  gap: 18px;
+  margin-top: 28px;
+  padding: 26px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-panel);
+}
+.pdf-to-image-panel[hidden] { display: none !important; }
+.pdf-to-image-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+.pdf-to-image-eyebrow {
+  color: var(--color-accent);
+  font-size: .65rem;
+  font-weight: 800;
+  letter-spacing: .13em;
+}
+.pdf-to-image-heading h2 {
+  margin: 7px 0 5px;
+  font-size: 1.35rem;
+  letter-spacing: -.045em;
+}
+.pdf-to-image-heading p,
+.pdf-to-image-intro p,
+.pdf-to-image-foundation-card p {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: .76rem;
+  line-height: 1.55;
+}
+.pdf-to-image-status {
+  flex: 0 0 auto;
+  padding: 6px 10px;
+  color: var(--color-accent);
+  background: var(--color-accent-soft);
+  border-radius: 999px;
+  font-size: .66rem;
+  font-weight: 750;
+}
+.pdf-to-image-intro {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 18px;
+  background: var(--color-surface-muted);
+  border: 1px dashed var(--color-border);
+  border-radius: 13px;
+}
+.pdf-to-image-intro-icon,
+.pdf-to-image-card-icon {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  place-items: center;
+  color: var(--color-accent);
+  background: var(--color-accent-soft);
+  border-radius: 12px;
+}
+.pdf-to-image-intro-icon svg,
+.pdf-to-image-card-icon svg { width: 21px; height: 21px; }
+.pdf-to-image-intro h3,
+.pdf-to-image-foundation-card h3 {
+  margin: 0 0 5px;
+  font-size: .86rem;
+}
+.pdf-to-image-foundation-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+.pdf-to-image-foundation-card {
+  display: grid;
+  align-content: start;
+  justify-items: start;
+  gap: 9px;
+  min-width: 0;
+  padding: 17px;
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border);
+  border-radius: 13px;
+}
+.pdf-to-image-foundation-card span {
+  margin-top: 3px;
+  color: var(--color-muted);
+  font-size: .66rem;
+  font-weight: 700;
+}
+.pdf-to-image-privacy {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0;
+  padding: 11px 13px;
+  color: var(--color-muted);
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border);
+  border-radius: 9px;
+  font-size: .68rem;
+  line-height: 1.55;
+}
+.pdf-to-image-privacy svg {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
+  margin-top: 1px;
+  color: var(--color-accent);
+}
+@media (max-width: 640px) {
+  .pdf-to-image-panel { padding: 17px; }
+  .pdf-to-image-heading { flex-direction: column; }
+  .pdf-to-image-foundation-grid { grid-template-columns: 1fr; }
+}

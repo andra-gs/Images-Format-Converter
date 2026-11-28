@@ -54,11 +54,12 @@ const workspaceModeButtons = [...document.querySelectorAll("[data-workspace-mode
 const imageFormatWorkspace = document.querySelector("#image-format-workspace");
 
 const selectWorkspaceMode = (mode) => {
-  const pdfWorkspace = document.querySelector("#image-to-pdf-panel");
-  const showPdf = mode === "pdf";
+  const imageToPdfWorkspace = document.querySelector("#image-to-pdf-panel");
+  const pdfToImageWorkspace = document.querySelector("#pdf-to-image-panel");
 
-  if (imageFormatWorkspace) imageFormatWorkspace.hidden = showPdf;
-  if (pdfWorkspace) pdfWorkspace.hidden = !showPdf;
+  if (imageFormatWorkspace) imageFormatWorkspace.hidden = mode !== "format";
+  if (imageToPdfWorkspace) imageToPdfWorkspace.hidden = mode !== "pdf";
+  if (pdfToImageWorkspace) pdfToImageWorkspace.hidden = mode !== "pdf-to-image";
 
   workspaceModeButtons.forEach((button) => {
     const selected = button.dataset.workspaceMode === mode;

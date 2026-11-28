@@ -1,6 +1,6 @@
 .workspace-mode-picker {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
   width: min(100%, 920px);
   margin: 0 auto 28px;
@@ -85,6 +85,12 @@
 .workspace-mode-content[hidden],
 .image-to-pdf-panel[hidden] {
   display: none !important;
+}
+
+@media (max-width: 900px) {
+  .workspace-mode-picker {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 640px) {
