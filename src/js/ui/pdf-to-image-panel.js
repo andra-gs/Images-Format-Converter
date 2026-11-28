@@ -508,7 +508,7 @@ if (mountPoint && !document.querySelector("#pdf-to-image-panel")) {
   };
 
   const makeOutputName = (page, entry) => {
-    const base = entry.file.name.replace(/\\.pdf$/i, "").replace(/[^a-z0-9-_]+/gi, "-").replace(/^-+|-+$/g, "") || "document";
+    const base = entry.file.name.replace(/\.pdf$/i, "").replace(/[^a-z0-9-_]+/gi, "-").replace(/^-+|-+$/g, "") || "document";
     return `document-${entry.id}-${base}-page-${String(page.pageNumber).padStart(3, "0")}.${exportSettings.format === "jpeg" ? "jpg" : exportSettings.format}`;
   };
 
