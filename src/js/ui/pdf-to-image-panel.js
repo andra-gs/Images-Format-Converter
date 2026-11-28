@@ -99,7 +99,7 @@ if (mountPoint && !document.querySelector("#pdf-to-image-panel")) {
           </label>
           <label class="pdf-setting-field pdf-quality-field" for="pdf-output-quality" hidden>
             <span>Image quality <strong id="pdf-quality-value">85%</strong></span>
-            <input id="pdf-output-quality" type="range" min="10" max="100" step="1" value="85" />
+            <input id="pdf-output-quality" type="range" min="0" max="100" step="1" value="85" />
             <small>Higher quality generally creates larger files.</small>
           </label>
         </div>
