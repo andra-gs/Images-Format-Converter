@@ -1318,3 +1318,26 @@ Add newest entries first.
 - Tests and build:
   - No application code or dependencies changed.
   - No automated tests, browser checks, or production build were run because this update changes planning documentation only.
+
+
+### 2026-11-28 — Phase 8 UI scope correction: generated PDF preview
+- Status: UI viewer path prepared; real PDF integration pending engine merge.
+- Scope correction:
+  - Split the old single-image pre-export approximation into an explicitly labelled **Layout Preview** and a separate **Generated PDF Preview**.
+  - The generated document area is designed to display only the actual non-empty `application/pdf` Blob returned by the Phase 8 engine.
+  - Added embedded PDF viewing, output metadata, download, and clear-result controls, with Object URL cleanup on replacement, Clear All, explicit clear, and page unload.
+  - Kept the mock honest: it produces no Blob, does not populate the PDF viewer, and does not enable a fake download.
+  - Updated the Phase 8 UI scope and browser checklist so actual PDF viewer/navigation/download checks occur after engine integration, not during mock-only QA.
+- Files changed:
+  - `src/js/ui/image-to-pdf-panel.js`
+  - `src/styles/image-to-pdf.css`
+  - `docs/PHASE_8_PDF_UI.md`
+- Verification:
+  - Repository source was updated on `phase-8-pdf-ui`.
+  - No local automated tests, production build, or browser QA were run for this scope correction.
+  - The engine branch has not yet been integrated here; actual PDF preview remains unavailable until Andra's engine is merged and wired in.
+- Next steps:
+  - Pull the latest `phase-8-pdf-ui` branch.
+  - Run automated tests and production build.
+  - Browser-check the distinction between Layout Preview and the empty Generated PDF Preview in mock mode.
+  - After engine merge, integrate the real engine and verify multi-page PDF viewing and download.
