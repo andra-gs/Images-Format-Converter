@@ -26,7 +26,7 @@ if (mountPoint && !document.querySelector("#image-to-pdf-panel")) {
           <strong>Add images</strong>
           <span>Choose multiple image files or drop them here. Arrange the page order below.</span>
         </div>
-        <label class="pdf-add-button" for="pdf-file-input"><i data-lucide="image-plus"></i> Add images</label>
+        <button class="pdf-add-button" id="pdf-add-button" type="button"><i data-lucide="image-plus"></i> Add images</button>
         <input id="pdf-file-input" type="file" accept="image/*" multiple hidden />
       </div>
       <div class="pdf-dropzone" id="pdf-dropzone" tabindex="0" role="button" aria-label="Add images or drag and drop them here">
@@ -128,7 +128,7 @@ if (mountPoint && !document.querySelector("#image-to-pdf-panel")) {
         </div>
         <div class="pdf-progress" id="pdf-progress" hidden>
           <div class="pdf-progress-heading"><span id="pdf-progress-label">Preparing export…</span><span id="pdf-progress-count"></span></div>
-          <progress id="pdf-progress-bar" max="100" value="0"></progress>
+          <progress id="pdf-progress-bar" max="100" value="0" aria-label="Mock export progress"></progress>
         </div>
         <div class="pdf-export-actions">
           <button class="pdf-export-button" id="pdf-export-button" type="button" disabled><i data-lucide="file-output"></i> Run mock export</button>
@@ -473,6 +473,7 @@ if (mountPoint && !document.querySelector("#image-to-pdf-panel")) {
     }
   };
 
+  $("#pdf-add-button").addEventListener("click", () => fileInput.click());
   fileInput.addEventListener("change", (event) => {
     addFiles(event.target.files);
     fileInput.value = "";
