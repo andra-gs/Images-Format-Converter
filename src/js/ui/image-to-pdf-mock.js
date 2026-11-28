@@ -11,6 +11,11 @@ const PAGE_PRESETS = {
 };
 
 const MAX_PAGE_PT = 14400;
+const MAX_SOURCE_DIMENSION = 19200;
+const MAX_IMAGE_PIXELS = 20_000_000;
+const MAX_FILE_BYTES = 25 * 1024 * 1024;
+const MAX_TOTAL_FILE_BYTES = 100 * 1024 * 1024;
+const MAX_PAGE_COUNT = 50;
 const MM_TO_PT = 72 / 25.4;
 
 export class ImageToPdfError extends Error {
@@ -43,6 +48,11 @@ const normalizeMargins = (marginMm = 10) => {
 };
 
 const validateOptions = (options = {}) => {
+  const allowedKeys = new Set(["pageSize", "orientation", "marginMm", "fit", "background"]);
+  if (Object.keys(options).some((key) => !allowedKeys.has(key))) {
+    throw new ImageToPdfError("INVALID_OPTIONS", "Unknown page setting was provided.");
+  }
+
   const normalized = {
     pageSize: options.pageSize ?? "A4",
     orientation: options.orientation ?? "portrait",
@@ -70,6 +80,10 @@ export function calculateImagePdfPageLayout({ imageWidth, imageHeight, options =
   if (!Number.isFinite(imageWidth) || !Number.isFinite(imageHeight) ||
       imageWidth <= 0 || imageHeight <= 0) {
     throw new ImageToPdfError("INVALID_INPUT", "Image dimensions must be positive numbers.");
+  }
+  if (imageWidth > MAX_SOURCE_DIMENSION || imageHeight > MAX_SOURCE_DIMENSION ||
+      imageWidth * imageHeight > MAX_IMAGE_PIXELS) {
+    throw new ImageToPdfError("LIMIT_EXCEEDED", "The source image exceeds the supported dimensions or pixel limit.");
   }
 
   const settings = validateOptions(options);
@@ -141,6 +155,24 @@ export async function createImagePdf({ images, options = {}, signal, onProgress 
   if (!Array.isArray(images) || images.length === 0) {
     throw new ImageToPdfError("INVALID_INPUT", "Add at least one image before continuing.");
   }
+  if (images.length > MAX_PAGE_COUNT) {
+    throw new ImageToPdfError("LIMIT_EXCEEDED", "The export exceeds the maximum page count.");
+  }
+  const ids = new Set();
+  let totalBytes = 0;
+  for (const [index, item] of images.entries()) {
+    if (!item?.id || typeof item.id !== "string" || ids.has(item.id) || !(item.file instanceof File)) {
+      throw new ImageToPdfError("INVALID_INPUT", "An image queue item or ID is invalid.", item?.id ?? null, index);
+    }
+    ids.add(item.id);
+    if (item.file.size <= 0 || item.file.size > MAX_FILE_BYTES) {
+      throw new ImageToPdfError("LIMIT_EXCEEDED", "The image file exceeds the per-file size limit.", item.id, index);
+    }
+    totalBytes += item.file.size;
+  }
+  if (totalBytes > MAX_TOTAL_FILE_BYTES) {
+    throw new ImageToPdfError("LIMIT_EXCEEDED", "The selected files exceed the combined size limit.");
+  }
 
   const report = (progress) => {
     try { onProgress?.(progress); } catch { /* UI callbacks cannot interrupt the mock. */ }
@@ -155,9 +187,6 @@ export async function createImagePdf({ images, options = {}, signal, onProgress 
 
   for (const [index, item] of images.entries()) {
     checkpoint();
-    if (!item?.id || !(item.file instanceof File)) {
-      throw new ImageToPdfError("INVALID_INPUT", "An image queue item is invalid.", item?.id ?? null, index);
-    }
     report({
       phase: "validating",
       completed: index + 1,
