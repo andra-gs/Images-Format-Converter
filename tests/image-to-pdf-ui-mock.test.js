@@ -116,3 +116,22 @@ test("margins that consume the full page are rejected", () => {
     (error) => error.code === "INVALID_OPTIONS"
   );
 });
+
+test("unsupported transparency and unknown options are rejected by the UI mock", () => {
+  assert.throws(
+    () => calculateImagePdfPageLayout({
+      imageWidth: 100,
+      imageHeight: 100,
+      options: { background: "transparent" }
+    }),
+    (error) => error.code === "INVALID_OPTIONS"
+  );
+  assert.throws(
+    () => calculateImagePdfPageLayout({
+      imageWidth: 100,
+      imageHeight: 100,
+      options: { pageSize: "A4", undocumentedSetting: true }
+    }),
+    (error) => error.code === "INVALID_OPTIONS"
+  );
+});
