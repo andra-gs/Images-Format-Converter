@@ -33,7 +33,7 @@ The UI mock is intentionally isolated in its own module. It does not import jsPD
 - White page background only. Transparency is intentionally not exposed before the contract's two-viewer verification gate passes.
 - Preview geometry is requested from the mock `calculateImagePdfPageLayout()` function. The UI maps its returned page and image rectangles to CSS positioning; it does not implement a second Fit/Fill layout calculation.
 - Mock validation/decoding/composition/finalization progress, cancellation through `AbortController`, and error/status presentation.
-- Object URLs are revoked when queue entries are removed, cleared, or the page unloads.
+- Thumbnail Object URLs are revoked when queue entries are removed, cleared, or the page unloads. Temporary decoded resources are closed immediately after thumbnail creation.
 
 ## Explicit mock boundary
 
