@@ -63,8 +63,7 @@ const selectWorkspaceMode = (mode) => {
   workspaceModeButtons.forEach((button) => {
     const selected = button.dataset.workspaceMode === mode;
     button.classList.toggle("is-active", selected);
-    button.setAttribute("aria-selected", String(selected));
-    button.tabIndex = selected ? 0 : -1;
+    button.setAttribute("aria-pressed", String(selected));
   });
 };
 
