@@ -340,7 +340,7 @@ if (mountPoint && !document.querySelector("#image-to-pdf-panel")) {
   const removeEntry = (index) => {
     if (running) return;
     const [removed] = entries.splice(index, 1);
-    URL.revokeObjectURL(removed.url);
+    if (removed.url) URL.revokeObjectURL(removed.url);
     if (entries.length === 0) activeIndex = 0;
     else if (activeIndex >= entries.length) activeIndex = entries.length - 1;
     else if (index < activeIndex) activeIndex -= 1;
@@ -503,7 +503,7 @@ if (mountPoint && !document.querySelector("#image-to-pdf-panel")) {
   });
   clearButton.addEventListener("click", () => {
     if (running) return;
-    for (const entry of entries) URL.revokeObjectURL(entry.url);
+    for (const entry of entries) if (entry.url) URL.revokeObjectURL(entry.url);
     entries.length = 0;
     activeIndex = 0;
     renderQueue();
