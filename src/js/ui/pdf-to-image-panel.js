@@ -274,16 +274,16 @@ if (mountPoint && !document.querySelector("#pdf-to-image-panel")) {
     $("#pdf-page-count").textContent = pages.length
       ? `${selectedCount} of ${pages.length} pages selected`
       : "Add a PDF to view its pages.";
-    clearButton.disabled = documents.length === 0 || isLoading || isPreviewing;
+    clearButton.disabled = documents.length === 0 || isLoading || isPreviewing || isExporting;
     addButton.disabled = isLoading || isPreviewing || isExporting;
-    fileInput.disabled = isLoading || isPreviewing;
-    selectAllButton.disabled = pages.length === 0 || isLoading || isPreviewing || selectedCount === pages.length;
-    selectNoneButton.disabled = pages.length === 0 || isLoading || isPreviewing || selectedCount === 0;
+    fileInput.disabled = isLoading || isPreviewing || isExporting;
+    selectAllButton.disabled = pages.length === 0 || isLoading || isPreviewing || isExporting || selectedCount === pages.length;
+    selectNoneButton.disabled = pages.length === 0 || isLoading || isPreviewing || isExporting || selectedCount === 0;
     previewButton.disabled = selectedCount === 0 || isLoading || isPreviewing || isExporting;
     exportButton.disabled = selectedCount === 0 || isLoading || isPreviewing || isExporting;
-    $("#pdf-output-format").disabled = isLoading || isPreviewing;
-    $("#pdf-output-dpi").disabled = isLoading || isPreviewing;
-    $("#pdf-output-quality").disabled = isLoading || isPreviewing;
+    $("#pdf-output-format").disabled = isLoading || isPreviewing || isExporting;
+    $("#pdf-output-dpi").disabled = isLoading || isPreviewing || isExporting;
+    $("#pdf-output-quality").disabled = isLoading || isPreviewing || isExporting;
     renderExportConfiguration();
   };
 
@@ -301,7 +301,7 @@ if (mountPoint && !document.querySelector("#pdf-to-image-panel")) {
           <strong title="${escapeHtml(entry.file.name)}">${escapeHtml(entry.file.name)}</strong>
           <small>${entry.session.numPages} pages · ${formatBytes(entry.file.size)}</small>
         </span>
-        <button class="pdf-icon-button" type="button" data-remove-document="${entry.id}" aria-label="Remove ${escapeHtml(entry.file.name)}" title="Remove document" ${isLoading || isPreviewing ? "disabled" : ""}><i data-lucide="x"></i></button>
+        <button class="pdf-icon-button" type="button" data-remove-document="${entry.id}" aria-label="Remove ${escapeHtml(entry.file.name)}" title="Remove document" ${isLoading || isPreviewing || isExporting ? "disabled" : ""}><i data-lucide="x"></i></button>
       </li>
     `).join("");
     renderIcons(documentList);
@@ -509,7 +509,7 @@ if (mountPoint && !document.querySelector("#pdf-to-image-panel")) {
 
   const makeOutputName = (page, entry) => {
     const base = entry.file.name.replace(/\\.pdf$/i, "").replace(/[^a-z0-9-_]+/gi, "-").replace(/^-+|-+$/g, "") || "document";
-    return `${base}-page-${String(page.pageNumber).padStart(3, "0")}.${exportSettings.format === "jpeg" ? "jpg" : exportSettings.format}`;
+    return `document-${entry.id}-${base}-page-${String(page.pageNumber).padStart(3, "0")}.${exportSettings.format === "jpeg" ? "jpg" : exportSettings.format}`;
   };
 
   const appendDownloadLink = (name, blob) => {
@@ -591,7 +591,7 @@ if (mountPoint && !document.querySelector("#pdf-to-image-panel")) {
         exportProgressBar.value = index + 1;
       }
 
-      if (completed > 1 && !signal.aborted) {
+      if (selected.length > 1 && completed > 0 && !signal.aborted) {
         exportProgressLabel.textContent = "Creating ZIP archive…";
         const archive = await zip.generateAsync({ type: "blob" });
         if (!signal.aborted) appendDownloadLink("pdf-pages-export.zip", archive);
@@ -778,7 +778,7 @@ if (mountPoint && !document.querySelector("#pdf-to-image-panel")) {
   });
 
   pageList.addEventListener("click", (event) => {
-    if (isLoading || isPreviewing) return;
+    if (isLoading || isPreviewing || isExporting) return;
     const moveButton = event.target.closest("[data-move-page]");
     if (moveButton) {
       clearPreview();
@@ -799,11 +799,13 @@ if (mountPoint && !document.querySelector("#pdf-to-image-panel")) {
   });
 
   selectAllButton.addEventListener("click", () => {
+    if (isLoading || isPreviewing || isExporting) return;
     clearPreview();
     pages.forEach((page) => { page.selected = true; });
     renderPages();
   });
   selectNoneButton.addEventListener("click", () => {
+    if (isLoading || isPreviewing || isExporting) return;
     clearPreview();
     pages.forEach((page) => { page.selected = false; });
     renderPages();
@@ -831,7 +833,7 @@ if (mountPoint && !document.querySelector("#pdf-to-image-panel")) {
   });
 
   clearButton.addEventListener("click", async () => {
-    if (isLoading || isPreviewing) return;
+    if (isLoading || isPreviewing || isExporting) return;
     clearPreview();
     const current = [...documents];
     documents.length = 0;
