@@ -449,13 +449,13 @@ Deliverable: completed QA, synchronized project documentation, and the published
 
 The first stable release focuses on image conversion. The next development track adds document workflows for common academic tasks while preserving the local-first principle. PDF and Word files are document formats, so they must use a document-processing pipeline rather than being forced into the existing raster-image conversion service.
 
-Phases 8–13 are planned, with Phase 8 currently in progress on its engine and UI feature branches. The Image to PDF engine is implemented on `phase-8-image-to-pdf` and is not yet merged into `main` or advertised as a released capability. No PDF or Word conversion capability is available from the stable application yet. Start each phase only after its scope, technical dependencies, ownership, and acceptance criteria are agreed. Keep the existing image pipeline stable and reusable where appropriate.
+Phases 8–13 are planned. Phase 8's Image to PDF engine PR #13 has merged into `main`, but the full workflow remains in progress because Farrel's UI PR #12 is closed and unmerged. The `phase-8-pdf-ui` branch still contains mock export wiring and must be synchronized with `main` before integration. Phase 9 engine planning has started on `phase-9-pdf-engine`; no PDF-to-image capability is implemented or advertised. Start implementation only after its technical dependencies, ownership, API contract, and acceptance criteria are agreed. Keep the existing image pipeline stable and reusable where appropriate.
 
 ### Phase 8: Image to PDF
 
 **Priority: P1. First document feature.**
 
-**Status: In progress.** Engine implementation and automated tests are on `phase-8-image-to-pdf`. UI workspace work is on `phase-8-pdf-ui` and is tracked in PR #12. The engine PR must merge before UI integration.
+**Status: In progress.** Engine PR #13 was merged into `main` on 2026-11-28 (merge commit `5889f55`). The PR reported 170/170 automated tests, successful `npm ci`, production build, and CodeQL checks. The project owner reported browser QA passed, but `docs/PHASE_8_ENGINE_QA.md` still has no recorded checklist results. Farrel's UI PR #12 is closed and unmerged; branch `phase-8-pdf-ui` is 1 commit behind `main` and still uses `image-to-pdf-mock.js`. Farrel must synchronize the branch, replace mock export with the real engine, and submit a new integration PR. Do not mark Phase 8 complete until the integrated workflow passes.
 
 Objective: let users convert one or more supported images into a single PDF document entirely in the browser.
 
@@ -490,6 +490,8 @@ Completion criteria:
 **Priority: P1.**
 
 Objective: render PDF pages into the image formats already supported by the application.
+
+Planning status: API contract draft is available on `phase-9-pdf-engine`. Review and approve it with Farrel before implementation or UI integration. Phase 8 UI integration remains outstanding.
 
 API contract: [Phase 9 PDF to Image API Contract](./PHASE_9_API_CONTRACT.md) (draft for team review; not approved for implementation).
 
