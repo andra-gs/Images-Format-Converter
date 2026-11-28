@@ -75,6 +75,42 @@ if (mountPoint && !document.querySelector("#pdf-to-image-panel")) {
         <p class="pdf-page-hint">Selected pages will be exported in the order shown. Use the arrows to rearrange pages.</p>
       </section>
 
+      <section class="pdf-export-card" aria-labelledby="pdf-export-title">
+        <div class="pdf-card-heading">
+          <div>
+            <h3 id="pdf-export-title">Export configuration</h3>
+            <p>Choose the output format and image resolution for selected pages.</p>
+          </div>
+        </div>
+        <div class="pdf-export-grid">
+          <label class="pdf-setting-field" for="pdf-output-format">
+            <span>Output format</span>
+            <select id="pdf-output-format">
+              <option value="png">PNG</option>
+              <option value="jpeg">JPEG</option>
+              <option value="webp">WebP</option>
+            </select>
+            <small>PNG preserves lossless image quality. JPEG and WebP use compression.</small>
+          </label>
+          <label class="pdf-setting-field" for="pdf-output-dpi">
+            <span>Resolution <strong id="pdf-dpi-value">150 DPI</strong></span>
+            <input id="pdf-output-dpi" type="range" min="72" max="600" step="1" value="150" />
+            <small>72–600 DPI · Default 150 DPI</small>
+          </label>
+          <label class="pdf-setting-field pdf-quality-field" for="pdf-output-quality" hidden>
+            <span>Image quality <strong id="pdf-quality-value">85%</strong></span>
+            <input id="pdf-output-quality" type="range" min="10" max="100" step="1" value="85" />
+            <small>Higher quality generally creates larger files.</small>
+          </label>
+        </div>
+        <div class="pdf-export-estimate" aria-live="polite">
+          <div><span>Selected pages</span><strong id="pdf-export-selected-count">0</strong></div>
+          <div><span>Estimated raster size</span><strong id="pdf-export-dimensions">—</strong></div>
+          <div><span>Total pixel workload</span><strong id="pdf-export-pixels">—</strong></div>
+        </div>
+        <p class="pdf-export-validation" id="pdf-export-validation" role="status" aria-live="polite">Add and select PDF pages to calculate the output dimensions.</p>
+      </section>
+
       <p class="pdf-to-image-privacy"><i data-lucide="info"></i><span>Files stay on your device. Page cards currently use the mock document metadata; actual page-image thumbnails will be connected when the PDF engine is integrated.</span></p>
     </section>
   `);
@@ -98,6 +134,8 @@ if (mountPoint && !document.querySelector("#pdf-to-image-panel")) {
   let nextDocumentId = 1;
   let isLoading = false;
   let loadController = null;
+  const exportSettings = { format: "png", dpi: 150, quality: 0.85 };
+  const exportLimits = { maxDimension: 8192, maxPixelsPerPage: 16_000_000, maxPixelsPerJob: 100_000_000 };
 
   const formatBytes = (bytes) => bytes < 1024 ** 2
     ? `${(bytes / 1024).toFixed(1)} KB`
@@ -110,6 +148,68 @@ if (mountPoint && !document.querySelector("#pdf-to-image-panel")) {
   };
 
   const getSelectedPages = () => pages.filter((page) => page.selected);
+
+  const getRasterDimensions = (page, dpi = exportSettings.dpi) => {
+    const rotated = Math.abs(page.info.rotation || 0) % 180 === 90;
+    const widthPt = rotated ? page.info.heightPt : page.info.widthPt;
+    const heightPt = rotated ? page.info.widthPt : page.info.heightPt;
+    return {
+      width: Math.ceil(widthPt * dpi / 72),
+      height: Math.ceil(heightPt * dpi / 72)
+    };
+  };
+
+  const renderExportConfiguration = () => {
+    const format = $("#pdf-output-format");
+    const dpi = $("#pdf-output-dpi");
+    const quality = $("#pdf-output-quality");
+    const qualityField = $(".pdf-quality-field");
+    const selectedCount = $("#pdf-export-selected-count");
+    const dimensions = $("#pdf-export-dimensions");
+    const pixels = $("#pdf-export-pixels");
+    const validation = $("#pdf-export-validation");
+    if (!format || !dpi || !quality || !qualityField) return;
+
+    format.value = exportSettings.format;
+    dpi.value = String(exportSettings.dpi);
+    $("#pdf-dpi-value").textContent = `${exportSettings.dpi} DPI`;
+    quality.value = String(Math.round(exportSettings.quality * 100));
+    $("#pdf-quality-value").textContent = `${Math.round(exportSettings.quality * 100)}%`;
+    qualityField.hidden = exportSettings.format === "png";
+
+    const selected = getSelectedPages();
+    selectedCount.textContent = String(selected.length);
+    if (selected.length === 0) {
+      dimensions.textContent = "—";
+      pixels.textContent = "—";
+      validation.textContent = "Select at least one page to prepare an export.";
+      validation.dataset.state = "info";
+      return;
+    }
+
+    const results = selected.map((page) => ({ page, ...getRasterDimensions(page) }));
+    const totalPixels = results.reduce((sum, item) => sum + item.width * item.height, 0);
+    const invalid = results.filter((item) =>
+      item.width > exportLimits.maxDimension ||
+      item.height > exportLimits.maxDimension ||
+      item.width * item.height > exportLimits.maxPixelsPerPage
+    );
+    const maxWidth = Math.max(...results.map((item) => item.width));
+    const maxHeight = Math.max(...results.map((item) => item.height));
+    dimensions.textContent = `${maxWidth.toLocaleString()} × ${maxHeight.toLocaleString()} px max`;
+    pixels.textContent = `${(totalPixels / 1_000_000).toFixed(2)} MP / 100 MP`;
+
+    if (invalid.length > 0) {
+      validation.textContent = `${invalid.length} selected page(s) exceed the 8,192 px dimension or 16 MP per-page limit. Reduce the DPI or deselect those pages.`;
+      validation.dataset.state = "error";
+    } else if (totalPixels > exportLimits.maxPixelsPerJob) {
+      validation.textContent = "The selected pages exceed the 100 MP export-job limit. Reduce the DPI or select fewer pages.";
+      validation.dataset.state = "error";
+    } else {
+      validation.textContent = `Configuration is valid. ${selected.length} page(s) are within the provisional raster limits.`;
+      validation.dataset.state = "success";
+    }
+  };
 
   const updateSummary = () => {
     const selectedCount = getSelectedPages().length;
@@ -124,6 +224,7 @@ if (mountPoint && !document.querySelector("#pdf-to-image-panel")) {
     fileInput.disabled = isLoading;
     selectAllButton.disabled = pages.length === 0 || isLoading || selectedCount === pages.length;
     selectNoneButton.disabled = pages.length === 0 || isLoading || selectedCount === 0;
+    renderExportConfiguration();
   };
 
   const renderDocuments = () => {
@@ -378,6 +479,19 @@ if (mountPoint && !document.querySelector("#pdf-to-image-panel")) {
   selectNoneButton.addEventListener("click", () => {
     pages.forEach((page) => { page.selected = false; });
     renderPages();
+  });
+
+  $("#pdf-output-format").addEventListener("change", (event) => {
+    exportSettings.format = event.target.value;
+    renderExportConfiguration();
+  });
+  $("#pdf-output-dpi").addEventListener("input", (event) => {
+    exportSettings.dpi = Number(event.target.value);
+    renderExportConfiguration();
+  });
+  $("#pdf-output-quality").addEventListener("input", (event) => {
+    exportSettings.quality = Number(event.target.value) / 100;
+    renderExportConfiguration();
   });
 
   clearButton.addEventListener("click", async () => {
