@@ -192,3 +192,23 @@ If GitHub access, a branch, or a PR is unavailable, state that limitation explic
 - Do not copy branch-specific progress into `main` documentation until the corresponding work is merged or the project owner explicitly asks for a consolidated pending-work summary.
 - Keep documentation concise, specific, and consistent with the code and test results.
 
+
+## Phase 8–13 ownership and collaboration
+
+The post-v1.0.0 document roadmap has two assigned contributors:
+
+| GitHub username | Phase 8–13 responsibility |
+|---|---|
+| andra-gs | PDF/DOCX technical evaluation, document-processing engines, validation, document/page contracts, resource limits, core tests, engineering QA, and release engineering |
+| FarrelPtrv | Document workflow UI, page interaction and organization UI, engine integration, browser/UI/accessibility QA, and user documentation |
+
+Use phase-specific branch names and detailed scope in docs/DEVELOPMENT_ROADMAP.md. These are planning responsibilities and do not imply that work or branches already exist.
+
+1. Confirm scope, acceptance criteria, shared files, and API contracts before each phase.
+2. Keep processing-engine work separate from UI work.
+3. Agree on input/output data, progress, cancellation, errors, and resource ownership before integration.
+4. Merge the engine PR first. The UI owner must update the UI branch from latest main before final integration.
+5. Merge one PR at a time and rerun automated tests, production build, and end-to-end browser checks.
+6. Keep PDF/DOCX in a separate local-first document-processing layer. Do not add them as raster codecs.
+7. Treat Phase 10 DOCX-to-PDF as a Go/No-Go research gate. Do not ship it without demonstrated fidelity against a representative fixture corpus.
+8. Do not mark planned work complete without implementation and verification evidence.
