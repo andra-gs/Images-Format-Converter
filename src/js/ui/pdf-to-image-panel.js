@@ -592,9 +592,13 @@ if (mountPoint && !document.querySelector("#pdf-to-image-panel")) {
       }
 
       if (selected.length > 1 && completed > 0 && !signal.aborted) {
-        exportProgressLabel.textContent = "Creating ZIP archive…";
-        const archive = await zip.generateAsync({ type: "blob" });
-        if (!signal.aborted) appendDownloadLink("pdf-pages-export.zip", archive);
+        try {
+          exportProgressLabel.textContent = "Creating ZIP archive…";
+          const archive = await zip.generateAsync({ type: "blob" });
+          if (!signal.aborted) appendDownloadLink("pdf-pages-export.zip", archive);
+        } catch (error) {
+          errors.push(`ZIP archive: ${error.message || "Could not create the ZIP file."}`);
+        }
       }
     } finally {
       const wasCancelled = signal.aborted;
