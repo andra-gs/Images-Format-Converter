@@ -135,3 +135,28 @@ test("unsupported transparency and unknown options are rejected by the UI mock",
     (error) => error.code === "INVALID_OPTIONS"
   );
 });
+
+
+test("forced landscape orientation swaps A4 page dimensions", () => {
+  const layout = calculateImagePdfPageLayout({
+    imageWidth: 1200,
+    imageHeight: 1600,
+    options: { pageSize: "A4", orientation: "landscape" }
+  });
+
+  assert.equal(layout.pageWidthPt, 841.89);
+  assert.equal(layout.pageHeightPt, 595.28);
+  assert.ok(layout.pageWidthPt / layout.pageHeightPt > 1);
+});
+
+test("forced portrait orientation keeps A4 page dimensions upright", () => {
+  const layout = calculateImagePdfPageLayout({
+    imageWidth: 1600,
+    imageHeight: 900,
+    options: { pageSize: "A4", orientation: "portrait" }
+  });
+
+  assert.equal(layout.pageWidthPt, 595.28);
+  assert.equal(layout.pageHeightPt, 841.89);
+  assert.ok(layout.pageWidthPt / layout.pageHeightPt < 1);
+});
