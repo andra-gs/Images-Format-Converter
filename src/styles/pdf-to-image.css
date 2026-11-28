@@ -304,3 +304,23 @@
   .pdf-preview-card > .pdf-card-heading { flex-direction: column; }
   .pdf-preview-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+
+.pdf-export-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.pdf-download-results { display: flex; flex-wrap: wrap; gap: 8px; }
+.pdf-download-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 7px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  color: var(--color-accent);
+  font-size: .68rem;
+  font-weight: 700;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+.pdf-download-link:hover { border-color: var(--color-accent); }
+.pdf-export-actions[hidden], .pdf-download-results[hidden] { display: none !important; }
