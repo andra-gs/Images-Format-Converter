@@ -277,7 +277,7 @@ if (mountPoint && !document.querySelector("#pdf-to-image-panel")) {
           <strong title="${escapeHtml(entry.file.name)}">${escapeHtml(entry.file.name)}</strong>
           <small>${entry.session.numPages} pages · ${formatBytes(entry.file.size)}</small>
         </span>
-        <button class="pdf-icon-button" type="button" data-remove-document="${entry.id}" aria-label="Remove ${escapeHtml(entry.file.name)}" title="Remove document"><i data-lucide="x"></i></button>
+        <button class="pdf-icon-button" type="button" data-remove-document="${entry.id}" aria-label="Remove ${escapeHtml(entry.file.name)}" title="Remove document" ${isLoading || isPreviewing ? "disabled" : ""}><i data-lucide="x"></i></button>
       </li>
     `).join("");
     renderIcons(documentList);
@@ -481,7 +481,7 @@ if (mountPoint && !document.querySelector("#pdf-to-image-panel")) {
   };
 
   const removeDocument = async (documentId) => {
-    if (isLoading) return;
+    if (isLoading || isPreviewing) return;
     const index = documents.findIndex((entry) => entry.id === documentId);
     if (index < 0) return;
     clearPreview();
