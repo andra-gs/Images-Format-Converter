@@ -1434,3 +1434,23 @@ Add newest entries first.
 - Follow-up:
   - Integrate the production engine into the UI.
   - Keep transparent background unavailable unless its verification gate passes.
+
+
+### 2026-11-28 — Phase 8 UI integration with the production PDF engine
+- Status: Integrated and owner-verified on `phase-8-pdf-ui`; final UI integration PR pending.
+- Integration:
+  - Replaced the UI mock import with `calculateImagePdfPageLayout()` and `createImagePdf()` from `src/js/documents/image-to-pdf.js`.
+  - Connected the ordered image queue, approved page options, `AbortSignal`, and engine progress callbacks to the production PDF engine.
+  - Connected the returned non-empty `application/pdf` Blob to the Generated PDF Preview and download flow.
+  - Preserved Object URL cleanup, cancellation handling, typed error presentation, and failed-item identification by stable `imageId` with `imageIndex` fallback.
+  - Removed the mock module and mock-only test; added focused UI layout tests against the production layout helper.
+- Verification reported by the owner:
+  - `npm test`: 180/180 passed, 0 failed, 0 cancelled.
+  - `npm run build`: successful. The existing advisory Vite warning for large HEIC-related chunks remains non-fatal.
+  - Integrated browser checks: owner confirmed the expected behavior.
+- Scope constraints:
+  - UI does not import jsPDF directly and does not duplicate engine layout or PDF composition.
+  - PDF processing remains local to the browser.
+  - Transparent background remains disabled pending its independent verification gate.
+- Next step:
+  - Open the final UI integration PR from `phase-8-pdf-ui` to `main` for maintainer review. Do not push feature work directly to `main`.
