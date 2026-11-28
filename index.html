@@ -57,10 +57,30 @@
       <main class="main-content">
         <section class="hero" aria-labelledby="hero-title">
           <span class="eyebrow">PRIVATE. SIMPLE. IN YOUR BROWSER.</span>
-          <h1 id="hero-title">Your images.<br /><span>Any format.</span></h1>
-          <p>Convert images directly on your device. No account, no upload, and no third-party conversion server.</p>
+          <h1 id="hero-title">What would you like<br /><span>to do with your images?</span></h1>
+          <p>Choose a tool to get started. Your files stay on your device.</p>
         </section>
 
+        <nav class="workspace-mode-picker" aria-label="Choose a conversion tool" role="tablist">
+          <button class="workspace-mode-option is-active" type="button" role="tab" id="mode-image-format" aria-selected="true" aria-controls="image-format-workspace" data-workspace-mode="format">
+            <span class="workspace-mode-icon" aria-hidden="true"><i data-lucide="file-image"></i></span>
+            <span class="workspace-mode-copy">
+              <strong>Image Format Converter</strong>
+              <small>Convert images between PNG, JPEG, WebP, and other formats.</small>
+            </span>
+            <span class="workspace-mode-arrow" aria-hidden="true">→</span>
+          </button>
+          <button class="workspace-mode-option" type="button" role="tab" id="mode-images-to-pdf" aria-selected="false" aria-controls="image-to-pdf-panel" data-workspace-mode="pdf">
+            <span class="workspace-mode-icon" aria-hidden="true"><i data-lucide="file-output"></i></span>
+            <span class="workspace-mode-copy">
+              <strong>Images to PDF</strong>
+              <small>Combine multiple images into one PDF document.</small>
+            </span>
+            <span class="workspace-mode-arrow" aria-hidden="true">→</span>
+          </button>
+        </nav>
+
+        <div id="image-format-workspace" class="workspace-mode-content">
         <section class="workspace" aria-labelledby="workspace-title">
           <div class="workspace-heading">
             <div>
@@ -179,6 +199,7 @@
         </section>
 
         <p class="phase-note">PNG, JPEG, WebP, BMP, TIFF, SVG wrapper, and GIF output are available.</p>
+        </div>
       </main>
 
       <footer class="app-footer">
