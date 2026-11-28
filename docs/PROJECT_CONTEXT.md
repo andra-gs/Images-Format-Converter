@@ -246,3 +246,27 @@ Planned sequence:
 - Do not expose a format or conversion path in the UI until its implementation and real-file verification are complete.
 
 The detailed phase scope and acceptance criteria are maintained in docs/DEVELOPMENT_ROADMAP.md. No document conversion dependency or runtime capability is selected by this planning update.
+
+## 12. Expanded roadmap and team responsibilities (Phases 8–13)
+
+All responsibilities below are planned, not completed. Detailed scope and acceptance criteria are in docs/DEVELOPMENT_ROADMAP.md.
+
+| Phase | Andra (andra-gs) | Farrel (FarrelPtrv) |
+|---|---|---|
+| 8. Image to PDF | PDF generation engine, library evaluation, page composition, validation, tests | Image-to-PDF workspace, image ordering, page settings, preview, progress, download |
+| 9. PDF to Image | PDF.js evaluation, loading/rendering, page-to-image adapter, limits, tests | PDF upload, page selection, format/resolution, preview, progress, downloads |
+| 10. DOCX gate | Research, fixture corpus, fidelity matrix, Go/No-Go | Prototype UI, test workflow, preview/errors, visual comparison |
+| 11. PDF management | Merge/reorder/rotate/remove engine, preservation rules, tests | PDF organizer UI, thumbnails, page operations, preview/download |
+| 12. Unified workflow | Document orchestration, validation, queues, cancellation, resource management, regression tests | Unified navigation, consistent document UI, integration, responsive/accessibility QA |
+| 13. Final QA/release | Engineering QA, automated/integration tests, performance/security audit, release engineering | Browser/UI QA, accessibility, documentation, screenshots, user guide |
+
+Phase 10 is a decision gate, not a commitment to ship DOCX conversion. Proceed only if local processing and acceptable layout fidelity are demonstrated against a representative corpus. Legacy .doc remains out of scope.
+
+The target is v2.0.0 after Phases 8–13. DOCX-to-PDF is included only if its gate passes and implementation is completed. OCR, PDF-to-DOCX, cloud storage/synchronization, online collaboration, and advanced metadata management remain deferred unless separately approved.
+
+### Integration sequence
+- Create separate Andra and Farrel feature branches from latest main for each phase.
+- Agree on APIs, data models, errors, progress/cancellation, and resource ownership before integration.
+- Merge the engine PR first. Farrel updates the UI branch from the new main before completing integration.
+- Merge one PR at a time, then rerun tests, production build, and end-to-end browser checks.
+- Keep PDF/DOCX local and in a separate document-processing layer, not in the raster image capability registry.
