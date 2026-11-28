@@ -705,3 +705,121 @@ PR #9 merged the production Export UI integration into `main` after the Image Op
 The current roadmap now marks Phase 5 and Phase 6 complete. Earlier Phase 6 checkpoints in this file that describe production integration or verification as pending are historical checkpoints and are superseded by this completion record.
 
 Known UI issue tracked separately from Phase 7 completion: the last recorded Phase 1 check found that the startup skeleton always appears in the light theme, even when dark theme is selected. The no-unstyled-content-flash check passed. Do not treat this issue as fixed until a specific fix and retest are recorded.
+
+
+## Post-v1.0.0 execution plan: Phase 8–13
+
+All phases below are planned. Complete implementation and verification gates before moving to the next phase.
+
+### Phase 8: Image to PDF
+**Andra (andra-gs), PDF generation engine**
+- Evaluate pdf-lib and jsPDF for license, maintenance, browser compatibility, bundle size, memory, image quality, and page layout. Do not install a candidate before evaluation.
+- Define the document/page model and PDF creation API.
+- Reuse existing image decoder interfaces. Preserve image order and create one PDF page per image.
+- Support A4/Letter, portrait/landscape, margins, Fit to Page/Fill Page, transparency, and orientation behavior.
+- Define limits and validation errors. Add automated tests and real-file checks.
+
+**Farrel (FarrelPtrv), Image to PDF UI**
+- Build the workflow workspace, image thumbnails, reorder/remove controls, page settings, preview, progress, errors, and local PDF download.
+- Reuse existing upload/preview patterns. Verify responsive layout, keyboard access, and both themes.
+
+**Gate:** output opens in independent PDF readers, page count/order/layout are correct, and processing remains local.
+
+### Phase 9: PDF to Image
+**Andra, PDF rendering engine**
+- Evaluate PDF.js including worker setup, licensing, browser support, bundle size, fidelity, and memory.
+- Implement PDF loading/validation, page rendering, and a Canvas/ImageData adapter.
+- Support page selection, DPI/resolution, PNG/JPEG/WebP output, and explicit adapters to existing image encoders/export contracts.
+- Render incrementally or through a bounded queue. Enforce file, page, scale, dimension, pixel, and memory limits.
+- Handle malformed, encrypted, and password-protected PDFs. Add automated and real-PDF tests.
+
+**Farrel, PDF to Image UI**
+- Add PDF upload/document information, page thumbnails and selection, format/resolution controls, preview, progress, per-page errors, individual downloads, and ZIP export where appropriate.
+- Verify mobile/desktop, keyboard, and theme behavior.
+
+**Gate:** selected pages render in correct order/dimensions, outputs open as valid images, resource limits hold, and image-export regressions are absent.
+
+### Phase 10: DOCX to PDF research and prototype
+**Andra, research and fidelity gate**
+- Evaluate Mammoth.js, docx-preview, and feasible local/LibreOffice approaches as candidates only.
+- Build a representative DOCX corpus covering fonts, margins, headings, tables, images, headers/footers, page breaks, lists, and embedded objects.
+- Compare output against reference rendering. Document compatibility, bundle size, memory, browser support, performance, and licensing.
+- Produce a Go/No-Go recommendation. Do not claim Word-equivalent output without evidence.
+
+**Farrel, prototype UI and test workflow**
+- Build a clearly marked prototype for DOCX upload, document information, preview, progress, and errors.
+- Organize test fixtures and visual comparison checklist. Record unsupported features.
+- Keep the prototype out of production choices until a Go decision.
+
+**Gate:** proceed only if local processing and agreed layout fidelity are demonstrated. Otherwise defer DOCX-to-PDF. Legacy .doc is out of scope.
+
+### Phase 11: PDF document management
+**Andra, PDF manipulation engine**
+- Evaluate a browser-compatible library with real files.
+- Implement merge, page reorder, rotation, and removal. Add split/extract only after core operations are stable and scope is agreed.
+- Define preservation behavior for forms, annotations, bookmarks, links, metadata, fonts, and encryption.
+- Test mixed page sizes, rotated pages, malformed files, and unsupported structures. Validate output in independent readers.
+
+**Farrel, PDF management UI**
+- Build upload, document information, page thumbnails, drag-and-drop ordering, merge/rotate/remove controls, warnings, preview, progress, errors, and local download.
+- Add extract/split controls only if approved. Verify accessibility, responsive layout, and themes.
+
+**Gate:** operations match selections, output remains readable, and preservation limitations are disclosed.
+
+### Phase 12: Unified document workflow
+**Andra, document orchestration**
+- Consolidate document validation, routing, page/document models, and processing contracts in a separate document layer.
+- Define bounded queues, cancellation, progress, error isolation, and resource ownership.
+- Integrate workers only where supported and justified. Standardize Blob creation, cleanup, and download handoff.
+- Add cross-workflow regression tests for image conversion and all approved document workflows.
+
+**Farrel, unified UI and integration**
+- Add navigation between Image Converter and Document Tools.
+- Standardize upload, settings, preview, progress, success, and error patterns.
+- Integrate approved operations with shared contracts. Maintain themes, responsive behavior, and keyboard accessibility.
+- Ensure deferred capabilities are not shown as active.
+
+**Gate:** image and document workflows coexist without regressions, duplicated processing logic, or inconsistent interactions.
+
+### Phase 13: Final QA, documentation, and release
+**Andra, engineering QA and release**
+- Run unit, integration, and regression tests with representative real files.
+- Verify DOCX only if Phase 10 passes and production implementation is complete.
+- Audit file/page/pixel limits, memory, cancellation, cleanup, dependency security, and local-only processing.
+- Resolve release blockers, run npm test and npm run build, verify CI, and prepare technical release notes.
+
+**Farrel, UI QA and user documentation**
+- Test supported desktop/mobile browsers, keyboard/focus, accessibility labels, themes, responsive layouts, and all loading/empty/success/error states.
+- Verify upload, preview, page selection/order, progress, and download.
+- Update README usage, document workflow guide, screenshots, and known limitations.
+
+**Gate:** all included features pass automated tests, real-file checks, browser QA, production build, and documentation review. Publish v2.0.0 only after the full release scope passes.
+
+### Branch naming
+Create branches from latest main when each phase starts. Names are conventions, not existing branches.
+
+| Phase | Andra (andra-gs) | Farrel (FarrelPtrv) |
+|---|---|---|
+| 8 | phase-8-pdf-engine | phase-8-pdf-ui |
+| 9 | phase-9-pdf-renderer | phase-9-pdf-to-image-ui |
+| 10 | phase-10-docx-research | phase-10-docx-prototype |
+| 11 | phase-11-pdf-engine | phase-11-pdf-management-ui |
+| 12 | phase-12-document-core | phase-12-unified-ui |
+| 13 | phase-13-release-qa | phase-13-ui-qa-docs |
+
+### Working agreement
+1. Confirm scope, acceptance criteria, branches, and shared files before each phase.
+2. Andra owns engines, contracts, validation, resource limits, and core tests. Farrel owns UI, interactions, and UI-engine integration.
+3. Agree on API signatures, input/output shapes, progress/cancellation, errors, and resource ownership before parallel work.
+4. Farrel may build against documented mocks while Andra builds the engine. Replace mocks only after the real contract is agreed.
+5. Merge engine PR first. Farrel updates the UI branch from latest main before integration.
+6. Merge one PR at a time, then rerun full tests, build, and end-to-end browser checks.
+7. Keep all document content local. Never upload document bytes, rendered pages, extracted text, or metadata.
+8. Planned work remains unchecked until implementation and verification evidence exist.
+
+### Target v2.0.0 scope
+- Preserve v1.0.0 image conversion, editing, and optimization.
+- Deliver verified Image to PDF, PDF to Image, and PDF merge/reorder/rotate/remove workflows.
+- Include DOCX to PDF only if its fidelity gate passes and production implementation is completed.
+- Deliver separate local-first document processing, unified navigation, responsive/accessibility QA, resource limits, tests, and documentation.
+- Deferred unless separately approved: legacy DOC, OCR, PDF-to-DOCX, cloud storage/synchronization, online collaboration, and advanced metadata management.
