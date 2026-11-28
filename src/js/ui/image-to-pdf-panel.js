@@ -232,10 +232,7 @@ if (mountPoint && !document.querySelector("#image-to-pdf-panel")) {
       const thumb = document.createElement("img");
       thumb.className = "pdf-queue-thumb";
       if (entry.url) thumb.src = entry.url;
-      else {
-        thumb.classList.add("pdf-queue-thumb-empty");
-        thumb.removeAttribute("src");
-      }
+      else thumb.hidden = true;
       thumb.alt = "";
       const details = document.createElement("span");
       details.className = "pdf-queue-details";
