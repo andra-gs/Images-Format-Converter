@@ -15,7 +15,7 @@ if (mountPoint && !document.querySelector("#image-to-pdf-panel")) {
       <div class="pdf-panel-heading">
         <div class="pdf-heading-copy">
           <span class="pdf-eyebrow">DOCUMENT TOOLS · PHASE 8</span>
-          <h2 id="pdf-title">Image to PDF</h2>
+          <h2 id="pdf-title">Images to PDF</h2>
           <p>Combine your images into an ordered, multi-page PDF. Everything stays in this browser.</p>
         </div>
         <span class="pdf-beta-label">UI preview</span>
