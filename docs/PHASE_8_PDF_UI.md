@@ -44,44 +44,26 @@ The UI now calls the real `createImagePdf()` engine with the ordered `{ id, file
 
 The UI does not import jsPDF. The engine remains responsible for validation, decoding, page composition, output validation, and typed failures. The UI resolves a failed queue item by `imageId` first and falls back to `imageIndex`.
 
-## Verification plan
+## Verification results
 
-### Automated
-- [ ] Run `npm test`.
-- [ ] Run `npm run build`.
-- [ ] Confirm focused production-layout tests cover fixed presets, auto orientation, Image Size, per-side margins, contain/cover, invalid dimensions, transparency gating, and invalid options.
+### Automated checks
+- [x] `npm test` — the owner reported **180/180 tests passed**, with 0 failures and 0 cancelled tests.
+- [x] `npm run build` — the owner reported a successful production build.
+- [x] Focused UI layout tests use the production `calculateImagePdfPageLayout()` helper from the document engine.
 
-### Browser — desktop and mobile widths
-- [ ] Switch between Image Format Converter and Images to PDF; confirm only the selected workspace is visible and both queues retain their state.
-- [ ] Add one image and multiple images using the file picker.
-- [ ] Add images using drag-and-drop.
-- [ ] Confirm thumbnails, file names, sizes, and page count.
-- [ ] Reorder pages up and down; verify the selected preview follows the selected queue item.
-- [ ] Remove one image and clear the full queue; verify the remaining page order and previews.
-- [ ] Verify A4, A5, Letter, and Image Size previews.
-- [ ] Verify portrait, landscape, and auto orientation; confirm orientation is disabled for Image Size.
-- [ ] Verify Fit and Fill previews for landscape and portrait sources.
-- [ ] Verify uniform margins and individual top/right/bottom/left margins.
-- [ ] Verify invalid margins produce a clear preview error and can be corrected.
-- [ ] Verify the pre-export Layout Preview is clearly labelled as an approximation, not the final PDF.
-- [ ] Switch A4/A5/Letter between Portrait and Landscape; the page outline must visibly change from taller-than-wide to wider-than-tall. Confirm Auto follows each source image's aspect ratio.
-- [ ] Verify the Generated PDF Preview empty state is visible before a real export.
-- [ ] After engine integration, generate a PDF and verify the embedded viewer displays the actual multi-page document.
-- [ ] After engine integration, verify PDF page navigation, zoom, Download PDF, filename, and output page count.
-- [ ] Verify replacing a generated PDF revokes the previous Object URL.
-- [ ] Verify Clear generated PDF, Clear All, and page unload revoke the generated PDF Object URL.
-- [ ] Generate PDFs from one image and a multi-image queue; verify the embedded viewer shows the actual PDF pages.
-- [ ] Cancel a running export and verify the cancelled state and absence of a partial PDF.
-- [ ] Trigger a failing image and verify the correct queue item is identified by its stable ID.
-- [ ] Verify no transparency control is shown.
-- [ ] Verify light/dark themes, keyboard focus, accessible labels, and responsive layout.
-- [ ] Confirm the PDF is generated locally and the download contains a valid PDF document.
-- [ ] Confirm existing image conversion, Editor, and export optimization workflows remain unaffected.
+### Browser checks
+- [x] The owner reported that the Phase 8 integration browser checks completed successfully.
+- [x] The integrated workflow was checked with the real PDF engine, including generated PDF preview and download.
+- [x] Workspace switching, queue behavior, page settings, progress/cancellation, and error handling were reported as behaving as expected.
+- [x] Existing image conversion and Editor workflows were reported unaffected.
+
+The browser results above are contributor-reported verification, not an independently repeated test run in this documentation commit.
 
 ## Current status
 
-- The UI foundation, top-level workspace selector, real engine integration, generated-PDF viewer, and download path are committed to `phase-8-pdf-ui`.
-- The UI calls the production engine merged into `main` through PR #13 and no longer imports or ships the mock module.
-- Focused layout tests now import the production layout helper.
-- Automated tests, production build, and browser QA have not yet been rerun after this integration. Do not open the final UI PR until these checks pass.
-- Real-file browser verification remains required for multi-page output, PDF navigation/download, cancellation, failure identification at the UI boundary, and Object URL cleanup.
+- The production engine is merged into `main` through PR #13.
+- The `phase-8-pdf-ui` branch imports the production engine directly; the mock implementation and mock test have been removed.
+- Generated PDF preview and download use the non-empty `application/pdf` Blob returned by `createImagePdf()`. No fake PDF or mock download is used.
+- The owner-reported automated test suite (180/180), production build, and integrated browser checks have passed.
+- The final UI integration PR is the remaining collaboration/review step. Do not merge directly into `main`; the PR is for review and merge by the repository maintainer.
+- Transparent background remains unavailable until its separate verification gate passes.
