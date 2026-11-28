@@ -42,8 +42,9 @@ Use the Mozilla-maintained `pdfjs-dist` package as the primary candidate. The cu
 - Published modern distribution archive: approximately 6.5 MB.
 - Third-party package analysis reports approximately 434 KiB minified and 129.5 KiB minified + gzip for the main minified package measurement. This is not the final Vite bundle size.
 - The package declares Node.js `>=22.13.0 || >=24`. Confirm the local and CI Node versions before installation.
-- PDF.js provides separate display and worker modules. The worker must match the display package version.
+- PDF.js provides separate display and core worker modules. The worker must match the display package version. The current API also documents an optional renderer-worker path; evaluate it separately rather than assuming it is required for the first implementation.
 - Vite should emit the worker as a local build asset. Do not load it from a CDN.
+- PDF.js documents CMaps as required core assets for some documents, plus configurable standard-font, ICC, and WASM asset directories. Their local delivery strategy must be tested and documented.
 - The official project documents a modern build and a separate legacy build. Actual browser support must be verified against this application's supported browser matrix.
 
 This is a recommendation, not a completed compatibility approval. Before pinning the dependency, verify:
@@ -97,11 +98,12 @@ Input:
 | Field | Type | Required | Description |
 |---|---|---:|---|
 | `file` | `File | Blob` | Yes | A local, non-empty PDF file. |
-| `password` | `string` | No | Password supplied by the user for a protected PDF. Keep it in memory only. |
+| `password` | `string` | No | Initial password supplied by the user for a protected PDF. Keep it in memory only. |
+| `onPassword` | `(request) => Promise<string | null>` | No | Optional UI callback used when PDF.js requests or rejects a password. The request contains a normalized reason: `required` or `incorrect`. Return a password to retry, or `null` to cancel. |
 | `signal` | `AbortSignal` | No | Requests cancellation during loading. |
 | `onProgress` | `(snapshot) => void` | No | Receives loading progress. Callback exceptions must not interrupt the engine. |
 
-The engine reads the supplied Blob locally and passes its bytes to PDF.js. It must not pass a remote URL to `getDocument()`.
+The engine reads the supplied Blob locally and passes its bytes to PDF.js. It must not pass a remote URL to `getDocument()`. If PDF.js requests a password, bridge its `onPassword` callback to the optional `onPassword` UI callback. If no callback is supplied or the user cancels, reject with `PASSWORD_REQUIRED` or `INCORRECT_PASSWORD` as appropriate.
 
 The returned document session:
 
@@ -322,8 +324,8 @@ Acceptance gate:
 
 1. Confirm the proposed public API and ownership boundary.
 2. Confirm initial file/page/DPI/pixel limits after a real-device memory test.
-3. Confirm the PDF.js worker and CMap/standard-font asset strategy.
-4. Confirm whether the UI needs a password-entry/retry flow in its first iteration.
+3. Confirm the PDF.js core worker, optional renderer worker, and CMap/standard-font/ICC/WASM asset strategy.
+4. Confirm the UI password-entry/retry flow and the `onPassword` callback contract.
 5. Confirm whether page-level quality presets/target-size optimization should be a later adapter or remain outside Phase 9.
 
 Until these points are reviewed, this document remains a draft. Do not treat the API as approved and do not begin UI integration against it.
