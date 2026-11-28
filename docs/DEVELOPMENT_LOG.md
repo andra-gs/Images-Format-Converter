@@ -5,7 +5,7 @@ This file records actual repository progress. Update it after meaningful impleme
 ## Project status
 
 - Current stage: Phase 9 planning and PDF.js evaluation after the v1.0.0 release
-- Current phase status: Phases 0–7 are complete and `v1.0.0` was published on 2026-11-26. Phase 8 Image to PDF engine PR #13 is merged into `main`; its automated checks passed and the project owner confirmed browser QA. Phase 9 PDF to Image has started with PDF.js evaluation and a draft API contract. No Phase 9 dependency or engine implementation has been merged. Phase 1 retains one separately tracked UI issue: the startup skeleton was last reported to always appear in the light theme, even when dark theme is selected.
+- Current phase status: Phases 0–7 are complete and `v1.0.0` was published on 2026-11-26. Phase 8 Image to PDF engine PR #13 is merged into `main`; automated checks passed. The project owner reported browser QA passed, but the QA checklist still has no recorded results. Farrel's Phase 8 UI PR #12 is closed and unmerged, so the complete workflow remains unfinished. Phase 9 engine planning has started on `phase-9-pdf-engine` with PDF.js evaluation and a draft API contract. No Phase 9 dependency or engine implementation has been added. Phase 1 retains one separately tracked UI issue: the startup skeleton was last reported to always appear in the light theme, even when dark theme is selected.
 - Latest release: [v1.0.0](https://github.com/andra-gs/Images-Format-Converter/releases/tag/v1.0.0), published 2026-11-26
 - Release tag commit: `df882784d4bd18854067663191bc4b00dae5c0d5`
 - Last updated: 2026-11-28
@@ -30,16 +30,18 @@ This file records actual repository progress. Update it after meaningful impleme
 | Phase 5: Image manipulation | Complete | Merged into `main`; project owner reports post-merge `npm test` and `npm run dev` checks passed on 2026-11-23. A separate post-merge production build result is not recorded |
 | Phase 6: Image optimization and export workflow | Complete | Optimizer merged through PR #7; production Export UI integration merged through PR #9 on 2026-11-25. PR #9 reports 156/156 tests, successful build, successful integrated browser checks, and passing GitHub Actions. Metadata Management remains deferred |
 | Phase 7: Testing and documentation | Complete and released | Phase 7 QA and documentation complete; GitHub release `v1.0.0` published on 2026-11-26 |
-| Phase 8: Image to PDF | Complete | Engine PR #13 merged into `main`; 170/170 automated tests, production build, CodeQL, and dependency installation passed. Browser QA was confirmed by the project owner |
+| Phase 8: Image to PDF | Engine merged; UI integration pending | PR #13 merged into `main`; 170/170 automated tests, production build, CodeQL, and dependency installation passed. Owner reported browser QA passed, but `PHASE_8_ENGINE_QA.md` remains unchecked. Farrel's PR #12 is closed and unmerged; its UI branch still needs synchronization and real-engine integration |
 | Phase 9: PDF to Image | In progress (planning) | PDF.js evaluation completed at a preliminary level; draft API contract created on `phase-9-pdf-engine`. Dependency installation, implementation, and browser verification have not started |
 
 ## Change log
 
 ### 2026-11-28 - Phase 9 kickoff and PDF.js evaluation
-- Created feature branch `phase-9-pdf-engine` from the current `main` branch.
+- Created feature branch `phase-9-pdf-engine` from the current `main` branch. Current branch head after the documentation commits: `1295126d0bfce2118141289d87b9f5fe2a7d0095`.
 - Reviewed the current `AGENTS.md`, Phase 9 roadmap, technical architecture, image encoder, conversion service, and image optimizer contracts.
 - Evaluated Mozilla PDF.js / `pdfjs-dist`. The current stable package reviewed is `6.5.438` under Apache-2.0. Its display API and worker architecture fit local PDF loading and page rendering. The published distribution and reported minified/gzip figures indicate a non-trivial bundle contribution; the actual Vite output must be measured after integration.
 - Identified unresolved evaluation items: local worker asset resolution, CMap and standard-font asset delivery, supported browser matrix, real-PDF fidelity, and memory behavior.
+- Cross-branch check: no open Pull Requests were found. Phase 8 PR #13 is merged. Phase 8 UI PR #12 is closed and unmerged; branch `phase-8-pdf-ui` is 1 commit behind `main` and still contains mock export wiring. Phase 8 is therefore not complete as an integrated user workflow.
+- Phase 8 QA record discrepancy: the project owner previously reported browser QA as passed, but every item in `docs/PHASE_8_ENGINE_QA.md` remains unchecked. The exact browser/device/viewer evidence still needs to be recorded.
 - Added `docs/PHASE_9_API_CONTRACT.md` as a draft for Farrel's review. It proposes document-session loading, page metadata, sequential page rendering to ImageData, typed errors, cancellation, and resource ownership. It is not approved for UI integration.
 - Proposed initial file/page/DPI/pixel limits are provisional and require real-browser memory testing.
 - No dependency was installed, no engine code was implemented, and no tests or production build were run during this planning checkpoint.
