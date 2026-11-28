@@ -75,7 +75,7 @@ if (mountPoint && !document.querySelector("#pdf-to-image-panel")) {
         <p class="pdf-page-hint">Selected pages will be exported in the order shown. Use the arrows to rearrange pages.</p>
       </section>
 
-      <p class="pdf-to-image-privacy"><i data-lucide="info"></i><span>Files stay on your device. This phase uses a separate UI mock for PDF loading and page metadata; actual PDF page rendering will be connected to the PDF engine after UI development.</span></p>
+      <p class="pdf-to-image-privacy"><i data-lucide="info"></i><span>Files stay on your device. Page cards currently use the mock document metadata; actual page-image thumbnails will be connected when the PDF engine is integrated.</span></p>
     </section>
   `);
 
@@ -274,16 +274,22 @@ if (mountPoint && !document.querySelector("#pdf-to-image-panel")) {
           continue;
         }
 
+        const pageMetadata = [];
+        for (let pageNumber = 1; pageNumber <= session.numPages; pageNumber += 1) {
+          pageMetadata.push({
+            pageNumber,
+            info: await session.getPageInfo(pageNumber)
+          });
+        }
+
         const entry = { id: nextDocumentId++, file, session };
         documents.push(entry);
-
-        for (let pageNumber = 1; pageNumber <= session.numPages; pageNumber += 1) {
-          const info = await session.getPageInfo(pageNumber);
+        for (const metadata of pageMetadata) {
           pages.push({
-            id: `${entry.id}:${pageNumber}`,
+            id: `${entry.id}:${metadata.pageNumber}`,
             documentId: entry.id,
-            pageNumber,
-            info,
+            pageNumber: metadata.pageNumber,
+            info: metadata.info,
             selected: true
           });
         }
