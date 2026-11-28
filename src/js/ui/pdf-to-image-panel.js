@@ -405,6 +405,7 @@ if (mountPoint && !document.querySelector("#pdf-to-image-panel")) {
         const entry = documents.find((item) => item.id === page.documentId);
         if (!entry) {
           errors.push(`Page ${page.pageNumber}: its PDF document is no longer available.`);
+          previewProgressBar.value = index + 1;
           continue;
         }
 
@@ -483,6 +484,7 @@ if (mountPoint && !document.querySelector("#pdf-to-image-panel")) {
     if (isLoading) return;
     const index = documents.findIndex((entry) => entry.id === documentId);
     if (index < 0) return;
+    clearPreview();
     const [entry] = documents.splice(index, 1);
     for (let pageIndex = pages.length - 1; pageIndex >= 0; pageIndex -= 1) {
       if (pages[pageIndex].documentId === documentId) pages.splice(pageIndex, 1);
@@ -494,8 +496,9 @@ if (mountPoint && !document.querySelector("#pdf-to-image-panel")) {
 
   const addFiles = async (fileList) => {
     const candidates = [...fileList];
-    if (candidates.length === 0 || isLoading) return;
+    if (candidates.length === 0 || isLoading || isPreviewing) return;
 
+    clearPreview();
     const rejected = [];
     let addedCount = 0;
 
@@ -613,6 +616,7 @@ if (mountPoint && !document.querySelector("#pdf-to-image-panel")) {
     if (!checkbox || isLoading || isPreviewing) return;
     const page = pages.find((entry) => entry.id === checkbox.dataset.selectPage);
     if (!page) return;
+    clearPreview();
     page.selected = checkbox.checked;
     renderPages();
   });
@@ -621,6 +625,7 @@ if (mountPoint && !document.querySelector("#pdf-to-image-panel")) {
     if (isLoading || isPreviewing) return;
     const moveButton = event.target.closest("[data-move-page]");
     if (moveButton) {
+      clearPreview();
       const index = pages.findIndex((entry) => entry.id === moveButton.dataset.movePage);
       const target = index + Number(moveButton.dataset.direction);
       if (index < 0 || target < 0 || target >= pages.length) return;
@@ -630,6 +635,7 @@ if (mountPoint && !document.querySelector("#pdf-to-image-panel")) {
     }
     const removeButton = event.target.closest("[data-remove-page]");
     if (removeButton) {
+      clearPreview();
       const index = pages.findIndex((entry) => entry.id === removeButton.dataset.removePage);
       if (index >= 0) pages.splice(index, 1);
       renderPages();
@@ -637,10 +643,12 @@ if (mountPoint && !document.querySelector("#pdf-to-image-panel")) {
   });
 
   selectAllButton.addEventListener("click", () => {
+    clearPreview();
     pages.forEach((page) => { page.selected = true; });
     renderPages();
   });
   selectNoneButton.addEventListener("click", () => {
+    clearPreview();
     pages.forEach((page) => { page.selected = false; });
     renderPages();
   });
