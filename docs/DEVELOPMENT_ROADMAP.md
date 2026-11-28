@@ -455,35 +455,37 @@ Phases 8–13 are planned, with Phase 8 currently in progress on its engine and 
 
 **Priority: P1. First document feature.**
 
-**Status: In progress.** Engine implementation and automated tests are on `phase-8-image-to-pdf`. UI workspace work is on `phase-8-pdf-ui` and is tracked in PR #12. The engine PR must merge before UI integration.
+**Status: UI and engine implementation integrated on `phase-8-pdf-ui`; final UI integration PR is pending review and merge.** The production engine was merged into `main` through PR #13. The UI branch now uses that engine and no longer contains the mock implementation.
 
 Objective: let users convert one or more supported images into a single PDF document entirely in the browser.
 
-Planned scope:
-- Accept the image input formats already supported by the application, subject to the actual decoder capability registry and browser environment.
+Implemented scope:
+- Accept image input formats supported by the existing decoder and validator, subject to browser capability and engine limits.
 - Convert one image into a one-page PDF or combine multiple images into one multi-page PDF.
-- Provide a page list with thumbnail preview, page order, and remove/reorder actions.
-- Provide page size presets such as A4, A5, Letter, and original-image dimensions.
-- Provide portrait/landscape orientation, page margins, and image placement modes such as Fit and Fill.
-- Preserve image aspect ratio when fitting content. Make cropping behavior explicit when Fill is selected.
-- Offer PDF page preview before export.
-- Provide a clear output filename and PDF download.
+- Provide a page queue with thumbnails, stable IDs, page ordering, remove, and clear actions.
+- Provide A4, A5, Letter, and original-image page sizes.
+- Provide portrait, landscape, and auto orientation where applicable, page margins, and Fit/Fill placement.
+- Provide a clearly labelled pre-export Layout Preview and a separate Generated PDF Preview for the actual generated document.
+- Provide PDF page navigation, output metadata, download, and clear-result controls.
 - Keep image decoding, page composition, and PDF generation local to the browser.
+- Connect progress, cancellation, typed errors, and generated PDF Object URL cleanup to the production engine.
 
-Technical evaluation:
-- Compare pdf-lib and jsPDF for multi-page composition, image embedding, page dimensions, memory behavior, bundle size, licensing, and browser compatibility. jsPDF 4.2.1 is selected and pinned on the engine feature branch. Real-browser transparency, memory, and output-fidelity verification remain pending.
-- Reuse the existing image decoder and validation where their contracts fit. Do not duplicate image format decoding.
-- Define whether image transparency is preserved by the selected PDF library and document any flattening behavior.
-- jsPDF 4.2.1 has been selected and pinned after license, bundle-size, and API review. Real-file output, transparency, memory, and browser compatibility verification remain required before merge.
+Engine and integration:
+- jsPDF 4.2.1 is pinned and isolated inside `src/js/documents/image-to-pdf.js`.
+- The UI calls `calculateImagePdfPageLayout()` and `createImagePdf()`; it does not import jsPDF or duplicate decoding, geometry, or PDF composition.
+- The generated preview/download accepts only the non-empty `application/pdf` Blob returned by the engine. No mock PDF or fake download is used.
+- The engine implementation was merged into `main` through PR #13. The UI integration remains on `phase-8-pdf-ui` pending its own PR review.
 
-Completion criteria:
-- Single-image and multi-image PDF files open in independent PDF viewers.
-- Page count, order, page dimensions, orientation, margins, and placement match the selected settings.
-- Representative transparent and opaque sources render as expected.
-- Large batches fail gracefully without freezing the interface or exhausting memory under the documented limits.
-- Per-file decode failures are isolated and explained.
-- No selected image data is transmitted to a remote service.
-- Automated tests, real-browser checks, and production build pass.
+Verification:
+- The owner reported `npm test` passing **180/180 tests**, with no failures or cancellations.
+- The owner reported `npm run build` succeeding. The existing advisory warning for large HEIC-related chunks is non-fatal.
+- The owner confirmed the integrated browser checks behaved as expected.
+- These local/browser results are contributor-reported; this documentation update does not independently rerun them.
+
+Remaining gates and constraints:
+- Transparent background remains disabled until its separate verification gate passes.
+- Production bundle and memory behavior measurements remain follow-up verification items; do not claim these measurements are complete.
+- Final UI integration PR review and merge are still required before advertising Phase 8 as part of the stable `main` application.
 
 ### Phase 9: PDF to Image
 
