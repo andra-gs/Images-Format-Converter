@@ -1,7 +1,7 @@
-import { createIcons, FileText, FileUp, Layers3, Settings2, Info } from "lucide";
+import { createIcons, FileText, Images, Settings2, Info } from "lucide";
 import "../../styles/pdf-to-image.css";
 
-const iconSet = { FileText, FileUp, Layers3, Settings2, Info };
+const iconSet = { FileText, Images, Settings2, Info };
 const renderIcons = (root = document) => createIcons({
   icons: iconSet,
   attrs: { "aria-hidden": "true" },
@@ -23,7 +23,7 @@ if (mountPoint && !document.querySelector("#pdf-to-image-panel")) {
       </header>
 
       <section class="pdf-to-image-intro" aria-labelledby="pdf-to-image-start-title">
-        <div class="pdf-to-image-intro-icon"><i data-lucide="file-up"></i></div>
+        <div class="pdf-to-image-intro-icon"><i data-lucide="file-text"></i></div>
         <div>
           <h3 id="pdf-to-image-start-title">Your PDF workspace</h3>
           <p>The upload area, document queue, page selection, and export controls will be added in the next implementation step.</p>
@@ -32,7 +32,7 @@ if (mountPoint && !document.querySelector("#pdf-to-image-panel")) {
 
       <div class="pdf-to-image-foundation-grid">
         <section class="pdf-to-image-foundation-card" aria-labelledby="pdf-to-image-pages-title">
-          <div class="pdf-to-image-card-icon"><i data-lucide="layers-3"></i></div>
+          <div class="pdf-to-image-card-icon"><i data-lucide="images"></i></div>
           <h3 id="pdf-to-image-pages-title">Page management</h3>
           <p>Document details, page thumbnails, selection, and page ordering.</p>
           <span>Planned · Phase 9.2</span>
