@@ -611,7 +611,7 @@ The exact module boundaries and worker ownership must be designed against the im
 | docx-preview | Render DOCX content in a browser for preview | Preview does not establish a reliable PDF export path or Word-equivalent layout |
 | LibreOffice | Reference renderer for DOCX fidelity evaluation | A remote service is outside the privacy model; local/WASM feasibility must be demonstrated before adoption |
 
-jsPDF 4.2.1 is approved and pinned on the Phase 8 engine feature branch only. It is not yet part of `main` or a released application build. pdf-lib is not installed. Other candidates remain subject to their respective phase evaluations. Continue verifying package maintenance, license, security, browser compatibility, bundle size, and representative real-file behavior.
+jsPDF 4.2.1 is included in `main` and is used by the merged Phase 8 Image to PDF engine. pdf-lib is not installed. PDF.js remains a Phase 9 candidate under evaluation; see `docs/PHASE_9_API_CONTRACT.md` for the draft assessment and unresolved worker/font asset checks. Do not add `pdfjs-dist` to application dependencies until the worker, asset, browser, bundle, and real-PDF checks are completed.
 
 ### Cross-pipeline contracts and constraints
 
@@ -660,7 +660,7 @@ Release only after included workflows pass automated tests, representative real-
 
 ## 31. Phase 8 Image to PDF engine implementation
 
-**Feature branch status:** `phase-8-image-to-pdf`. This section records branch work pending merge and does not imply that the stable `main` application already exposes PDF generation.
+**Integration status:** The engine was merged into `main` through PR #13 on 2026-11-28. Merge commit: `5889f55f1929fa649113774bf6dbbe8ad798573d`. The engine is present in the repository, but the complete Image to PDF user workflow remains unfinished because Farrel's UI PR #12 was closed without merging and still requires integration with the real engine.
 
 ### Engine module
 
@@ -684,10 +684,10 @@ Release only after included workflows pass automated tests, representative real-
 - Processing is sequential. Cancellation is checked between safe processing steps. Browser decoding and synchronous PDF serialization cannot be interrupted mid-operation.
 - White page background is the only enabled production background. Transparent output remains disabled until generated PDFs pass the agreed independent-viewer tests.
 
-### Verification status on the feature branch
+### Verification status after PR #13 merge
 
-- Automated tests cover page geometry, page size presets, auto orientation, mixed page dimensions, margins, contain/cover crop, invalid settings, fail-fast validation/decode errors, cancellation before and during processing, resource cleanup, progress completion counts, callback isolation, and multi-page output.
+- PR #13 reported 170/170 automated tests passing, successful `npm ci`, successful production build, and passing CodeQL analysis.
+- The project owner reported that browser QA passed. However, `docs/PHASE_8_ENGINE_QA.md` still contains unchecked items and no recorded browser/device/viewer results. Treat the browser QA result as owner-reported until the checklist is reconciled.
 - Manual browser QA harness: `tests/browser-image-to-pdf.html` and `tests/browser-image-to-pdf.js`. The checklist is `docs/PHASE_8_ENGINE_QA.md`.
-- GitHub Actions runs on the engine branch have passed `npm ci`, `npm test`, and `npm run build`.
-- Real-browser checks with representative source images, independent PDF viewer checks, actual bundle contribution measurement, mobile memory testing, and transparency verification are still pending.
-- Do not mark Phase 8 complete until those checks and the UI integration acceptance criteria pass.
+- Farrel's former UI PR #12 is closed and unmerged. Its branch still contains mock export wiring; the full workflow must not be described as complete until the UI is synchronized with `main`, connected to `createImagePdf()`, and verified end to end.
+- Do not mark Phase 8 complete until the QA record and UI integration acceptance criteria pass.
