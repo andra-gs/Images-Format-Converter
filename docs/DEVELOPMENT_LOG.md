@@ -1,5 +1,12 @@
 # Development Log
 
+### 2026-11-28 — Phase 9 raster geometry floating-point fix
+- Fixed integer-boundary rounding in `calculatePdfRasterDimensions()`. The previous calculation could produce `1650.0000000000002`, causing `Math.ceil()` to allocate an unnecessary extra pixel.
+- Dimensions are now calculated by multiplying before dividing, with a narrowly bounded machine-precision tolerance around integer boundaries. Genuine fractional dimensions still round upward.
+- Added regression tests for exact integer boundaries and genuinely fractional dimensions.
+- Targeted verification: `node --test tests/pdf-raster-geometry.test.js` passed 10/10 tests on Node.js v22.16.0.
+- Full repository `npm test` and `npm run build` have not been run in this environment. The targeted result is not full-suite or build verification.
+
 ### 2026-11-28 — Phase 9 PDF-to-Image engine planning and branch synchronization
 - Status: Phase 9 API contract remains a draft. Andra's engine work is on `phase-9-pdf-engine`; Farrel owns the separate UI branch.
 - Team review: Farrel proposed a 200-page document limit. Andra accepted it provisionally, with sequential rendering, one active page render, and a 100 MP export-job pixel cap. Other resource limits remain provisional pending real-device memory tests.

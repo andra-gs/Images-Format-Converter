@@ -34,6 +34,22 @@ function normalizeLimits(limits = {}) {
   return normalized;
 }
 
+function ceilPixelDimension(points, dpi) {
+  // Multiply before dividing to avoid an unnecessary rounded intermediate.
+  const exactDimension = (points * dpi) / POINTS_PER_INCH;
+  const nearestInteger = Math.round(exactDimension);
+  const floatingPointTolerance =
+    Number.EPSILON * Math.max(1, Math.abs(exactDimension)) * 4;
+
+  // Ignore machine-precision noise only at integer boundaries.
+  // Genuine fractional dimensions still round upward to avoid clipping.
+  if (Math.abs(exactDimension - nearestInteger) <= floatingPointTolerance) {
+    return nearestInteger;
+  }
+
+  return Math.ceil(exactDimension);
+}
+
 /**
  * Calculate a safe integer raster size from a PDF.js page viewport measured
  * in PDF points at scale 1. Pass the viewport's rotated width and height so
@@ -60,8 +76,8 @@ export function calculatePdfRasterDimensions({
   }
 
   const scale = dpi / POINTS_PER_INCH;
-  const width = Math.ceil(widthPt * scale);
-  const height = Math.ceil(heightPt * scale);
+  const width = ceilPixelDimension(widthPt, dpi);
+  const height = ceilPixelDimension(heightPt, dpi);
 
   if (width > normalizedLimits.maxDimension || height > normalizedLimits.maxDimension) {
     throw new RangeError("The requested PDF raster exceeds the maximum output dimension.");

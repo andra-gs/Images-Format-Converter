@@ -29,6 +29,27 @@ test("uses 150 DPI by default and rounds fractional pixel dimensions upward", ()
   assert.equal(result.height, Math.ceil(200 * 150 / 72));
 });
 
+test("does not add a pixel for floating-point noise at an exact integer boundary", () => {
+  const result = calculatePdfRasterDimensions({
+    widthPt: 792,
+    heightPt: 612,
+    dpi: 150
+  });
+
+  assert.equal(result.width, 1650);
+  assert.equal(result.height, 1275);
+});
+
+test("still rounds genuinely fractional dimensions upward", () => {
+  const result = calculatePdfRasterDimensions({
+    widthPt: 792 + 1e-8,
+    heightPt: 612,
+    dpi: 150
+  });
+
+  assert.equal(result.width, 1651);
+});
+
 test("accepts rotated viewport dimensions without applying rotation twice", () => {
   const result = calculatePdfRasterDimensions({
     widthPt: 792,
