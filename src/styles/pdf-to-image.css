@@ -123,3 +123,101 @@
   .pdf-to-image-heading, .pdf-pages-heading { flex-direction: column; }
   .pdf-page-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+.pdf-export-card {
+  display: grid;
+  gap: 17px;
+  min-width: 0;
+  padding: 18px;
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border);
+  border-radius: 13px;
+}
+.pdf-export-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 13px;
+}
+.pdf-setting-field {
+  display: grid;
+  align-content: start;
+  gap: 9px;
+  min-width: 0;
+  color: var(--color-text);
+  font-size: .72rem;
+  font-weight: 700;
+}
+.pdf-setting-field > span {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.pdf-setting-field > span strong {
+  color: var(--color-accent);
+  font-variant-numeric: tabular-nums;
+}
+.pdf-setting-field select {
+  width: 100%;
+  min-height: 38px;
+  padding: 8px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+}
+.pdf-setting-field input[type="range"] {
+  width: 100%;
+  margin: 10px 0 5px;
+  accent-color: var(--color-accent);
+  cursor: pointer;
+}
+.pdf-setting-field small {
+  color: var(--color-muted);
+  font-size: .62rem;
+  font-weight: 400;
+  line-height: 1.45;
+}
+.pdf-setting-field[hidden] { display: none !important; }
+.pdf-export-estimate {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+.pdf-export-estimate > div {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 9px;
+  background: var(--color-surface);
+}
+.pdf-export-estimate span {
+  color: var(--color-muted);
+  font-size: .62rem;
+}
+.pdf-export-estimate strong {
+  overflow-wrap: anywhere;
+  color: var(--color-text);
+  font-size: .78rem;
+  font-variant-numeric: tabular-nums;
+}
+.pdf-export-validation {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--color-surface);
+  color: var(--color-muted);
+  font-size: .68rem;
+  line-height: 1.5;
+}
+.pdf-export-validation[data-state="success"] { color: #23966a; }
+.pdf-export-validation[data-state="error"] { color: #dc5555; }
+@media (max-width: 760px) {
+  .pdf-export-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .pdf-export-estimate { grid-template-columns: 1fr; }
+}
