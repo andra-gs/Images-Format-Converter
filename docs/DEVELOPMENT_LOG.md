@@ -11,7 +11,7 @@
   - Repointed focused layout tests to the production engine helper and removed the obsolete UI mock module and mock test file.
   - Updated the Phase 8 UI documentation and checklist for real engine verification.
 - Files changed:
-  - `src/js/ui/ui/image-to-pdf-panel.js`
+  - `src/js/ui/image-to-pdf-panel.js`
   - `src/js/ui/image-to-pdf-mock.js` (deleted)
   - `src/styles/image-to-pdf.css`
   - `tests/image-to-pdf-ui-mock.test.js` (deleted)
