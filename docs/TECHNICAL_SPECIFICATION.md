@@ -625,3 +625,34 @@ No dependency in this table is approved or installed by this planning update. Re
 - Release temporary canvases, ImageBitmap objects, workers, object URLs, and large buffers. Isolate failures by document/page where practical.
 
 Implementation must follow the phase-specific scope and acceptance criteria in docs/DEVELOPMENT_ROADMAP.md. Do not advertise planned document formats in the current supported-format matrix.
+
+## 31. Phase 8–13 implementation contracts and release gates
+
+This section records planning constraints only. It does not approve dependencies or make PDF/DOCX currently supported formats.
+
+### Ownership and integration
+- Andra (andra-gs) owns document engines, library evaluation, validation, page/document contracts, resource limits, and core automated tests.
+- Farrel (FarrelPtrv) owns document workflow UI, interaction patterns, and UI integration with agreed engine contracts.
+- Agree on API signatures, progress/cancellation, error shapes, and resource ownership before integration.
+- Merge the engine PR before the UI PR. The UI branch must update from latest main before integration is finalized.
+
+### Contracts to define before implementation
+- Image to PDF: ordered image inputs, page dimensions, orientation, margins, fit/fill, transparency/background, output Blob, and validation errors.
+- PDF to Image: loading, page selection, render scale/DPI, output format, page-level results, progress, cancellation, and per-page errors.
+- PDF management: source documents, merge order, page references, reorder/remove/rotate operations, preservation warnings, and output Blob.
+- DOCX to PDF: fidelity corpus and compatibility matrix before implementation. Preview or HTML extraction alone does not prove Word-compatible pagination.
+
+### Resource and privacy requirements
+- Process document bytes locally. Never transmit PDFs, DOCX files, rendered pages, extracted text, or document metadata to remote services.
+- Enforce limits for input bytes, page count, render scale, output dimensions, total rendered pixels, and concurrent operations.
+- Render large PDFs incrementally or through bounded queues. Avoid allocating every page canvas at once.
+- Define cancellation and cleanup for workers, canvases, ImageBitmap objects, object URLs, and large buffers.
+- Isolate page-level failures where possible. Handle encrypted PDFs and unsupported document structures explicitly.
+
+### Phase 10 DOCX decision gate
+A Go decision requires a representative fixture corpus, a compatibility matrix for fonts/margins/tables/images/headers/footers/page breaks/lists/embedded objects, visual comparison against reference rendering with an agreed fidelity threshold, and evidence of local operation within supported browser, bundle, and memory limits.
+
+If these conditions are not met, defer production DOCX-to-PDF and keep it out of the supported-format matrix.
+
+### v2.0.0 release gate
+Release only after included workflows pass automated tests, representative real-file tests, browser QA, production build, CI, resource cleanup, and documentation review. DOCX-to-PDF is conditional. Legacy DOC, OCR, PDF-to-DOCX, cloud storage, and online collaboration are outside the planned baseline.
