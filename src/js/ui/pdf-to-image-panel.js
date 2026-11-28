@@ -2,6 +2,7 @@ import { createIcons, FileText, Images, Info, ArrowUp, ArrowDown, X, Trash2, Che
 import "../../styles/pdf-to-image.css";
 import { openPdfDocument } from "../documents/pdf-to-image-mock.js";
 import { convertImageDataToFormat } from "../core/conversion-service.js";
+import JSZip from "jszip";
 
 const iconSet = { FileText, Images, Info, ArrowUp, ArrowDown, X, Trash2, Check };
 const renderIcons = (root = document) => createIcons({
@@ -131,6 +132,18 @@ if (mountPoint && !document.querySelector("#pdf-to-image-panel")) {
         <div class="pdf-preview-grid" id="pdf-preview-grid">
           <div class="pdf-empty-state">Rendered page previews will appear here.</div>
         </div>
+        <div class="pdf-export-actions">
+          <button class="pdf-preview-button" id="pdf-export-button" type="button" disabled>Export selected pages</button>
+          <button class="pdf-cancel-button" id="pdf-export-cancel" type="button" hidden>Cancel export</button>
+        </div>
+        <div class="pdf-preview-progress" id="pdf-export-progress" hidden>
+          <span id="pdf-export-progress-label" aria-live="polite">Preparing export…</span>
+          <progress id="pdf-export-progress-bar" max="100" value="0"></progress>
+        </div>
+        <p class="pdf-preview-feedback" id="pdf-export-feedback" role="status" aria-live="polite" hidden></p>
+        <div class="pdf-download-results" id="pdf-download-results" aria-live="polite">
+          <div class="pdf-empty-state">Exported files will appear here.</div>
+        </div>
       </section>
 
       <p class="pdf-to-image-privacy"><i data-lucide="info"></i><span>Files stay on your device. Page cards and previews currently use mock document data; actual PDF page content will appear after the real PDF engine is integrated.</span></p>
@@ -157,6 +170,13 @@ if (mountPoint && !document.querySelector("#pdf-to-image-panel")) {
   const previewProgressBar = $("#pdf-preview-progress-bar");
   const previewFeedback = $("#pdf-preview-feedback");
   const previewGrid = $("#pdf-preview-grid");
+  const exportButton = $("#pdf-export-button");
+  const exportCancelButton = $("#pdf-export-cancel");
+  const exportProgress = $("#pdf-export-progress");
+  const exportProgressLabel = $("#pdf-export-progress-label");
+  const exportProgressBar = $("#pdf-export-progress-bar");
+  const exportFeedback = $("#pdf-export-feedback");
+  const downloadResults = $("#pdf-download-results");
 
   const documents = [];
   const pages = [];
@@ -165,7 +185,10 @@ if (mountPoint && !document.querySelector("#pdf-to-image-panel")) {
   let loadController = null;
   let isPreviewing = false;
   let previewController = null;
+  let isExporting = false;
+  let exportController = null;
   const previewObjectUrls = [];
+  const exportObjectUrls = [];
   const exportSettings = { format: "png", dpi: 150, quality: 0.85 };
   const exportLimits = { maxDimension: 8192, maxPixelsPerPage: 16_000_000, maxPixelsPerJob: 100_000_000 };
 
@@ -256,7 +279,8 @@ if (mountPoint && !document.querySelector("#pdf-to-image-panel")) {
     fileInput.disabled = isLoading || isPreviewing;
     selectAllButton.disabled = pages.length === 0 || isLoading || isPreviewing || selectedCount === pages.length;
     selectNoneButton.disabled = pages.length === 0 || isLoading || isPreviewing || selectedCount === 0;
-    previewButton.disabled = selectedCount === 0 || isLoading || isPreviewing;
+    previewButton.disabled = selectedCount === 0 || isLoading || isPreviewing || isExporting;
+    exportButton.disabled = selectedCount === 0 || isLoading || isPreviewing || isExporting;
     $("#pdf-output-format").disabled = isLoading || isPreviewing;
     $("#pdf-output-dpi").disabled = isLoading || isPreviewing;
     $("#pdf-output-quality").disabled = isLoading || isPreviewing;
@@ -343,6 +367,15 @@ if (mountPoint && !document.querySelector("#pdf-to-image-panel")) {
     renderPages();
   };
 
+  const clearExportResults = () => {
+    for (const url of exportObjectUrls.splice(0)) URL.revokeObjectURL(url);
+    downloadResults.innerHTML = '<div class="pdf-empty-state">Exported files will appear here.</div>';
+    exportFeedback.hidden = true;
+    exportFeedback.textContent = "";
+    exportProgress.hidden = true;
+    exportProgressBar.value = 0;
+  };
+
   const clearPreview = () => {
     for (const url of previewObjectUrls.splice(0)) URL.revokeObjectURL(url);
     previewGrid.innerHTML = '<div class="pdf-empty-state">Rendered page previews will appear here.</div>';
@@ -386,6 +419,7 @@ if (mountPoint && !document.querySelector("#pdf-to-image-panel")) {
     }
 
     clearPreview();
+    clearExportResults();
     showFeedback("");
     isPreviewing = true;
     previewController = new AbortController();
@@ -467,6 +501,126 @@ if (mountPoint && !document.querySelector("#pdf-to-image-panel")) {
         previewFeedback.textContent = "All selected pages were rendered successfully.";
         previewFeedback.dataset.state = "success";
         previewFeedback.hidden = false;
+      }
+      updateSummary();
+    }
+  };
+
+  const makeOutputName = (page, entry) => {
+    const base = entry.file.name.replace(/\\.pdf$/i, "").replace(/[^a-z0-9-_]+/gi, "-").replace(/^-+|-+$/g, "") || "document";
+    return `${base}-page-${String(page.pageNumber).padStart(3, "0")}.${exportSettings.format === "jpeg" ? "jpg" : exportSettings.format}`;
+  };
+
+  const appendDownloadLink = (name, blob) => {
+    const url = URL.createObjectURL(blob);
+    exportObjectUrls.push(url);
+    const link = document.createElement("a");
+    link.className = "pdf-download-link";
+    link.href = url;
+    link.download = name;
+    link.textContent = `Download ${name}`;
+    downloadResults.append(link);
+  };
+
+  const runExport = async () => {
+    if (isLoading || isPreviewing || isExporting) return;
+    const selected = getSelectedPages();
+    if (!selected.length) return;
+    renderExportConfiguration();
+    if ($("#pdf-export-validation").dataset.state === "error") {
+      exportFeedback.textContent = "The current export settings exceed the raster limits. Reduce the DPI or select fewer pages.";
+      exportFeedback.dataset.state = "error";
+      exportFeedback.hidden = false;
+      return;
+    }
+
+    clearExportResults();
+    isExporting = true;
+    exportController = new AbortController();
+    const { signal } = exportController;
+    exportCancelButton.hidden = false;
+    exportProgress.hidden = false;
+    exportProgressBar.max = selected.length;
+    exportProgressLabel.textContent = `Preparing ${selected.length} selected page(s)…`;
+    updateSummary();
+
+    const zip = new JSZip();
+    const errors = [];
+    let completed = 0;
+    try {
+      for (let index = 0; index < selected.length; index += 1) {
+        if (signal.aborted) break;
+        const page = selected[index];
+        const entry = documents.find((item) => item.id === page.documentId);
+        if (!entry) {
+          errors.push(`Page ${page.pageNumber}: its PDF document is no longer available.`);
+          exportProgressBar.value = index + 1;
+          continue;
+        }
+
+        let rendered = null;
+        try {
+          exportProgressLabel.textContent = `Rendering page ${index + 1} of ${selected.length}…`;
+          rendered = await entry.session.renderPage(page.pageNumber, {
+            dpi: exportSettings.dpi,
+            signal,
+            onProgress() {
+              exportProgressLabel.textContent = `Rendering page ${index + 1} of ${selected.length}…`;
+            }
+          });
+          if (signal.aborted) break;
+
+          const options = exportSettings.format === "png"
+            ? {}
+            : { quality: exportSettings.quality, backgroundColor: "#ffffff" };
+          const encoded = await convertImageDataToFormat(rendered.imageData, exportSettings.format, options);
+          if (signal.aborted) break;
+
+          const filename = makeOutputName(page, entry);
+          zip.file(filename, encoded.blob);
+          appendDownloadLink(filename, encoded.blob);
+          completed += 1;
+        } catch (error) {
+          if (signal.aborted || error?.code === "ABORTED") break;
+          errors.push(`Page ${page.pageNumber}: ${error.message || "Export failed."}`);
+        } finally {
+          if (rendered) rendered.imageData = null;
+        }
+        exportProgressBar.value = index + 1;
+      }
+
+      if (completed > 1 && !signal.aborted) {
+        exportProgressLabel.textContent = "Creating ZIP archive…";
+        const archive = await zip.generateAsync({ type: "blob" });
+        if (!signal.aborted) appendDownloadLink("pdf-pages-export.zip", archive);
+      }
+    } finally {
+      const wasCancelled = signal.aborted;
+      exportController = null;
+      isExporting = false;
+      exportCancelButton.hidden = true;
+      exportProgressBar.value = wasCancelled ? completed : selected.length;
+      exportProgressLabel.textContent = wasCancelled
+        ? `Export cancelled · ${completed} page(s) completed`
+        : `Export complete · ${completed} of ${selected.length} page(s) exported`;
+      if (errors.length) {
+        exportFeedback.textContent = errors.join(" ");
+        exportFeedback.dataset.state = "error";
+        exportFeedback.hidden = false;
+      } else if (wasCancelled) {
+        exportFeedback.textContent = "Export was cancelled. Files completed before cancellation remain available.";
+        exportFeedback.dataset.state = "warning";
+        exportFeedback.hidden = false;
+      } else if (completed === 0) {
+        exportFeedback.textContent = "No pages could be exported.";
+        exportFeedback.dataset.state = "error";
+        exportFeedback.hidden = false;
+      } else {
+        exportFeedback.textContent = completed > 1
+          ? "Pages exported successfully. Download files individually or use the ZIP archive."
+          : "Page exported successfully. Use the download link below.";
+        exportFeedback.dataset.state = "success";
+        exportFeedback.hidden = false;
       }
       updateSummary();
     }
@@ -655,6 +809,8 @@ if (mountPoint && !document.querySelector("#pdf-to-image-panel")) {
 
   previewButton.addEventListener("click", runPreview);
   previewCancelButton.addEventListener("click", () => previewController?.abort());
+  exportButton.addEventListener("click", runExport);
+  exportCancelButton.addEventListener("click", () => exportController?.abort());
 
   $("#pdf-output-format").addEventListener("change", (event) => {
     clearPreview();
@@ -687,7 +843,9 @@ if (mountPoint && !document.querySelector("#pdf-to-image-panel")) {
   window.addEventListener("beforeunload", () => {
     loadController?.abort();
     previewController?.abort();
+    exportController?.abort();
     for (const url of previewObjectUrls) URL.revokeObjectURL(url);
+    for (const url of exportObjectUrls) URL.revokeObjectURL(url);
     for (const entry of documents) {
       try { entry.session.destroy(); } catch { /* Best-effort page unload cleanup. */ }
     }
